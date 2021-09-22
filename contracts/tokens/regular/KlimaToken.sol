@@ -1309,11 +1309,11 @@ contract Divine is TWAPOracleUpdater {
     }
 }
 
-contract KlimaERC20Token is Divine {
+contract KlimaToken is Divine {
 
     using SafeMath for uint256;
 
-    constructor() Divine("Klima DAO", "KLIMA", 18) {
+    constructor() Divine("Klima DAO", "KLIMA", 9) {
     }
 
     function mint(address account_, uint256 amount_) external onlyVault() {
