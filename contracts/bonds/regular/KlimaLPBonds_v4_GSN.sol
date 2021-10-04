@@ -5,9 +5,98 @@
 // ██║  ██╗███████╗██║██║ ╚═╝ ██║██║  ██║    ██████╔╝██║  ██║╚██████╔╝
 // ╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝
 
+pragma solidity = 0.7.6;
+/**
+ * a contract must implement this interface in order to support relayed transaction.
+ * It is better to inherit the BaseRelayRecipient as its implementation.
+ */
+abstract contract IRelayRecipient {
+
+    /**
+     * return if the forwarder is trusted to forward relayed transactions to us.
+     * the forwarder is required to verify the sender's signature, and verify
+     * the call is not a replay.
+     */
+    function isTrustedForwarder(address forwarder) public virtual view returns(bool);
+
+    /**
+     * return the sender of this call.
+     * if the call came through our trusted forwarder, then the real sender is appended as the last 20 bytes
+     * of the msg.data.
+     * otherwise, return `msg.sender`
+     * should be used in the contract anywhere instead of _msgSender()
+     */
+    function _msgSender() internal virtual view returns (address payable);
+
+    /**
+     * return the msg.data of this call.
+     * if the call came through our trusted forwarder, then the real sender was appended as the last 20 bytes
+     * of the msg.data - so this method will strip those 20 bytes off.
+     * otherwise (if the call was made directly and not through the forwarder), return `msg.data`
+     * should be used in the contract instead of msg.data, where this difference matters.
+     */
+    function _msgData() internal virtual view returns (bytes memory);
+
+    function versionRecipient() external virtual view returns (string memory);
+}
+
+pragma solidity = 0.7.6;
+/**
+ * A base contract to be inherited by any contract that want to receive relayed transactions
+ * A subclass must use "_msgSender()" instead of "msg.sender"
+ */
+abstract contract BaseRelayRecipient is IRelayRecipient {
+
+    /*
+     * Forwarder singleton we accept calls from
+     */
+    address public trustedForwarder;
+
+    function isTrustedForwarder(address forwarder) public override view returns(bool) {
+        return forwarder == trustedForwarder;
+    }
+
+    /**
+     * return the sender of this call.
+     * if the call came through our trusted forwarder, return the original sender.
+     * otherwise, return `msg.sender`.
+     * should be used in the contract anywhere instead of msg.sender
+     */
+    function _msgSender() internal override virtual view returns (address payable ret) {
+        if (msg.data.length >= 20 && isTrustedForwarder(msg.sender)) {
+            // At this point we know that the sender is a trusted forwarder,
+            // so we trust that the last bytes of msg.data are the verified sender address.
+            // extract sender address from the end of msg.data
+            assembly {
+                ret := shr(96,calldataload(sub(calldatasize(),20)))
+            }
+        } else {
+            return msg.sender;
+        }
+    }
+
+    /**
+     * return the msg.data of this call.
+     * if the call came through our trusted forwarder, then the real sender was appended as the last 20 bytes
+     * of the msg.data - so this method will strip those 20 bytes off.
+     * otherwise, return `msg.data`
+     * should be used in the contract instead of msg.data, where the difference matters (e.g. when explicitly
+     * signing or hashing the
+     */
+    function _msgData() internal override virtual view returns (bytes memory ret) {
+        if (msg.data.length >= 20 && isTrustedForwarder(msg.sender)) {
+            return msg.data[0:msg.data.length-20];
+        } else {
+            return msg.data;
+        }
+    }
+}
+
+
+
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
-pragma solidity 0.7.5;
+pragma solidity 0.7.6;
 
 interface IOwnable {
     function policy() external view returns (address);
@@ -610,7 +699,7 @@ interface IStakingHelper {
     function stake( uint _amount, address _recipient ) external;
 }
 
-contract KlimaBondDepository is Ownable {
+contract KlimaBondDepository is Ownable, BaseRelayRecipient {
 
     using FixedPoint for *;
     using SafeERC20 for IERC20;
@@ -831,14 +920,19 @@ contract KlimaBondDepository is Ownable {
 
         // profits are calculated
         uint fee = payout.mul( terms.fee ).div( 10000 );
-        uint profit = value.sub( payout ).sub( fee );
+        uint profit = 0 ;
+        if (payout + fee < value){
+           profit = value.sub( payout ).sub( fee );
+        }
+
+
 
         /**
             principle is transferred in
             approved and
             deposited into the treasury, returning (_amount - profit) KLIMA
          */
-        IERC20( principle ).safeTransferFrom( msg.sender, address(this), _amount );
+        IERC20( principle ).safeTransferFrom( _msgSender(), address(this), _amount );
         IERC20( principle ).approve( address( treasury ), _amount );
         ITreasury( treasury ).deposit( _amount, principle, profit );
 
@@ -1104,4 +1198,11 @@ contract KlimaBondDepository is Ownable {
         IERC20( _token ).safeTransfer( DAO, IERC20( _token ).balanceOf( address(this) ) );
         return true;
     }
+    //GSN Functions
+
+    function setTrustedForwarder(address _trustedForwarder) external onlyPolicy {
+        trustedForwarder = _trustedForwarder;
+    }
+
+    string public constant override versionRecipient = "2.2.2";
 }

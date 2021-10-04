@@ -591,7 +591,7 @@ interface ITreasury {
     function deposit( uint _amount, address _token, uint _profit ) external returns ( uint );
 }
 
-interface IPOLY {
+interface IPKLIMA {
     function burnFrom( address account_, uint256 amount_ ) external;
 }
 
@@ -601,23 +601,22 @@ interface IOldClaimContract {
     function percentCanVest( address _vester ) external view returns ( uint );
 }
 
-interface ICirculatingOHM {
-    function OHMCirculatingSupply() external view returns ( uint );
+interface ICirculatingKLIMA {
+    function KLIMACirculatingSupply() external view returns ( uint );
 }
 
-contract ExercisepOLY {
+contract ExercisepKLIMA {
     using SafeMath for uint;
     using SafeERC20 for IERC20;
 
     address public owner;
     address public newOwner;
 
-    address public immutable pOLY;
-    address public immutable OHM;
-    address public immutable DAI;
+    address public immutable pKLIMA;
+    address public immutable KLIMA;
+    address public immutable BCT;
     address public immutable treasury;
-    address public immutable previousContract;
-    address public immutable circulatingOHMContract;
+    address public immutable circulatingKLIMAContract;
 
     struct Term {
         uint percent; // 4 decimals ( 5000 = 0.5% )
@@ -630,20 +629,18 @@ contract ExercisepOLY {
 
     bool hasMigrated;
 
-    constructor( address _pOLY, address _ohm, address _dai, address _treasury, address _previousClaimContract, address _circulatingOHMContract ) {
+    constructor( address _pKLIMA, address _KLIMA, address _BCT, address _treasury, address _circulatingKLIMAContract ) {
         owner = msg.sender;
-        require( _pOLY != address(0) );
-        pOLY = _pOLY;
-        require( _ohm != address(0) );
-        OHM = _ohm;
-        require( _dai != address(0) );
-        DAI = _dai;
+        require( _pKLIMA != address(0) );
+        pKLIMA = _pKLIMA;
+        require( _KLIMA != address(0) );
+        KLIMA = _KLIMA;
+        require( _BCT != address(0) );
+        BCT = _BCT;
         require( _treasury != address(0) );
         treasury = _treasury;
-        require( _previousClaimContract != address(0) );
-        previousContract = _previousClaimContract;
-        require( _circulatingOHMContract != address(0) );
-        circulatingOHMContract = _circulatingOHMContract;
+        require( _circulatingKLIMAContract != address(0) );
+        circulatingKLIMAContract = _circulatingKLIMAContract;
     }
 
     // Sets terms for a new wallet
@@ -652,31 +649,27 @@ contract ExercisepOLY {
         require( _amountCanClaim >= terms[ _vester ].max, "cannot lower amount claimable" );
         require( _rate >= terms[ _vester ].percent, "cannot lower vesting rate" );
 
-        if( terms[ _vester ].max == 0 ) {
-            terms[ _vester ].claimed = IOldClaimContract( previousContract ).amountClaimed( _vester );
-        }
-
         terms[ _vester ].max = _amountCanClaim;
         terms[ _vester ].percent = _rate;
 
         return true;
     }
 
-    // Allows wallet to redeem pOLY for OHM
+    // Allows wallet to redeem pKLIMA for KLIMA
     function exercise( uint _amount ) external returns ( bool ) {
         Term memory info = terms[ msg.sender ];
         require( redeemable( info ) >= _amount, 'Not enough vested' );
         require( info.max.sub( info.claimed ) >= _amount, 'Claimed over max' );
 
-        IERC20( DAI ).safeTransferFrom( msg.sender, address( this ), _amount );
-        IPOLY( pOLY ).burnFrom( msg.sender, _amount );
+        IERC20( BCT ).safeTransferFrom( msg.sender, address( this ), _amount );
+        IPKLIMA( pKLIMA ).burnFrom( msg.sender, _amount );
 
-        IERC20( DAI ).approve( treasury, _amount );
-        uint OHMToSend = ITreasury( treasury ).deposit( _amount, DAI, 0 );
+        IERC20( BCT ).approve( treasury, _amount );
+        uint KLIMAToSend = ITreasury( treasury ).deposit( _amount, BCT, 0 );
 
         terms[ msg.sender ].claimed = info.claimed.add( _amount );
 
-        IERC20( OHM ).safeTransfer( msg.sender, OHMToSend );
+        IERC20( KLIMA ).safeTransfer( msg.sender, KLIMAToSend );
 
         return true;
     }
@@ -705,24 +698,7 @@ contract ExercisepOLY {
     }
 
     function redeemable( Term memory _info ) internal view returns ( uint ) {
-        return ( ICirculatingOHM( circulatingOHMContract ).OHMCirculatingSupply().mul( _info.percent ).mul( 1000 ) ).sub( _info.claimed );
-    }
-
-    // Migrates terms from old redemption contract
-    function migrate( address[] calldata _addresses ) external returns ( bool ) {
-        require( msg.sender == owner, "Sender is not owner" );
-        require( !hasMigrated, "Already migrated" );
-
-        for( uint i = 0; i < _addresses.length; i++ ) {
-            terms[ _addresses[i] ] = Term({
-            percent: IOldClaimContract( previousContract ).percentCanVest( _addresses[i] ).mul( 100 ),
-            claimed: IOldClaimContract( previousContract ).amountClaimed( _addresses[i] ),
-            max: IOldClaimContract( previousContract ).maxAllowedToClaim( _addresses[i] )
-            });
-        }
-
-        hasMigrated = true;
-        return true;
+        return ( ICirculatingKLIMA( circulatingKLIMAContract ).KLIMACirculatingSupply().mul( _info.percent ).mul( 1000 ) ).sub( _info.claimed );
     }
 
     function pushOwnership( address _newOwner ) external returns ( bool ) {
