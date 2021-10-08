@@ -14,7 +14,6 @@ contract AlphaKlimaRedeemUpgradeable is ERC2771ContextUpgradeable  {
     IERC20Upgradeable public aKLIMA;
 
     address public owner;
-    address public _trustedForwarder;
 
     modifier onlyOwner() {
         require(_msgSender() == owner, "Owner: caller does not have the the owner role");

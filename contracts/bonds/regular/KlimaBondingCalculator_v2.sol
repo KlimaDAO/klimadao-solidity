@@ -270,10 +270,12 @@ contract KlimaBondingCalculator is IBondingCalculator {
     using SafeMath for uint112;
 
     address public KLIMA;
+    address public USDC;
 
-    constructor( address _KLIMA ) {
+    constructor( address _KLIMA, address _USDC ) {
         require( _KLIMA != address(0) );
         KLIMA = _KLIMA;
+        USDC = _USDC;
     }
 
 
@@ -302,7 +304,7 @@ contract KlimaBondingCalculator is IBondingCalculator {
         ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
 
         uint reserve;
-        if ( IUniswapV2Pair( _pair ).token0() == KLIMA ) {
+        if ( IUniswapV2Pair( _pair ).token0() == KLIMA || IUniswapV2Pair( _pair ).token0() == USDC ) {
             reserve = reserve1;
         } else {
             reserve = reserve0;

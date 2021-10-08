@@ -58,6 +58,15 @@ module.exports = {
           },
         },
       },
+      {
+        version: "0.7.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
     ],
   },
   networks: {
@@ -70,17 +79,17 @@ module.exports = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     kovan: {
-      url: "https://kovan.infura.io/v3/0f83eb63faea409abc1f440c9f077646", // <---- YOUR INFURA ID! (or it won't work)
+      url: "https://kovan.infura.io/v3/f16fe897786f47149695118b395db6e3", // <---- YOUR INFURA ID! (or it won't work)
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mainnet: {
-      url: "https://mainnet.infura.io/v3/0f83eb63faea409abc1f440c9f077646", // <---- YOUR INFURA ID! (or it won't work)
+      url: "https://mainnet.infura.io/v3/f16fe897786f47149695118b395db6e3", // <---- YOUR INFURA ID! (or it won't work)
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     goerli: {
-      url: "https://goerli.infura.io/v3/0f83eb63faea409abc1f440c9f077646", // <---- YOUR INFURA ID! (or it won't work)
+      url: "https://goerli.infura.io/v3/f16fe897786f47149695118b395db6e3", // <---- YOUR INFURA ID! (or it won't work)
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
@@ -91,13 +100,14 @@ module.exports = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     matic: {
-      url: "https://polygon-mainnet.infura.io/v3/0f83eb63faea409abc1f440c9f077646",
-      gasPrice: 10e9,
+      url: "https://polygon-mainnet.infura.io/v3/f16fe897786f47149695118b395db6e3",
+      gasPrice: 100e9,
+      timeout: 200000,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     mumbai: {
-      url: "https://polygon-mumbai.infura.io/v3/0f83eb63faea409abc1f440c9f077646",
+      url: "https://polygon-mumbai.infura.io/v3/f16fe897786f47149695118b395db6e3",
       gasPrice: 5e9,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],

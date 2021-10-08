@@ -11,12 +11,15 @@ import  "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol"
 
 
 
-contract PreKlimaTokenUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableUpgradeable {
+contract PreKlimaTokenUpgradeableChild is ERC20PresetFixedSupplyUpgradeable, OwnableUpgradeable {
 
     using SafeMathUpgradeable for uint256;
 
     bool public requireSellerApproval;
     bool public allowMinting;
+
+    // Matic childChainManager
+    address public childChainManagerProxy;
 
     mapping( address => bool ) public isApprovedSeller;
 
@@ -24,22 +27,24 @@ contract PreKlimaTokenUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableU
         
     }
     
-    function initialize(address _Klimadmin) public initializer {
+    function initializeChild(address _Klimadmin, address _childChainManagerProxy) public initializer {
         
-        __PreKlimaTokenUpgradeable_init(_Klimadmin);
+        __PreKlimaTokenUpgradeableChild_init(_Klimadmin, _childChainManagerProxy);
         
     }
     
     
-    function __PreKlimaTokenUpgradeable_init(address _Klimadmin) internal {
-
+    function __PreKlimaTokenUpgradeableChild_init(address _Klimadmin, address _childChainManagerProxy) internal initializer {
+        require(_childChainManagerProxy != address(0), "_childChainManagerProxy must not be null");
         requireSellerApproval = true;
         allowMinting = true;
         _addApprovedSeller( address(this) );
         _addApprovedSeller( _Klimadmin );
         _addApprovedSeller(address(0x0000));
+        _addApprovedSeller(_childChainManagerProxy);
         __Ownable_init();
-        __ERC20PresetFixedSupply_init("PreKlima", "pKLIMA", 1000000000 * 1e18, _Klimadmin);
+        childChainManagerProxy = _childChainManagerProxy;
+        __ERC20PresetFixedSupply_init("PreKlima (POS)", "pKLIMA", 0 * 1e18, _Klimadmin);
     }
 
     function allowOpenTrading() external onlyOwner() returns ( bool ) {
@@ -92,6 +97,32 @@ contract PreKlimaTokenUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableU
     function mint( address recipient_, uint256 amount_) public virtual onlyOwner() {
         require( allowMinting, "Minting has been disabled." );
         _mint( recipient_, amount_ );
+    }
+
+    /**
+  * @notice called when token is deposited on root chain
+  * @dev Should be callable only by ChildChainManager
+  * Should handle deposit by minting the required amount for user
+  * Make sure minting is done only by this function
+  * @param user user address for whom deposit is being done
+  * @param depositData abi encoded amount
+  */
+    function deposit(address user, bytes calldata depositData)
+    external
+    {
+        require(_msgSender() == childChainManagerProxy, "You're not allowed to deposit");
+
+        uint256 amount = abi.decode(depositData, (uint256));
+        _mint(user, amount);
+    }
+
+    /**
+      * @notice called when user wants to withdraw tokens back to root chain
+      * @dev Should burn user's tokens. This transaction will be verified when exiting on root chain
+      * @param amount amount of tokens to withdraw
+      */
+    function withdraw(uint256 amount) external {
+        _burn(_msgSender(), amount);
     }
 
 }
