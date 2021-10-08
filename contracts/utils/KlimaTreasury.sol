@@ -180,7 +180,7 @@ contract Ownable is IOwnable {
     }
 
     modifier onlyManager() {
-        require( _owner == msg.sender, "Ownable: caller is not the owner" );
+        require( _owner == msg.sender, "Ownable: caller is not the Manager" );
         _;
     }
 
@@ -498,13 +498,13 @@ contract KlimaTreasury is Ownable {
         @return send_ uint
      */
     function deposit( uint _amount, address _token, uint _profit ) external returns ( uint send_ ) {
-        require( isReserveToken[ _token ] || isLiquidityToken[ _token ], "Not accepted" );
+        require( isReserveToken[ _token ] || isLiquidityToken[ _token ], "Not accepted as a Reserve Token" );
         IERC20( _token ).safeTransferFrom( msg.sender, address(this), _amount );
 
         if ( isReserveToken[ _token ] ) {
-            require( isReserveDepositor[ msg.sender ], "Not approved" );
+            require( isReserveDepositor[ msg.sender ], "Not approved as a Reserve Depositor" );
         } else {
-            require( isLiquidityDepositor[ msg.sender ], "Not approved" );
+            require( isLiquidityDepositor[ msg.sender ], "Not approved as a Liquidity Depositor" );
         }
 
         uint value = valueOf( _token, _amount );
@@ -524,8 +524,8 @@ contract KlimaTreasury is Ownable {
         @param _token address
      */
     function withdraw( uint _amount, address _token ) external {
-        require( isReserveToken[ _token ], "Not accepted" ); // Only reserves can be used for redemptions
-        require( isReserveSpender[ msg.sender ] == true, "Not approved" );
+        require( isReserveToken[ _token ], "Not accepted as a Reserve Token" ); // Only reserves can be used for redemptions
+        require( isReserveSpender[ msg.sender ] == true, "Not approved as a Reserve Spender" );
 
         uint value = valueOf( _token, _amount );
         IKLIMAERC20( KLIMA ).burnFrom( msg.sender, value );
@@ -544,8 +544,8 @@ contract KlimaTreasury is Ownable {
         @param _token address
      */
     function incurDebt( uint _amount, address _token ) external {
-        require( isDebtor[ msg.sender ], "Not approved" );
-        require( isReserveToken[ _token ], "Not accepted" );
+        require( isDebtor[ msg.sender ], "Not approved as a Debtor" );
+        require( isReserveToken[ _token ], "Not accepted as a Reserve Token" );
 
         uint value = valueOf( _token, _amount );
 
@@ -570,8 +570,8 @@ contract KlimaTreasury is Ownable {
         @param _token address
      */
     function repayDebtWithReserve( uint _amount, address _token ) external {
-        require( isDebtor[ msg.sender ], "Not approved" );
-        require( isReserveToken[ _token ], "Not accepted" );
+        require( isDebtor[ msg.sender ], "Not approved as a Debtor" );
+        require( isReserveToken[ _token ], "Not accepted as a Reserve Token" );
 
         IERC20( _token ).safeTransferFrom( msg.sender, address(this), _amount );
 
@@ -590,7 +590,7 @@ contract KlimaTreasury is Ownable {
         @param _amount uint
      */
     function repayDebtWithKLIMA( uint _amount ) external {
-        require( isDebtor[ msg.sender ], "Not approved" );
+        require( isDebtor[ msg.sender ], "Not approved as a Debtor" );
 
         IKLIMAERC20( KLIMA ).burnFrom( msg.sender, _amount );
 
@@ -607,9 +607,9 @@ contract KlimaTreasury is Ownable {
      */
     function manage( address _token, uint _amount ) external {
         if( isLiquidityToken[ _token ] ) {
-            require( isLiquidityManager[ msg.sender ], "Not approved" );
+            require( isLiquidityManager[ msg.sender ], "Not approved as Liquidity Manager" );
         } else {
-            require( isReserveManager[ msg.sender ], "Not approved" );
+            require( isReserveManager[ msg.sender ], "Not approved as Reserve Manager" );
         }
 
         uint value = valueOf( _token, _amount );
@@ -627,7 +627,7 @@ contract KlimaTreasury is Ownable {
         @notice send epoch reward to staking contract
      */
     function mintRewards( address _recipient, uint _amount ) external {
-        require( isRewardManager[ msg.sender ], "Not approved" );
+        require( isRewardManager[ msg.sender ], "Not approved as reward manager" );
         require( _amount <= excessReserves(), "Insufficient reserves" );
 
         IERC20Mintable( KLIMA ).mint( _recipient, _amount );
