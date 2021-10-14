@@ -475,7 +475,6 @@ contract KlimaTreasury is Ownable {
     constructor (
         address _KLIMA,
         address _BCT,
-        address _KLIMABCT,
         uint _blocksNeededForQueue
     ) {
         require( _KLIMA != address(0) );
@@ -483,9 +482,6 @@ contract KlimaTreasury is Ownable {
 
         isReserveToken[ _BCT ] = true;
         reserveTokens.push( _BCT );
-
-        isLiquidityToken[ _KLIMABCT ] = true;
-        liquidityTokens.push( _KLIMABCT );
 
         blocksNeededForQueue = _blocksNeededForQueue;
     }
