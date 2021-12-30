@@ -83,7 +83,7 @@ module.exports = {
       initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.
     },
     ropsten: {
-      url: process.env.ROPSTEN_URL || "",
+      url: "https://ropsten.infura.io/v3/f16fe897786f47149695118b395db6e3",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
