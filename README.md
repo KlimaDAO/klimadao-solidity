@@ -22,7 +22,7 @@ npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_treasury.js
 ```
 
 Update `.env` with the sKLIMA address from the previous step and with the BCT
-address and deploy the Klima treasury.
+address and deploy the Klima staking contracts.
 ```
-npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_treasury.js
+npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_staking.js
 ```

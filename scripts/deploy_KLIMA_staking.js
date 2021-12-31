@@ -1,17 +1,19 @@
 const { ethers } = require("hardhat");
 
 /*
-   Deploys KLIMA treasury
+   Deploys KLIMA staking contracts
  */
 async function main() {
-  const KlimaTreasury = await ethers.getContractFactory("KlimaTreasury");
-  const klimaTreasury = await KlimaTreasury.deploy(
+  const KlimaStaking = await ethers.getContractFactory("KlimaStaking_v2");
+  const klimaStaking = await KlimaStaking.deploy(
     process.env.KLIMA_ERC20_ADDRESS,
-    process.env.BCT_ERC20_ADDRESS,
-    34560
+    process.env.SKLIMA_ERC20_ADDRESS,
+    11520, // epoch length in blocks
+    0, // first epoch number
+    0 // first epoch block
   );
 
-  console.log("Klima Treasury Deployed at: ", klimaTreasury.address);
+  console.log("Klima Staking Deployed at: ", klimaStaking.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -8,7 +8,7 @@ async function main() {
   const klimaTreasury = await KlimaTreasury.deploy(
     process.env.KLIMA_ERC20_ADDRESS,
     process.env.BCT_ERC20_ADDRESS,
-    34560
+    34560 // amount of blocks needed to queue txs before they can be executed
   );
 
   console.log("Klima Treasury Deployed at: ", klimaTreasury.address);
