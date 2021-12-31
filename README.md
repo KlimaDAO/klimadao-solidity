@@ -2,7 +2,10 @@
 
 ## Build
 
-TODO: Document OZ hack that is needed in order to build the contracts
+Note that the `AlphaKlimaRedeemUpgradeable` will fail to get built by default.
+You will need to manually update the `@openzeppelin/contracts-upgradeable`
+contracts that are downloaded in your `node_modules` by changing `_trustedForwarder`
+in `metatx/ERC2771ContextUpgradeable.sol` from a private to a public address.
 ```
 npm i
 npx hardhat compile
