@@ -23,9 +23,12 @@ address and deploy the Klima treasury.
 ```
 npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_treasury.js
 ```
+Note that sKLIMA is not set at the treasury contract and needs to be a separate
+transaction to add it as it stands.
 
-Update `.env` with the sKLIMA address from the previous step and with the BCT
-address and deploy the Klima staking contracts.
+Update `.env` with the sKLIMA address from the first step and the treasury
+address from the previous step. Also, configure the desired parameters for
+the first epoch number, block, and epoch length in the deploy script below.
 ```
 npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_staking.js
 ```
