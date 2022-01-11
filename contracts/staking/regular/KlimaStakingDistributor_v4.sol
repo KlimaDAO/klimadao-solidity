@@ -312,6 +312,7 @@ contract Policy is IPolicy {
     function renouncePolicy() public virtual override onlyPolicy() {
         emit OwnershipTransferred( _policy, address(0) );
         _policy = address(0);
+        _newPolicy = address(0);
     }
 
     function pushPolicy( address newPolicy_ ) public virtual override onlyPolicy() {
@@ -477,6 +478,7 @@ contract Distributor is Policy {
      */
     function removeRecipient( uint _index, address _recipient ) external onlyPolicy() {
         require( _recipient == info[ _index ].recipient );
+        require(info[ _index ].recipient != address(0),"no recipient to remove");
         info[ _index ].recipient = address(0);
         info[ _index ].rate = 0;
     }
@@ -489,6 +491,7 @@ contract Distributor is Policy {
         @param _target uint
      */
     function setAdjustment( uint _index, bool _add, uint _rate, uint _target ) external onlyPolicy() {
+        require(info[ _index ].recipient != address(0),"no recipient to adjust");
         adjustments[ _index ] = Adjust({
         add: _add,
         rate: _rate,

@@ -619,6 +619,9 @@ contract AltExercisepOLY {
 
     mapping( address => address ) public walletChange;
 
+    event NewOwnerPushed(address oldOwner, address newOwner);
+    event NewOwnerPulled(address oldOwner, address newOwner);
+
     constructor( address _pOLY, address _ohm, address _dai, address _treasury, address _circulatingOHMContract ) {
         owner = msg.sender;
         require( _pOLY != address(0) );
@@ -640,6 +643,7 @@ contract AltExercisepOLY {
         require( _rate >= terms[ _vester ].percent, "cannot lower vesting rate" );
         require( _claimed >= terms[ _vester ].claimed, "cannot lower claimed" );
         require( !IPOLY( pOLY ).isApprovedSeller( _vester ) );
+        require( _max >= _claimed, "Claimed cannot be greater than max claimable");
 
         terms[ _vester ] = Term({
         percent: _rate,
@@ -668,6 +672,7 @@ contract AltExercisepOLY {
     // Allows wallet owner to transfer rights to a new address
     function pushWalletChange( address _newWallet ) external {
         require( terms[ msg.sender ].percent != 0 );
+        require( msg.sender != _newWallet, "Cannot set self as new wallet");
         walletChange[ msg.sender ] = _newWallet;
     }
 
@@ -693,11 +698,13 @@ contract AltExercisepOLY {
         require( msg.sender == owner, "Sender is not owner" );
         require( _newOwner != address(0) );
         newOwner = _newOwner;
+        emit NewOwnerPushed(msg.sender, _newOwner);
         return true;
     }
 
     function pullOwnership() external returns ( bool ) {
         require( msg.sender == newOwner );
+        emit NewOwnerPulled(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
         return true;

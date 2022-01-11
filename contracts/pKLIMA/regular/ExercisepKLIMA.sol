@@ -629,6 +629,9 @@ contract ExercisepKLIMA {
 
     bool hasMigrated;
 
+    event NewOwnerPushed(address oldOwner, address newOwner);
+    event NewOwnerPulled(address oldOwner, address newOwner);
+
     constructor( address _pKLIMA, address _KLIMA, address _BCT, address _treasury, address _circulatingKLIMAContract ) {
         owner = msg.sender;
         require( _pKLIMA != address(0) );
@@ -677,6 +680,7 @@ contract ExercisepKLIMA {
     // Allows wallet owner to transfer rights to a new address
     function pushWalletChange( address _newWallet ) external returns ( bool ) {
         require( terms[ msg.sender ].percent != 0 );
+        require( msg.sender != _newWallet, "Cannot set self as new wallet");
         walletChange[ msg.sender ] = _newWallet;
         return true;
     }
@@ -705,11 +709,13 @@ contract ExercisepKLIMA {
         require( msg.sender == owner, "Sender is not owner" );
         require( _newOwner != address(0) );
         newOwner = _newOwner;
+        emit NewOwnerPushed(msg.sender, _newOwner);
         return true;
     }
 
     function pullOwnership() external returns ( bool ) {
         require( msg.sender == newOwner );
+        emit NewOwnerPulled(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
         return true;

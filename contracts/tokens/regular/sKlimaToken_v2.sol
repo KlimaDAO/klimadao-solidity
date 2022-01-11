@@ -976,6 +976,7 @@ contract Ownable is IOwnable {
     function renounceManagement() public virtual override onlyManager() {
         emit OwnershipPushed( _owner, address(0) );
         _owner = address(0);
+        _newOwner = address(0);
     }
 
     function pushManagement( address newOwner_ ) public virtual override onlyManager() {
