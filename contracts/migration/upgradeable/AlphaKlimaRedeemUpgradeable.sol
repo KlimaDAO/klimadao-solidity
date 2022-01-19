@@ -56,7 +56,9 @@ contract AlphaKlimaRedeemUpgradeable is ERC2771ContextUpgradeable  {
 
         KLIMA.transfer(_msgSender(), amount);
     }
-    function setTrustedForwarder(address newForwarder) public onlyOwner {
-        _trustedForwarder = newForwarder;
-    }
+
+    // Can't do this https://ethereum.stackexchange.com/a/79604
+    // function setTrustedForwarder(address newForwarder) public onlyOwner {
+    //     _trustedForwarder = newForwarder;
+    // }
 }

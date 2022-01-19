@@ -8,3 +8,6 @@ artifacts
 .idea/
 
 mnemonic.txt
+
+types
+dist
