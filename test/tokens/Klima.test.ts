@@ -5,9 +5,8 @@ import { ethers } from "hardhat";
 
 
 import {
-  KlimaToken as OlympusERC20Token,
-  KlimaToken__factory as OlympusERC20Token__factory,
-  // OlympusAuthority__factory
+  KlimaToken,
+  KlimaToken__factory,
 } from '../../types';
 
 describe("OlympusTest", () => {
@@ -15,12 +14,13 @@ describe("OlympusTest", () => {
   let vault: SignerWithAddress;
   let bob: SignerWithAddress;
   let alice: SignerWithAddress;
-  let klima: OlympusERC20Token;
+  let klima: KlimaToken;
 
   beforeEach(async () => {
     [deployer, vault, bob, alice] = await ethers.getSigners();
 
-    klima = await (new OlympusERC20Token__factory(deployer)).deploy();
+    klima = await (new KlimaToken__factory(deployer)).deploy();
+    await klima.setVault(vault.address);
 
   });
 
@@ -33,7 +33,7 @@ describe("OlympusTest", () => {
   describe("mint", () => {
     it("must be done by vault", async () => {
       await expect(klima.connect(deployer).mint(bob.address, 100)).
-        to.be.revertedWith("UNAUTHORIZED");
+        to.be.revertedWith("VaultOwned: caller is not the Vault");
     });
 
     it("increases total supply", async () => {
