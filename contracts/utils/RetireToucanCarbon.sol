@@ -1,6 +1,43 @@
-/**
- *Submitted for verification at polygonscan.com on 2022-01-03
- */
+// File: interfaces/IKlimaCarbonRetirements.sol
+
+pragma solidity ^0.8.10;
+
+interface IKlimaCarbonRetirements {
+    function carbonRetired(
+        address _retiree,
+        address _pool,
+        uint256 _amount
+    ) external returns (bool);
+
+    function getUnclaimedTotal(address _minter) external view returns (uint256);
+
+    function offsetClaimed(address _minter, uint256 _amount)
+        external
+        returns (bool);
+
+    function getRetirementIndexInfo(address _retiree, uint256 _index)
+        external
+        view
+        returns (
+            address,
+            uint256,
+            string memory
+        );
+
+    function getRetirementPoolInfo(address _retiree, address _pool)
+        external
+        view
+        returns (uint256);
+
+    function getRetirementTotals(address _retiree)
+        external
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256
+        );
+}
 
 // File: interfaces/IBondDepository.sol
 
@@ -503,7 +540,7 @@ abstract contract Ownable is Context {
     }
 }
 
-// File: contracts/Ownable.sol
+// File: contracts/utils/Ownable.sol
 
 // File: @openzeppelin/contracts/utils/Address.sol
 
@@ -984,7 +1021,7 @@ library SafeERC20 {
     }
 }
 
-// File: contracts/SafeERC20.sol
+// File: contracts/utils/SafeERC20.sol
 
 // File: contracts/RetireToucanCarbon.sol
 
@@ -1002,8 +1039,19 @@ contract RetireToucanCarbon is Ownable {
         address _USDC,
         address _staking,
         address _stakingHelper,
-        address _DAO
+        address _DAO,
+        address _KlimaRetirementStorage
     ) {
+        // Null check for constructors
+        require(_KLIMA != address(0));
+        require(_sKLIMA != address(0));
+        require(_wsKLIMA != address(0));
+        require(_USDC != address(0));
+        require(_staking != address(0));
+        require(_stakingHelper != address(0));
+        require(_DAO != address(0));
+        require(_KlimaRetirementStorage != address(0));
+
         KLIMA = _KLIMA;
         sKLIMA = _sKLIMA;
         wsKLIMA = _wsKLIMA;
@@ -1011,24 +1059,43 @@ contract RetireToucanCarbon is Ownable {
         staking = _staking;
         stakingHelper = _stakingHelper;
         DAO = _DAO;
+        KlimaRetirementStorage = _KlimaRetirementStorage;
     }
 
-    address public immutable KLIMA;
-    address public immutable sKLIMA;
-    address public immutable wsKLIMA;
+    address public KLIMA;
+    address public sKLIMA;
+    address public wsKLIMA;
     address public immutable USDC;
-    address public immutable staking;
-    address public immutable stakingHelper;
+    address public staking;
+    address public stakingHelper;
     address public immutable DAO;
+    address public KlimaRetirementStorage;
 
+    // Event setup
     event ToucanRetired(
-        address retiree,
-        string beneficiary,
-        address carbonPool,
+        address indexed retiringAddress,
+        address indexed beneficiaryAddress,
+        string beneficiaryString,
+        string retirementMessage,
+        address indexed carbonPool,
         address carbonToken,
-        uint256 amount
+        uint256 retiredAmount
     );
-    event PoolAdded(address carbonPool, bool result);
+    event PoolAdded(
+        address indexed carbonPool,
+        address indexed poolRouter,
+        address indexed bondDepository
+    );
+    event PoolRouterChanged(
+        address indexed carbonPool,
+        address indexed oldRouter,
+        address indexed newRouter
+    );
+    event PoolBondChanged(
+        address indexed carbonPool,
+        address indexed oldBondDepository,
+        address indexed newBondDepository
+    );
     event FeeUpdated(uint256 oldFee, uint256 newFee);
 
     address[] public toucanPools;
@@ -1038,10 +1105,22 @@ contract RetireToucanCarbon is Ownable {
 
     uint256 feeAmount;
 
+    /**
+        @notice Get KLIMA type provided to regular KLIMA, swap, then retire.
+        @param _klimaType Address of the original KLIMA token provided (Wrapped/Staked/Unstaked).
+        @param _amount Total pool tokens being retired. Expected uint with 18 decimals.
+        @param _beneficiaryAddress Address of the beneficiary if different than sender. Value is set to msg.sender if null is sent.
+        @param _beneficiaryString String that can be used to describe the beneficiary
+        @param _retirementMessage String for specific retirement message if needed.
+        @param _listTCO2 List of TCO2 token addresses to redeem pool tokens.
+        @param _toucanPool Address of pool token being used to retire.
+     */
     function retireWithKLIMA(
+        address _klimaType,
         uint256 _amount,
-        string calldata _beneficiary,
-        address _KlimaType,
+        address _beneficiaryAddress,
+        string calldata _beneficiaryString,
+        string calldata _retirementMessage,
         address[] calldata _listTCO2,
         address _toucanPool
     ) public {
@@ -1049,42 +1128,16 @@ contract RetireToucanCarbon is Ownable {
 
         uint256 totalPoolNeeded = (_amount * (1000 + feeAmount)) / 1000;
 
-        (uint256 amountIn, address[] memory path) = getNeededKLIMA(
+        (uint256 amountIn, address[] memory path) = getNeededBuyAmount(
+            KLIMA,
             _toucanPool,
-            poolRouter[_toucanPool],
             totalPoolNeeded
         );
 
-        uint256 unwrappedKLIMA;
-
-        if (_KlimaType == wsKLIMA) {
-            // Get wsKLIMA needed, transfer and unwrap, unstake to KLIMA
-            uint256 wsKLIMANeeded = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(amountIn);
-
-            IERC20(wsKLIMA).safeTransferFrom(
-                msg.sender,
-                address(this),
-                wsKLIMANeeded
-            );
-            IERC20(wsKLIMA).approve(wsKLIMA, wsKLIMANeeded);
-            unwrappedKLIMA = IwsKLIMA(wsKLIMA).unwrap(wsKLIMANeeded);
-            IERC20(sKLIMA).safeIncreaseAllowance(staking, unwrappedKLIMA);
-            IStaking(staking).unstake(unwrappedKLIMA, false);
-        }
-
-        // If using sKLIMA, transfer in and unstake
-        if (_KlimaType == sKLIMA) {
-            IERC20(sKLIMA).safeTransferFrom(
-                msg.sender,
-                address(this),
-                amountIn
-            );
-            IERC20(sKLIMA).safeIncreaseAllowance(staking, amountIn);
-            IStaking(staking).unstake(amountIn, false);
-        }
+        uint256 unwrappedKLIMA = _stakedToUnstaked(_klimaType, amountIn);
 
         // If using KLIMA, transfer in
-        if (_KlimaType == KLIMA) {
+        if (_klimaType == KLIMA) {
             IERC20(KLIMA).safeTransferFrom(msg.sender, address(this), amountIn);
         }
 
@@ -1100,40 +1153,35 @@ contract RetireToucanCarbon is Ownable {
             );
         // Return any dust remaining (slippage protection)
 
-        uint256 tradeDust;
+        _returnKLIMADust(_klimaType, amounts, amountIn, unwrappedKLIMA);
 
-        if (_KlimaType == KLIMA) {
-            tradeDust = amountIn - (amounts[0] == 0 ? amounts[1] : amounts[0]);
-            IERC20(KLIMA).safeTransfer(msg.sender, tradeDust);
-        }
-        if (_KlimaType == sKLIMA) {
-            tradeDust = amountIn - (amounts[0] == 0 ? amounts[1] : amounts[0]);
-            IERC20(KLIMA).safeIncreaseAllowance(stakingHelper, tradeDust);
-
-            IStakingHelper(stakingHelper).stake(tradeDust);
-
-            IERC20(sKLIMA).safeTransfer(msg.sender, tradeDust);
-        }
-        if (_KlimaType == wsKLIMA) {
-            tradeDust =
-                unwrappedKLIMA -
-                (amounts[0] == 0 ? amounts[1] : amounts[0]);
-            IERC20(KLIMA).safeIncreaseAllowance(stakingHelper, tradeDust);
-
-            IStakingHelper(stakingHelper).stake(tradeDust);
-            IERC20(sKLIMA).safeIncreaseAllowance(wsKLIMA, tradeDust);
-            uint256 wrappedDust = IwsKLIMA(wsKLIMA).wrap(tradeDust);
-            IERC20(wsKLIMA).safeTransfer(msg.sender, wrappedDust);
-        }
-
-        _retireCarbon(_amount, _beneficiary, _listTCO2, _toucanPool);
+        // Retire the carbon
+        _retireCarbon(
+            _amount,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _listTCO2,
+            _toucanPool
+        );
 
         _bondFees(_toucanPool);
     }
 
+    /**
+        @notice Swap from USDC then retire.
+        @param _amount Total pool tokens being retired. Expected uint with 18 decimals.
+        @param _beneficiaryAddress Address of the beneficiary if different than sender. Value is set to msg.sender if null is sent.
+        @param _beneficiaryString String that can be used to describe the beneficiary
+        @param _retirementMessage String for specific retirement message if needed.
+        @param _listTCO2 List of TCO2 token addresses to redeem pool tokens.
+        @param _toucanPool Address of pool token being used to retire.
+     */
     function retireWithUSDC(
         uint256 _amount,
-        string calldata _beneficiary,
+        address _beneficiaryAddress,
+        string calldata _beneficiaryString,
+        string calldata _retirementMessage,
         address[] calldata _listTCO2,
         address _toucanPool
     ) public {
@@ -1141,9 +1189,9 @@ contract RetireToucanCarbon is Ownable {
 
         uint256 totalPoolNeeded = (_amount * (1000 + feeAmount)) / 1000;
 
-        (uint256 amountIn, address[] memory path) = getNeededUSDC(
+        (uint256 amountIn, address[] memory path) = getNeededBuyAmount(
+            USDC,
             _toucanPool,
-            poolRouter[_toucanPool],
             totalPoolNeeded
         );
 
@@ -1168,14 +1216,33 @@ contract RetireToucanCarbon is Ownable {
 
         IERC20(USDC).safeTransfer(msg.sender, tradeDust);
 
-        _retireCarbon(_amount, _beneficiary, _listTCO2, _toucanPool);
+        // Retire the carbon
+        _retireCarbon(
+            _amount,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _listTCO2,
+            _toucanPool
+        );
 
         _bondFees(_toucanPool);
     }
 
+    /**
+        @notice Transfer needed pool tokens to helper contract then retire.
+        @param _amount Total pool tokens being retired. Expected uint with 18 decimals.
+        @param _beneficiaryAddress Address of the beneficiary if different than sender. Value is set to msg.sender if null is sent.
+        @param _beneficiaryString String that can be used to describe the beneficiary
+        @param _retirementMessage String for specific retirement message if needed.
+        @param _listTCO2 List of TCO2 token addresses to redeem pool tokens.
+        @param _toucanPool Address of pool token being used to retire.
+     */
     function retireWithPool(
         uint256 _amount,
-        string calldata _beneficiary,
+        address _beneficiaryAddress,
+        string calldata _beneficiaryString,
+        string calldata _retirementMessage,
         address[] calldata _listTCO2,
         address _toucanPool
     ) public {
@@ -1191,17 +1258,42 @@ contract RetireToucanCarbon is Ownable {
         );
 
         // Retire the carbon
-        _retireCarbon(_amount, _beneficiary, _listTCO2, _toucanPool);
+        _retireCarbon(
+            _amount,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _listTCO2,
+            _toucanPool
+        );
 
         _bondFees(_toucanPool);
     }
 
+    /**
+        @notice Retires the underlying TCO2s from the pool using a provided list.
+        @notice Emits a retirement event and updates the KlimaCarbonRetirements contract with
+        @notice retirement details and amounts.
+        @param _amount Total pool tokens being retired. Expected uint with 18 decimals.
+        @param _beneficiaryAddress Address of the beneficiary if different than sender. Value is set to msg.sender if null is sent.
+        @param _beneficiaryString String that can be used to describe the beneficiary
+        @param _retirementMessage String for specific retirement message if needed.
+        @param _listTCO2 List of TCO2 token addresses to redeem pool tokens.
+        @param _toucanPool Address of pool token being used to retire.
+     */
     function _retireCarbon(
         uint256 _amount,
-        string calldata _beneficiary,
+        address _beneficiaryAddress,
+        string calldata _beneficiaryString,
+        string calldata _retirementMessage,
         address[] calldata _listTCO2,
         address _toucanPool
     ) internal {
+        // Assign default event values
+        if (_beneficiaryAddress == address(0)) {
+            _beneficiaryAddress = msg.sender;
+        }
+
         // The carbon to be retired should be transferred or swapped inside this contract before calling this function.
         uint256 leftToBurn = _amount;
 
@@ -1212,7 +1304,7 @@ contract RetireToucanCarbon is Ownable {
             uint256 poolBalance = IERC20(_listTCO2[i]).balanceOf(_toucanPool);
 
             // Error check for possible 0 balance / stale lists
-            if (poolBalance == 0) {} else {
+            if (poolBalance != 0) {
                 address[] memory redeemERC20 = new address[](1);
                 redeemERC20[0] = _listTCO2[i];
 
@@ -1220,44 +1312,35 @@ contract RetireToucanCarbon is Ownable {
 
                 // Burn only pool balance if there are more pool tokens than available
                 if (leftToBurn > poolBalance) {
-                    // Redeem from pool
                     redeemAmount[0] = poolBalance;
-                    IBaseCarbonTonne(_toucanPool).redeemMany(
-                        redeemERC20,
-                        redeemAmount
-                    );
-
-                    // Retire TCO2
-                    IToucanCarbonOffsets(_listTCO2[i]).retire(poolBalance);
-                    emit ToucanRetired(
-                        msg.sender,
-                        _beneficiary,
-                        _toucanPool,
-                        _listTCO2[i],
-                        poolBalance
-                    );
-
-                    leftToBurn -= poolBalance;
                 } else {
-                    // Redeem from pool
                     redeemAmount[0] = leftToBurn;
-                    IBaseCarbonTonne(_toucanPool).redeemMany(
-                        redeemERC20,
-                        redeemAmount
-                    );
-
-                    // Retire TCO2
-                    IToucanCarbonOffsets(_listTCO2[i]).retire(leftToBurn);
-                    emit ToucanRetired(
-                        msg.sender,
-                        _beneficiary,
-                        _toucanPool,
-                        _listTCO2[i],
-                        leftToBurn
-                    );
-
-                    leftToBurn = 0;
                 }
+
+                // Redeem from pool
+                IBaseCarbonTonne(_toucanPool).redeemMany(
+                    redeemERC20,
+                    redeemAmount
+                );
+
+                // Retire TCO2
+                IToucanCarbonOffsets(_listTCO2[i]).retire(redeemAmount[0]);
+                IKlimaCarbonRetirements(KlimaRetirementStorage).carbonRetired(
+                    _beneficiaryAddress,
+                    _toucanPool,
+                    redeemAmount[0]
+                );
+                emit ToucanRetired(
+                    msg.sender,
+                    _beneficiaryAddress,
+                    _beneficiaryString,
+                    _retirementMessage,
+                    _toucanPool,
+                    _listTCO2[i],
+                    redeemAmount[0]
+                );
+
+                leftToBurn -= redeemAmount[0];
             }
         }
 
@@ -1267,6 +1350,94 @@ contract RetireToucanCarbon is Ownable {
         );
     }
 
+    /**
+        @notice Unwraps/unstakes any KLIMA needed to regular KLIMA.
+        @param _klimaType Address of the KLIMA type being used.
+        @param _amountIn Amount of pool token needed.
+     */
+    function _stakedToUnstaked(address _klimaType, uint256 _amountIn)
+        internal
+        returns (uint256)
+    {
+        uint256 unwrappedKLIMA;
+
+        if (_klimaType == wsKLIMA) {
+            // Get wsKLIMA needed, transfer and unwrap, unstake to KLIMA
+            uint256 wsKLIMANeeded = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(_amountIn);
+
+            IERC20(wsKLIMA).safeTransferFrom(
+                msg.sender,
+                address(this),
+                wsKLIMANeeded
+            );
+            IERC20(wsKLIMA).approve(wsKLIMA, wsKLIMANeeded);
+            unwrappedKLIMA = IwsKLIMA(wsKLIMA).unwrap(wsKLIMANeeded);
+            IERC20(sKLIMA).safeIncreaseAllowance(staking, unwrappedKLIMA);
+            IStaking(staking).unstake(unwrappedKLIMA, false);
+        }
+
+        // If using sKLIMA, transfer in and unstake
+        if (_klimaType == sKLIMA) {
+            IERC20(sKLIMA).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _amountIn
+            );
+            IERC20(sKLIMA).safeIncreaseAllowance(staking, _amountIn);
+            IStaking(staking).unstake(_amountIn, false);
+        }
+
+        return unwrappedKLIMA;
+    }
+
+    /**
+        @notice Bonds any accumualted fees to the DAO address if the minimum bond size is met.
+        @param _klimaType Address of the type of KLIMA provided.
+        @param _amounts Swap results.
+        @param _amountIn Original KLIMA amount needed.
+        @param _unwrappedKLIMA Original amount of KLIMA that was unwrapped.
+     */
+    function _returnKLIMADust(
+        address _klimaType,
+        uint256[] memory _amounts,
+        uint256 _amountIn,
+        uint256 _unwrappedKLIMA
+    ) internal {
+        uint256 tradeDust;
+
+        if (_klimaType == KLIMA) {
+            tradeDust =
+                _amountIn -
+                (_amounts[0] == 0 ? _amounts[1] : _amounts[0]);
+            IERC20(KLIMA).safeTransfer(msg.sender, tradeDust);
+        }
+        if (_klimaType == sKLIMA) {
+            tradeDust =
+                _amountIn -
+                (_amounts[0] == 0 ? _amounts[1] : _amounts[0]);
+            IERC20(KLIMA).safeIncreaseAllowance(stakingHelper, tradeDust);
+
+            IStakingHelper(stakingHelper).stake(tradeDust);
+
+            IERC20(sKLIMA).safeTransfer(msg.sender, tradeDust);
+        }
+        if (_klimaType == wsKLIMA) {
+            tradeDust =
+                _unwrappedKLIMA -
+                (_amounts[0] == 0 ? _amounts[1] : _amounts[0]);
+            IERC20(KLIMA).safeIncreaseAllowance(stakingHelper, tradeDust);
+
+            IStakingHelper(stakingHelper).stake(tradeDust);
+            IERC20(sKLIMA).safeIncreaseAllowance(wsKLIMA, tradeDust);
+            uint256 wrappedDust = IwsKLIMA(wsKLIMA).wrap(tradeDust);
+            IERC20(wsKLIMA).safeTransfer(msg.sender, wrappedDust);
+        }
+    }
+
+    /**
+        @notice Bonds any accumualted fees to the DAO address if the minimum bond size is met.
+        @param _toucanPool Address of the pool token being retired.
+     */
     function _bondFees(address _toucanPool) internal returns (bool) {
         // Bond cumulative fees to the DAO if bond is large enough
         uint256 poolBalance = IERC20(_toucanPool).balanceOf(address(this));
@@ -1274,7 +1445,8 @@ contract RetireToucanCarbon is Ownable {
         uint256 bondPrice = IKlimaBondDepository(bondDepository[_toucanPool])
             .bondPriceInUSD();
 
-        if ((poolBalance * (10**9)) / bondPrice > 10000000) {
+        // Minimum .01 KLIMA bond size
+        if ((poolBalance * (1e9)) / bondPrice > 1e7) {
             IERC20(_toucanPool).safeIncreaseAllowance(
                 bondDepository[_toucanPool],
                 poolBalance
@@ -1289,22 +1461,73 @@ contract RetireToucanCarbon is Ownable {
         return true;
     }
 
-    function setFeeAmount(uint256 _amount) external onlyOwner returns (bool) {
-        emit FeeUpdated(feeAmount, _amount);
+    /**
+        @notice Allow the contract owner to update Klima protocol addresses resulting from possible migrations.
+        @param _selection Int to indicate which address is being updated.
+        @param _newAddress New address for contract needing to be updated.
+        @return bool
+     */
+    function setAddress(uint256 _selection, address _newAddress)
+        external
+        onlyOwner
+        returns (bool)
+    {
+        if (_selection == 0) {
+            KLIMA = _newAddress; // 0; Set new KLIMA address
+        }
+        if (_selection == 1) {
+            sKLIMA = _newAddress; // 1; Set new sKLIMA address
+        }
+        if (_selection == 2) {
+            wsKLIMA = _newAddress; // 2; Set new wsKLIMA address
+        }
+        if (_selection == 3) {
+            staking = _newAddress; // 3; Set new staking address
+        }
+        if (_selection == 4) {
+            stakingHelper = _newAddress; // 4; Set new stakingHelper address
+        }
 
-        feeAmount = _amount;
         return true;
     }
 
+    /**
+        @notice Update the router for an existing pool
+        @param _amount New fee amount, in .1% increments. 10 = 1%
+        @return bool
+     */
+    function setFeeAmount(uint256 _amount) external onlyOwner returns (bool) {
+        uint256 oldFee = feeAmount;
+        feeAmount = _amount;
+
+        emit FeeUpdated(oldFee, feeAmount);
+        return true;
+    }
+
+    /**
+        @notice Update the router for an existing pool
+        @param _toucanPool Pool being updated
+        @param _router New router address
+        @return bool
+     */
     function setPoolRouter(address _toucanPool, address _router)
         external
         onlyOwner
         returns (bool)
     {
+        address oldRouter = poolRouter[_toucanPool];
         poolRouter[_toucanPool] = _router;
+        emit PoolRouterChanged(_toucanPool, oldRouter, poolRouter[_toucanPool]);
         return true;
     }
 
+    /**
+        @notice Add a new carbon pool to retire with helper contract
+        @param _toucanPool Pool being added
+        @param _router UniswapV2 router to route trades through for non-pool retirements
+        @param _bondDepository Bond depository address
+        @return bool
+     */
     function addPool(
         address _toucanPool,
         address _router,
@@ -1313,19 +1536,23 @@ contract RetireToucanCarbon is Ownable {
         bool result;
 
         require(!listContains(toucanPools, _toucanPool), "Pool already added");
+        require(_toucanPool != address(0), "Pool cannot be zero address");
 
-        if (!listContains(toucanPools, _toucanPool)) {
-            toucanPools.push(_toucanPool);
-        }
-        result = !isToucanPool[_toucanPool];
-        isToucanPool[_toucanPool] = result;
+        toucanPools.push(_toucanPool);
+        isToucanPool[_toucanPool] = true;
         poolRouter[_toucanPool] = _router;
         bondDepository[_toucanPool] = _bondDepository;
 
-        emit PoolAdded(_toucanPool, result);
+        emit PoolAdded(_toucanPool, _router, _bondDepository);
         return true;
     }
 
+    /**
+        @notice Update the bond depository for a carbon pool
+        @param _toucanPool Pool being updated
+        @param _bondDepository New depository address
+        @return bool
+     */
     function updateBondDepository(address _toucanPool, address _bondDepository)
         external
         onlyOwner
@@ -1333,7 +1560,9 @@ contract RetireToucanCarbon is Ownable {
     {
         require(isToucanPool[_toucanPool], "Not a Toucan Carbon Pool");
 
+        address oldBond = bondDepository[_toucanPool];
         bondDepository[_toucanPool] = _bondDepository;
+        emit PoolBondChanged(_toucanPool, oldBond, bondDepository[_toucanPool]);
         return true;
     }
 
@@ -1356,45 +1585,36 @@ contract RetireToucanCarbon is Ownable {
         return false;
     }
 
-    function getNeededUSDC(
+    /**
+        @notice Call the Uniswap routers for needed amounts on token being retired.
+        @param _purchaseToken Address of token being used to purchase the pool token.
+        @param _toucanPool Address of pool token being used.
+        @param _poolAmount Amount of tokens being retired.
+        @return bool
+     */
+    function getNeededBuyAmount(
+        address _purchaseToken,
         address _toucanPool,
-        address _router,
         uint256 _poolAmount
     ) public view returns (uint256, address[] memory) {
         address[] memory path = new address[](2);
 
-        path[0] = USDC;
+        path[0] = _purchaseToken;
         path[1] = _toucanPool;
 
-        uint256[] memory amountIn = IUniswapV2Router02(_router).getAmountsIn(
-            _poolAmount,
-            path
-        );
+        uint256[] memory amountIn = IUniswapV2Router02(poolRouter[_toucanPool])
+            .getAmountsIn(_poolAmount, path);
 
-        return ((amountIn[0] * 1005) / 1000, path); // Account for .5% slippage
+        // Account for .1% default AMM slippage.
+        return ((amountIn[0] * 1001) / 1000, path);
     }
 
-    function getNeededKLIMA(
-        address _toucanPool,
-        address _router,
-        uint256 _poolAmount
-    ) public view returns (uint256, address[] memory) {
-        address[] memory path = new address[](2);
-
-        path[0] = KLIMA;
-        path[1] = _toucanPool;
-
-        uint256[] memory amountIn = IUniswapV2Router02(_router).getAmountsIn(
-            _poolAmount,
-            path
-        );
-
-        return ((amountIn[0] * 1005) / 1000, path); // Account for .5% slippage
-    }
-
-    // To withdraw any potentially un-bonded fees
-
-    function emergencyWithdraw(address _token) public onlyOwner returns (bool) {
+    /**
+        @notice Allow withdrawal of any unbonded fees
+        @param _token Address of token to transfer
+        @return bool
+     */
+    function feeWithdraw(address _token) public onlyOwner returns (bool) {
         IERC20(_token).safeTransfer(
             msg.sender,
             IERC20(_token).balanceOf(address(this))
