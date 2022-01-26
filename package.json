@@ -49,7 +49,7 @@
     "solidity-coverage": "^0.7.17"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.2",
-    "@openzeppelin/contracts-upgradeable": "^4.3.2"
+    "@openzeppelin/contracts": "^4.4.2",
+    "@openzeppelin/contracts-upgradeable": "^4.4.2"
   }
 }
