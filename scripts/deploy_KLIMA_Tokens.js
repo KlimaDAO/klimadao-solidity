@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 /*
-   Deploys KLIMA and sKLIMA
+   Deploys KLIMA, sKLIMA, and wsKLIMA
  */
 async function main() {
   const KlimaToken = await ethers.getContractFactory("KlimaToken");
@@ -13,6 +13,11 @@ async function main() {
   const sklimaToken = await sKlimaToken.deploy();
 
   console.log("sKlima Token Deployed at: ", sklimaToken.address);
+
+  const wsKlimaToken = await ethers.getContractFactory("wsKLIMA");
+  const wsklimaToken = await wsKlimaToken.deploy(sklimaToken.address);
+
+  console.log("wsKlima Token Deployed at: ", wsklimaToken.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
