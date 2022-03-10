@@ -174,22 +174,19 @@ contract RetireToucanCarbon is
         address retirementStorage = IKlimaRetirementAggregator(masterAggregator)
             .klimaRetirementStorage();
 
-        address[] memory listTCO2 = IToucanPool(_poolToken).getScoredTCO2s();
-
         // Redeem pool tokens
-        IToucanPool(_poolToken).redeemAuto(_totalAmount);
+        (
+            address[] memory tco2s,
+            uint256[] memory amounts
+        ) = IToucanPool(_poolToken).redeemAuto2(_totalAmount);
 
         // Retire TCO2
-        for (uint256 i = 0; _totalAmount > 0; i++) {
-            uint256 balance = IERC20Upgradeable(listTCO2[i]).balanceOf(
-                address(this)
-            );
-
-            IToucanCarbonOffsets(listTCO2[i]).retire(balance);
+        for (uint256 i = 0; i < tco2s.length; i++) {
+            IToucanCarbonOffsets(tco2s[i]).retire(amounts[i]);
             IKlimaCarbonRetirements(retirementStorage).carbonRetired(
                 _beneficiaryAddress,
                 _poolToken,
-                balance,
+                amounts[i],
                 _beneficiaryString,
                 _retirementMessage
             );
@@ -199,11 +196,9 @@ contract RetireToucanCarbon is
                 _beneficiaryString,
                 _retirementMessage,
                 _poolToken,
-                listTCO2[i],
-                balance
+                tco2s[i],
+                amounts[i]
             );
-
-            _totalAmount -= balance;
         }
     }
 

@@ -3,7 +3,5 @@
 pragma solidity ^0.8.0;
 
 interface IToucanPool {
-    function getScoredTCO2s() external view returns (address[] memory);
-
-    function redeemAuto(uint256 amount) external;
+    function redeemAuto2(uint256 amount) external returns (address[] memory, uint256[] memory);
 }
