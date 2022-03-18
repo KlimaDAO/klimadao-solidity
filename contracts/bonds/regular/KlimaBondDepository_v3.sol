@@ -725,7 +725,7 @@ contract KlimaBondDepository is Ownable {
         uint _initialDebt
     ) external onlyPolicy() {
 		// Allow policy to re-initialize if debt falls to zero.
-        require( terms.controlVariable == 0 || totalDebt == 0, "Bonds must be initialized from 0" );
+        require( terms.controlVariable == 0 || currentDebt() == 0, "Bonds must be initialized from 0" );
         terms = Terms ({
         controlVariable: _controlVariable,
         vestingTerm: _vestingTerm,
