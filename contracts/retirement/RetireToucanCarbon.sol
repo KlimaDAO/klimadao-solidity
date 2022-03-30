@@ -185,6 +185,10 @@ contract RetireToucanCarbon is
                 address(this)
             );
 
+            // The smallest denomination that can be retired is a kilo,
+            // anything less will fail.
+            if (balance < 1e15) continue;
+
             IToucanCarbonOffsets(listTCO2[i]).retire(balance);
             IKlimaCarbonRetirements(retirementStorage).carbonRetired(
                 _beneficiaryAddress,
