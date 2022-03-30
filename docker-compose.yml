@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  contracts-env:
+    security_opt:
+      - no-new-privileges
+    user: root:root
+    command: bash
+    working_dir: /src
+    env_file:
+      - .env
+    image: node:16
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/src:rw
+    #environment:
+      #- MNEMONIC=
+      #- ETHERSCAN_API_KEY=
+      #- INFURA_KEY=
+      #- ALCHEMY_KEY=
+      #- PRIVATE_KEY=
