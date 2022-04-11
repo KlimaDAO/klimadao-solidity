@@ -238,7 +238,8 @@ contract RetireMossCarbon is
             (sourceAmount, fee) = getNeededBuyAmount(
                 _sourceToken,
                 _poolToken,
-                _amount
+                _amount,
+                false
             );
         } else {
             sourceAmount = _amount;
@@ -320,7 +321,8 @@ contract RetireMossCarbon is
     function getNeededBuyAmount(
         address _sourceToken,
         address _poolToken,
-        uint256 _poolAmount
+        uint256 _poolAmount,
+        bool _specificRetire // @dev Added to maintain consistency between all bridges.
     ) public view returns (uint256, uint256) {
         uint256 fee = (_poolAmount * feeAmount) / 1000;
         uint256 totalAmount = _poolAmount + fee;

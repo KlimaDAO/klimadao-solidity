@@ -6,7 +6,8 @@ interface IRetireBridgeCommon {
     function getNeededBuyAmount(
         address _sourceToken,
         address _poolToken,
-        uint256 _poolAmount
+        uint256 _poolAmount,
+        bool _retireSpecific
     ) external view returns (uint256, uint256);
 
     function getSwapPath(address _sourceToken, address _poolToken)
