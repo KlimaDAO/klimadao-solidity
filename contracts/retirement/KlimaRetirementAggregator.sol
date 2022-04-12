@@ -58,6 +58,8 @@ contract KlimaRetirementAggregator is
     event PoolRemoved(address poolToken);
     event BridgeHelperUpdated(uint256 bridgeID, address helper);
 
+    /** === Non Specific Auto Retirements */
+
     /**
      * @notice This function will retire a carbon pool token that is held
      * in the caller's wallet. Depending on the pool provided the appropriate
@@ -154,54 +156,6 @@ contract KlimaRetirementAggregator is
     }
 
     /**
-     * @notice This function calls the appropriate helper for a pool token and
-     * returns the total amount in source tokens needed to perform the transaction.
-     * Any swap slippage buffers and fees are included in the return value.
-     *
-     * @param _sourceToken The contract address of the token being supplied.
-     * @param _poolToken The contract address of the pool token being retired.
-     * @param _amount The amount being supplied. Expressed in either the total
-     *          carbon to offset or the total source to spend. See _amountInCarbon.
-     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
-     * @return Returns both the source amount and carbon amount as a result of swaps.
-     */
-    function getSourceAmount(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon
-    ) public view returns (uint256, uint256) {
-        uint256 sourceAmount;
-        uint256 carbonAmount = _amount;
-
-        if (_amountInCarbon) {
-            (sourceAmount, ) = IRetireBridgeCommon(
-                bridgeHelper[poolBridge[_poolToken]]
-            ).getNeededBuyAmount(_sourceToken, _poolToken, _amount);
-            if (_sourceToken == wsKLIMA) {
-                sourceAmount = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(sourceAmount);
-            }
-        } else {
-            sourceAmount = _amount;
-
-            address poolRouter = IRetireBridgeCommon(
-                bridgeHelper[poolBridge[_poolToken]]
-            ).poolRouter(_poolToken);
-
-            address[] memory path = IRetireBridgeCommon(
-                bridgeHelper[poolBridge[_poolToken]]
-            ).getSwapPath(_sourceToken, _poolToken);
-
-            uint256[] memory amountsOut = IUniswapV2Router02(poolRouter)
-                .getAmountsOut(_amount, path);
-
-            carbonAmount = amountsOut[path.length - 1];
-        }
-
-        return (sourceAmount, carbonAmount);
-    }
-
-    /**
      * @notice Internal function that checks to make sure the needed source tokens
      * have been transferred to this contract, then calls the retirement function
      * on the bridge's specific helper contract.
@@ -267,6 +221,267 @@ contract KlimaRetirementAggregator is
                 _retiree
             );
         }
+    }
+
+    /** === Specific offset selection retirements === */
+
+    /**
+     * @notice This function will retire a carbon pool token that is held
+     * in the caller's wallet. Depending on the pool provided the appropriate
+     * retirement helper will be used as defined in the bridgeHelper mapping.
+     * If a token other than the pool is provided then the helper will attempt
+     * to swap to the appropriate pool and then retire.
+     *
+     * @param _sourceToken The contract address of the token being supplied.
+     * @param _poolToken The contract address of the pool token being retired.
+     * @param _amount The amount being supplied. Expressed in either the total
+     *          carbon to offset or the total source to spend. See _amountInCarbon.
+     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
+     * @param _beneficiaryAddress Address of the beneficiary of the retirement.
+     * @param _beneficiaryString String representing the beneficiary. A name perhaps.
+     * @param _retirementMessage Specific message relating to this retirement event.
+     */
+    function retireCarbonSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address[] memory _carbonList
+    ) public {
+        //require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+
+        (uint256 sourceAmount, ) = getSourceAmountSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon
+        );
+
+        IERC20Upgradeable(_sourceToken).safeTransferFrom(
+            _msgSender(),
+            address(this),
+            sourceAmount
+        );
+
+        _retireCarbonSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _msgSender(),
+            _carbonList
+        );
+    }
+
+    function retireCarbonSpecificFrom(
+        address _initiator,
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address[] memory _carbonList
+    ) public {
+        address retiree = _initiator;
+
+        _retireCarbonSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            retiree,
+            _carbonList
+        );
+    }
+
+    /**
+     * @notice Internal function that checks to make sure the needed source tokens
+     * have been transferred to this contract, then calls the retirement function
+     * on the bridge's specific helper contract.
+     *
+     * @param _sourceToken The contract address of the token being supplied.
+     * @param _poolToken The contract address of the pool token being retired.
+     * @param _amount The amount being supplied. Expressed in either the total
+     *          carbon to offset or the total source to spend. See _amountInCarbon.
+     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
+     * @param _beneficiaryAddress Address of the beneficiary of the retirement.
+     * @param _beneficiaryString String representing the beneficiary. A name perhaps.
+     * @param _retirementMessage Specific message relating to this retirement event.
+     * @param _retiree Address of the initiator where source tokens originated.
+     */
+    function _retireCarbonSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address _retiree,
+        address[] memory _carbonList
+    ) internal {
+        require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        // Only Toucan and C3 currently allow specific retirement.
+        require(
+            poolBridge[_poolToken] == 1 || poolBridge[_poolToken] == 2,
+            "Pool does not allow specific."
+        );
+
+        _prepareRetireSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon
+        );
+
+        if (poolBridge[_poolToken] == 0) {
+            // Reserve for possible future use.
+        } else if (poolBridge[_poolToken] == 1) {
+            IRetireToucanCarbon(bridgeHelper[1]).retireToucanSpecific(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree,
+                _carbonList
+            );
+        }
+    }
+
+    function _prepareRetireSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon
+    ) internal {
+        (uint256 sourceAmount, ) = getSourceAmountSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon
+        );
+
+        require(
+            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) ==
+                sourceAmount,
+            "Source tokens not transferred."
+        );
+
+        IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(
+            bridgeHelper[poolBridge[_poolToken]],
+            sourceAmount
+        );
+    }
+
+    /** === External views and helpful functions === */
+
+    /**
+     * @notice This function calls the appropriate helper for a pool token and
+     * returns the total amount in source tokens needed to perform the transaction.
+     * Any swap slippage buffers and fees are included in the return value.
+     *
+     * @param _sourceToken The contract address of the token being supplied.
+     * @param _poolToken The contract address of the pool token being retired.
+     * @param _amount The amount being supplied. Expressed in either the total
+     *          carbon to offset or the total source to spend. See _amountInCarbon.
+     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
+     * @return Returns both the source amount and carbon amount as a result of swaps.
+     */
+    function getSourceAmount(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon
+    ) public view returns (uint256, uint256) {
+        uint256 sourceAmount;
+        uint256 carbonAmount = _amount;
+
+        if (_amountInCarbon) {
+            (sourceAmount, ) = IRetireBridgeCommon(
+                bridgeHelper[poolBridge[_poolToken]]
+            ).getNeededBuyAmount(_sourceToken, _poolToken, _amount, false);
+            if (_sourceToken == wsKLIMA) {
+                sourceAmount = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(sourceAmount);
+            }
+        } else {
+            sourceAmount = _amount;
+
+            address poolRouter = IRetireBridgeCommon(
+                bridgeHelper[poolBridge[_poolToken]]
+            ).poolRouter(_poolToken);
+
+            address[] memory path = IRetireBridgeCommon(
+                bridgeHelper[poolBridge[_poolToken]]
+            ).getSwapPath(_sourceToken, _poolToken);
+
+            uint256[] memory amountsOut = IUniswapV2Router02(poolRouter)
+                .getAmountsOut(_amount, path);
+
+            carbonAmount = amountsOut[path.length - 1];
+        }
+
+        return (sourceAmount, carbonAmount);
+    }
+
+    /**
+     * @notice Same as getSourceAmount, but factors in the redemption fee
+     * for specific retirements.
+     *
+     * @param _sourceToken The contract address of the token being supplied.
+     * @param _poolToken The contract address of the pool token being retired.
+     * @param _amount The amount being supplied. Expressed in either the total
+     *          carbon to offset or the total source to spend. See _amountInCarbon.
+     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
+     * @return Returns both the source amount and carbon amount as a result of swaps.
+     */
+    function getSourceAmountSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon
+    ) public view returns (uint256, uint256) {
+        uint256 sourceAmount;
+        uint256 carbonAmount = _amount;
+
+        if (_amountInCarbon) {
+            (sourceAmount, ) = IRetireBridgeCommon(
+                bridgeHelper[poolBridge[_poolToken]]
+            ).getNeededBuyAmount(_sourceToken, _poolToken, _amount, true);
+            if (_sourceToken == wsKLIMA) {
+                sourceAmount = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(sourceAmount);
+            }
+        } else {
+            sourceAmount = _amount;
+
+            address poolRouter = IRetireBridgeCommon(
+                bridgeHelper[poolBridge[_poolToken]]
+            ).poolRouter(_poolToken);
+
+            address[] memory path = IRetireBridgeCommon(
+                bridgeHelper[poolBridge[_poolToken]]
+            ).getSwapPath(_sourceToken, _poolToken);
+
+            uint256[] memory amountsOut = IUniswapV2Router02(poolRouter)
+                .getAmountsOut(_amount, path);
+
+            carbonAmount = amountsOut[path.length - 1];
+        }
+
+        return (sourceAmount, carbonAmount);
     }
 
     /**

@@ -99,7 +99,8 @@ contract RetireToucanCarbon is
                 _sourceToken,
                 _poolToken,
                 _amount,
-                _amountInCarbon
+                _amountInCarbon,
+                false
             );
 
         // Get the pool tokens
@@ -150,6 +151,120 @@ contract RetireToucanCarbon is
     }
 
     /**
+     * @notice This function transfers source tokens if needed, swaps to the Toucan
+     * pool token, utilizes redeemMany, then retires the redeemed TCO2. Needed source
+     * token amount is expected to be held by the caller to use.
+     *
+     * @param _sourceToken The contract address of the token being supplied.
+     * @param _poolToken The contract address of the pool token being retired.
+     * @param _amount The amount being supplied. Expressed in either the total
+     *          carbon to offset or the total source to spend. See _amountInCarbon.
+     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
+     * @param _beneficiaryAddress Address of the beneficiary of the retirement.
+     * @param _beneficiaryString String representing the beneficiary. A name perhaps.
+     * @param _retirementMessage Specific message relating to this retirement event.
+     * @param _retiree The original sender of the transaction.
+     * @param _carbonList List of TCO2s to redeem
+     */
+    function retireToucanSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address _retiree,
+        address[] memory _carbonList
+    ) public {
+        require(isPoolToken[_poolToken], "Not a Toucan Carbon Token");
+
+        // Transfer source tokens
+        // After swapping _amount = the amount of carbon to retire
+
+        uint256 fee;
+        (_amount, fee) = _prepareRetireSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon,
+            _retiree
+        );
+
+        // Retire the tokens
+        _retireCarbonSpecific(
+            _amount,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _poolToken,
+            _carbonList
+        );
+
+        // Send the fee to the treasury
+        if (feeAmount > 0) {
+            IERC20Upgradeable(_poolToken).safeTransfer(
+                IKlimaRetirementAggregator(masterAggregator).treasury(),
+                fee
+            );
+        }
+    }
+
+    function _prepareRetireSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        address _retiree
+    ) internal returns (uint256, uint256) {
+        (
+            uint256 sourceAmount,
+            uint256 totalCarbon,
+            uint256 fee
+        ) = _transferSourceTokens(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                true
+            );
+
+        // Get the pool tokens
+
+        if (_sourceToken != _poolToken) {
+            // Swap the source to get pool
+            if (_amountInCarbon) {
+                // swapTokensForExactTokens
+                _swapForExactCarbon(
+                    _sourceToken,
+                    _poolToken,
+                    totalCarbon,
+                    sourceAmount,
+                    _retiree
+                );
+                _amount = sourceAmount - fee;
+            } else {
+                // swapExactTokensForTokens
+                (_amount, fee) = _swapExactForCarbon(
+                    _sourceToken,
+                    _poolToken,
+                    sourceAmount
+                );
+            }
+        } else {
+            _amount = sourceAmount - fee;
+        }
+
+        if (!_amountInCarbon) {
+            // Calculate the fee and adjust if pool token is provided with false bool
+            fee = (_amount * feeAmount) / 1000;
+            _amount = totalCarbon - fee;
+        }
+
+        return (_amount, fee);
+    }
+
+    /**
      * @notice Redeems the pool and retires the TCO2 tokens on Polygon.
      *  Emits a retirement event and updates the KlimaCarbonRetirements contract with
      *  retirement details and amounts.
@@ -174,22 +289,23 @@ contract RetireToucanCarbon is
         address retirementStorage = IKlimaRetirementAggregator(masterAggregator)
             .klimaRetirementStorage();
 
-        address[] memory listTCO2 = IToucanPool(_poolToken).getScoredTCO2s();
-
         // Redeem pool tokens
-        IToucanPool(_poolToken).redeemAuto(_totalAmount);
+        (address[] memory listTCO2, uint256[] memory amounts) = IToucanPool(
+            _poolToken
+        ).redeemAuto2(_totalAmount);
 
         // Retire TCO2
-        for (uint256 i = 0; _totalAmount > 0; i++) {
-            uint256 balance = IERC20Upgradeable(listTCO2[i]).balanceOf(
-                address(this)
-            );
+        for (uint256 i = 0; i < listTCO2.length; i++) {
+            // Skip over any TCO2s returned that were not actually redeemed.
+            if (IERC20Upgradeable(listTCO2[i]).balanceOf(address(this)) == 0) {
+                continue;
+            }
 
-            IToucanCarbonOffsets(listTCO2[i]).retire(balance);
+            IToucanCarbonOffsets(listTCO2[i]).retire(amounts[i]);
             IKlimaCarbonRetirements(retirementStorage).carbonRetired(
                 _beneficiaryAddress,
                 _poolToken,
-                balance,
+                amounts[i],
                 _beneficiaryString,
                 _retirementMessage
             );
@@ -200,11 +316,94 @@ contract RetireToucanCarbon is
                 _retirementMessage,
                 _poolToken,
                 listTCO2[i],
-                balance
+                amounts[i]
             );
 
-            _totalAmount -= balance;
+            _totalAmount -= amounts[i];
         }
+
+        require(_totalAmount == 0, "Total Retired != To Desired");
+    }
+
+    /**
+     * @notice Redeems the pool and retires the TCO2 tokens on Polygon.
+     *  Emits a retirement event and updates the KlimaCarbonRetirements contract with
+     *  retirement details and amounts.
+     * @param _totalAmount Total pool tokens being retired. Expected uint with 18 decimals.
+     * @param _beneficiaryAddress Address of the beneficiary if different than sender. Value is set to _msgSender() if null is sent.
+     * @param _beneficiaryString String that can be used to describe the beneficiary
+     * @param _retirementMessage String for specific retirement message if needed.
+     * @param _poolToken Address of pool token being used to retire.
+     * @param _carbonList List of TCO2 tokens to redeem
+     */
+    function _retireCarbonSpecific(
+        uint256 _totalAmount,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address _poolToken,
+        address[] memory _carbonList
+    ) internal {
+        // Assign default event values
+        if (_beneficiaryAddress == address(0)) {
+            _beneficiaryAddress = _msgSender();
+        }
+
+        address retirementStorage = IKlimaRetirementAggregator(masterAggregator)
+            .klimaRetirementStorage();
+
+        // Redeem the pool tokens using the list provided.
+
+        for (uint256 i = 0; i < _carbonList.length && _totalAmount > 0; i++) {
+            // Get the pools balance of TCO2
+            uint256 poolBalance = IERC20Upgradeable(_carbonList[i]).balanceOf(
+                _poolToken
+            );
+
+            // Error check for possible 0 balance / stale lists
+            if (poolBalance != 0) {
+                address[] memory redeemERC20 = new address[](1);
+                redeemERC20[0] = _carbonList[i];
+
+                uint256[] memory redeemAmount = new uint256[](1);
+
+                // Burn only pool balance if there are more pool tokens than available
+                if (_totalAmount > poolBalance) {
+                    redeemAmount[0] = poolBalance;
+                } else {
+                    redeemAmount[0] = _totalAmount;
+                }
+
+                // Redeem from pool
+                IToucanPool(_poolToken).redeemMany(redeemERC20, redeemAmount);
+                _totalAmount -= redeemAmount[0];
+
+                // Retire TCO2 - Update balance to account for possible fee.
+                redeemAmount[0] = IERC20Upgradeable(_carbonList[i]).balanceOf(
+                    address(this)
+                );
+
+                IToucanCarbonOffsets(_carbonList[i]).retire(redeemAmount[0]);
+                IKlimaCarbonRetirements(retirementStorage).carbonRetired(
+                    _beneficiaryAddress,
+                    _poolToken,
+                    redeemAmount[0],
+                    _beneficiaryString,
+                    _retirementMessage
+                );
+                emit ToucanRetired(
+                    msg.sender,
+                    _beneficiaryAddress,
+                    _beneficiaryString,
+                    _retirementMessage,
+                    _poolToken,
+                    _carbonList[i],
+                    redeemAmount[0]
+                );
+            }
+        }
+
+        require(_totalAmount == 0, "Not all pool tokens were burned.");
     }
 
     /**
@@ -220,7 +419,8 @@ contract RetireToucanCarbon is
         address _sourceToken,
         address _poolToken,
         uint256 _amount,
-        bool _amountInCarbon
+        bool _amountInCarbon,
+        bool _specificRetire
     )
         internal
         returns (
@@ -241,7 +441,8 @@ contract RetireToucanCarbon is
             (sourceAmount, fee) = getNeededBuyAmount(
                 _sourceToken,
                 _poolToken,
-                _amount
+                _amount,
+                _specificRetire
             );
         } else {
             sourceAmount = _amount;
@@ -323,10 +524,17 @@ contract RetireToucanCarbon is
     function getNeededBuyAmount(
         address _sourceToken,
         address _poolToken,
-        uint256 _poolAmount
+        uint256 _poolAmount,
+        bool _specificRetire
     ) public view returns (uint256, uint256) {
         uint256 fee = (_poolAmount * feeAmount) / 1000;
         uint256 totalAmount = _poolAmount + fee;
+
+        if (_specificRetire) {
+            totalAmount =
+                totalAmount +
+                _getSpecificCarbonFee(_poolToken, _poolAmount);
+        }
 
         if (_sourceToken != _poolToken) {
             address[] memory path = getSwapPath(_sourceToken, _poolToken);
@@ -340,6 +548,38 @@ contract RetireToucanCarbon is
         }
 
         return (totalAmount, fee);
+    }
+
+    function _getSpecificCarbonFee(address _poolToken, uint256 _poolAmount)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 poolFeeAmount;
+        bool feeExempt;
+
+        try
+            IToucanPool(_poolToken).redeemFeeExemptedAddresses(address(this))
+        returns (bool result) {
+            feeExempt = result;
+        } catch {
+            feeExempt = false;
+        }
+
+        if (feeExempt) {
+            poolFeeAmount = 0;
+        } else {
+            uint256 feeRedeemBp = IToucanPool(_poolToken)
+                .feeRedeemPercentageInBase();
+            uint256 feeRedeemDivider = IToucanPool(_poolToken)
+                .feeRedeemDivider();
+            poolFeeAmount =
+                ((_poolAmount * feeRedeemDivider) /
+                    (feeRedeemDivider - feeRedeemBp)) -
+                _poolAmount;
+        }
+
+        return poolFeeAmount;
     }
 
     /**
