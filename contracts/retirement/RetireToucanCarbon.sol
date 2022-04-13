@@ -205,7 +205,7 @@ contract RetireToucanCarbon is
         if (feeAmount > 0) {
             IERC20Upgradeable(_poolToken).safeTransfer(
                 IKlimaRetirementAggregator(masterAggregator).treasury(),
-                fee
+                IERC20Upgradeable(_poolToken).balanceOf(address(this))
             );
         }
     }
@@ -234,6 +234,10 @@ contract RetireToucanCarbon is
         if (_sourceToken != _poolToken) {
             // Swap the source to get pool
             if (_amountInCarbon) {
+                // Add redemption fee to the total to redeem.
+                totalCarbon += _getSpecificCarbonFee(_poolToken, _amount);
+                _amount += _getSpecificCarbonFee(_poolToken, _amount);
+
                 // swapTokensForExactTokens
                 _swapForExactCarbon(
                     _sourceToken,
@@ -242,7 +246,6 @@ contract RetireToucanCarbon is
                     sourceAmount,
                     _retiree
                 );
-                _amount = sourceAmount - fee;
             } else {
                 // swapExactTokensForTokens
                 (_amount, fee) = _swapExactForCarbon(
