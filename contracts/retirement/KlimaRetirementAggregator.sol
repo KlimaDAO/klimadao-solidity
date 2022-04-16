@@ -12,6 +12,7 @@ import "../interfaces/IwsKLIMA.sol";
 import "../interfaces/IRetireBridgeCommon.sol";
 import "../interfaces/IRetireMossCarbon.sol";
 import "../interfaces/IRetireToucanCarbon.sol";
+import "../interfaces/IRetireC3Carbon.sol";
 
 /**
  * @title KlimaRetirementAggregator
@@ -220,6 +221,17 @@ contract KlimaRetirementAggregator is
                 _retirementMessage,
                 _retiree
             );
+        } else if (poolBridge[_poolToken] == 2) {
+            IRetireC3Carbon(bridgeHelper[2]).retireC3(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree
+            );
         }
     }
 
@@ -349,6 +361,18 @@ contract KlimaRetirementAggregator is
             // Reserve for possible future use.
         } else if (poolBridge[_poolToken] == 1) {
             IRetireToucanCarbon(bridgeHelper[1]).retireToucanSpecific(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree,
+                _carbonList
+            );
+        } else if (poolBridge[_poolToken] == 2) {
+            IRetireC3Carbon(bridgeHelper[2]).retireC3Specific(
                 _sourceToken,
                 _poolToken,
                 _amount,
