@@ -2,16 +2,16 @@
 pragma solidity ^0.8.10;
 
 import {IERC20} from "../interfaces/IERC20.sol";
-import {IgOHM} from "../interfaces/IgOHM.sol";
+import {IwsKLIMA} from "../../interfaces/IwsKLIMA.sol";
 import {SafeERC20} from "../libraries/SafeERC20.sol";
-import {OlympusAccessControlledV2, IOlympusAuthority} from "../types/OlympusAccessControlledV2.sol";
+import {KlimaAccessControlledV2, IKlimaAuthority} from "../types/KlimaAccessControlledV2.sol";
 
 /**
-    @title IOHMIndexWrapper
-    @notice This interface is used to wrap cross-chain oracles to feed an index without needing IsOHM, 
-    while also being able to use sOHM on mainnet.
+    @title IKLIMAIndexWrapper
+    @notice This interface is used to wrap cross-chain oracles to feed an index without needing IsKLIMA,
+    while also being able to use sKLIMA on mainnet.
  */
-interface IOHMIndexWrapper {
+interface IKLIMAIndexWrapper {
     function index() external view returns (uint256 index);
 }
 
@@ -41,23 +41,23 @@ error YieldSplitter_NotYourDeposit();
 
 /**
     @title YieldSplitter
-    @notice Abstract contract that allows users to create deposits for their gOHM and have
+    @notice Abstract contract that allows users to create deposits for their wsKLIMA and have
             their yield claimable by the specified recipient party. This contract's functions
             are designed to be as generic as possible. This contract's responsibility is
             the accounting of the yield splitting and some error handling. All other logic such as
-            emergency controls, sending and recieving gOHM is up to the implementation of
+            emergency controls, sending and recieving wsKLIMA is up to the implementation of
             this abstract contract to handle.
  */
-abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
+abstract contract YieldSplitter is KlimaAccessControlledV2, IYieldSplitter {
     using SafeERC20 for IERC20;
 
-    IOHMIndexWrapper public immutable indexWrapper;
+    IKLIMAIndexWrapper public immutable indexWrapper;
 
     struct DepositInfo {
         uint256 id;
         address depositor;
         uint256 principalAmount; // Total amount of sOhm deposited as principal, 9 decimals.
-        uint256 agnosticAmount; // Total amount deposited priced in gOhm. 18 decimals.
+        uint256 agnosticAmount; // Total amount deposited priced in wsKlima. 18 decimals.
     }
 
     uint256 public idCount;
@@ -67,17 +67,17 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
 
     /**
         @notice Constructor
-        @param indexWrapper_ Address of contract that will return the sOHM to gOHM index. 
-                             On mainnet this will be sOHM but on other chains can be an oracle wrapper.
+        @param indexWrapper_ Address of contract that will return the sKLIMA to wsKLIMA index.
+                             On mainnet this will be sKLIMA but on other chains can be an oracle wrapper.
     */
-    constructor(address indexWrapper_, address authority_) OlympusAccessControlledV2(IOlympusAuthority(authority_)) {
-        indexWrapper = IOHMIndexWrapper(indexWrapper_);
+    constructor(address indexWrapper_, address authority_) KlimaAccessControlledV2(IKlimaAuthority(authority_)) {
+        indexWrapper = IKLIMAIndexWrapper(indexWrapper_);
     }
 
     /**
         @notice Create a deposit.
         @param depositor_ Address of depositor
-        @param amount_ Amount in gOhm. 18 decimals.
+        @param amount_ Amount in wsKlima. 18 decimals.
     */
     function _deposit(address depositor_, uint256 amount_) internal returns (uint256 depositId) {
         depositorIds[depositor_].push(idCount);
@@ -94,9 +94,9 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     }
 
     /**
-        @notice Add more gOhm to the depositor's principal deposit.
+        @notice Add more wsKlima to the depositor's principal deposit.
         @param id_ Id of the deposit.
-        @param amount_ Amount of gOhm to add. 18 decimals.
+        @param amount_ Amount of wsKlima to add. 18 decimals.
     */
     function _addToDeposit(
         uint256 id_,
@@ -113,7 +113,7 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     /**
         @notice Withdraw part of the principal amount deposited.
         @param id_ Id of the deposit.
-        @param amount_ Amount of gOHM to withdraw.
+        @param amount_ Amount of wsKLIMA to withdraw.
     */
     function _withdrawPrincipal(
         uint256 id_,
@@ -130,7 +130,7 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     /**
         @notice Withdraw all of the principal amount deposited.
         @param id_ Id of the deposit.
-        @return amountWithdrawn : amount of gOHM withdrawn. 18 decimals.
+        @return amountWithdrawn : amount of wsKLIMA withdrawn. 18 decimals.
     */
     function _withdrawAllPrincipal(uint256 id_, address depositorAddress) internal returns (uint256 amountWithdrawn) {
         if (depositInfo[id_].depositor != depositorAddress) revert YieldSplitter_NotYourDeposit();
@@ -142,9 +142,9 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     }
 
     /**
-        @notice Redeem excess yield from your deposit in sOHM.
+        @notice Redeem excess yield from your deposit in sKLIMA.
         @param id_ Id of the deposit.
-        @return amountRedeemed : amount of yield redeemed in gOHM. 18 decimals.
+        @return amountRedeemed : amount of yield redeemed in wsKLIMA. 18 decimals.
     */
     function _redeemYield(uint256 id_) internal returns (uint256 amountRedeemed) {
         DepositInfo storage userDeposit = depositInfo[id_];
@@ -156,10 +156,10 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     /**
         @notice Close a deposit. Remove all information in both the deposit info, depositorIds and recipientIds.
         @param id_ Id of the deposit.
-        @dev Internally for accounting reasons principal amount is stored in 9 decimal OHM terms. 
-        Since most implementations will work will gOHM, principal here is returned externally in 18 decimal gOHM terms.
-        @return principal : amount of principal that was deleted. in gOHM. 18 decimals.
-        @return agnosticAmount : total amount of gOHM deleted. Principal + Yield. 18 decimals.
+        @dev Internally for accounting reasons principal amount is stored in 9 decimal KLIMA terms.
+        Since most implementations will work will wsKLIMA, principal here is returned externally in 18 decimal wsKLIMA terms.
+        @return principal : amount of principal that was deleted. in wsKLIMA. 18 decimals.
+        @return agnosticAmount : total amount of wsKLIMA deleted. Principal + Yield. 18 decimals.
     */
     function _closeDeposit(uint256 id_, address depositorAddress)
         internal
@@ -197,13 +197,13 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     function redeemAllYieldOnBehalfOf(address recipient_) external virtual returns (uint256) {}
 
     /**
-        @notice Get redeemable gOHM balance of a specific deposit
+        @notice Get redeemable wsKLIMA balance of a specific deposit
         @param depositId_ Deposit ID for this donation
     */
     function redeemableBalance(uint256 depositId_) public view virtual returns (uint256) {}
 
     /**
-        @notice Get redeemable gOHM balance of a recipient address
+        @notice Get redeemable wsKLIMA balance of a recipient address
         @param recipient_ Address of user receiving donated yield
      */
     function totalRedeemableBalance(address recipient_) external view virtual returns (uint256) {}
@@ -236,7 +236,7 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
 
     /**
         @notice Calculate outstanding yield redeemable based on principal and agnosticAmount.
-        @return uint256 amount of yield in gOHM. 18 decimals.
+        @return uint256 amount of yield in wsKLIMA. 18 decimals.
      */
     function _getOutstandingYield(uint256 principal_, uint256 agnosticAmount_) internal view returns (uint256) {
         // agnosticAmount must be greater than or equal to _toAgnostic(principal_) since agnosticAmount_
@@ -245,18 +245,18 @@ abstract contract YieldSplitter is OlympusAccessControlledV2, IYieldSplitter {
     }
 
     /**
-        @notice Convert flat sOHM value to agnostic gOHM value at current index
+        @notice Convert flat sKLIMA value to agnostic wsKLIMA value at current index
         @dev Agnostic value earns rebases. Agnostic value is amount / rebase_index.
-             1e18 is because sOHM has 9 decimals, gOHM has 18 and index has 9.
+             1e18 is because sKLIMA has 9 decimals, wsKLIMA has 18 and index has 9.
      */
     function _toAgnostic(uint256 amount_) internal view returns (uint256) {
         return (amount_ * 1e18) / (indexWrapper.index());
     }
 
     /**
-        @notice Convert agnostic gOHM value at current index to flat sOHM value
-        @dev Agnostic value earns rebases. sOHM amount is gOHMamount * rebase_index.
-             1e18 is because sOHM has 9 decimals, gOHM has 18 and index has 9.
+        @notice Convert agnostic wsKLIMA value at current index to flat sKLIMA value
+        @dev Agnostic value earns rebases. sKLIMA amount is wsKLIMAamount * rebase_index.
+             1e18 is because sKLIMA has 9 decimals, wsKLIMA has 18 and index has 9.
      */
     function _fromAgnostic(uint256 amount_) internal view returns (uint256) {
         return (amount_ * (indexWrapper.index())) / 1e18;

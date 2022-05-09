@@ -1,6 +1,6 @@
 pragma solidity ^0.8.10;
 
-import "../interfaces/IOlympusAuthority.sol";
+import "../interfaces/IKlimaAuthority.sol";
 
 error UNAUTHORIZED();
 error AUTHORITY_INITIALIZED();
@@ -9,18 +9,18 @@ error AUTHORITY_INITIALIZED();
 /// instead of pointing towards the logic to execute. Over many
 /// functions this bloats contract size unnecessarily.
 /// imho modifiers are a meme.
-abstract contract OlympusAccessControlledV2 {
+abstract contract KlimaAccessControlledV2 {
     /* ========== EVENTS ========== */
 
-    event AuthorityUpdated(IOlympusAuthority authority);
+    event AuthorityUpdated(IKlimaAuthority authority);
 
     /* ========== STATE VARIABLES ========== */
 
-    IOlympusAuthority public authority;
+    IKlimaAuthority public authority;
 
     /* ========== Constructor ========== */
 
-    constructor(IOlympusAuthority _authority) {
+    constructor(IKlimaAuthority _authority) {
         authority = _authority;
         emit AuthorityUpdated(_authority);
     }
@@ -49,13 +49,13 @@ abstract contract OlympusAccessControlledV2 {
 
     /* ========== GOV ONLY ========== */
 
-    function initializeAuthority(IOlympusAuthority _newAuthority) internal {
-        if (authority != IOlympusAuthority(address(0))) revert AUTHORITY_INITIALIZED();
+    function initializeAuthority(IKlimaAuthority _newAuthority) internal {
+        if (authority != IKlimaAuthority(address(0))) revert AUTHORITY_INITIALIZED();
         authority = _newAuthority;
         emit AuthorityUpdated(_newAuthority);
     }
 
-    function setAuthority(IOlympusAuthority _newAuthority) external {
+    function setAuthority(IKlimaAuthority _newAuthority) external {
         _onlyGovernor();
         authority = _newAuthority;
         emit AuthorityUpdated(_newAuthority);

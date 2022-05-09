@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.10;
 
-import "../types/OlympusAccessControlled.sol";
+import "../types/KlimaAccessControlled.sol";
 import "../interfaces/IERC20.sol";
 
-abstract contract FrontEndRewarder is OlympusAccessControlled {
+abstract contract FrontEndRewarder is KlimaAccessControlled {
     /* ========= STATE VARIABLES ========== */
 
     uint256 public daoReward; // % reward for dao (3 decimals: 100 = 1%)
@@ -14,7 +14,7 @@ abstract contract FrontEndRewarder is OlympusAccessControlled {
 
     IERC20 internal immutable klima; // reward token
 
-    constructor(IOlympusAuthority _authority, IERC20 _klima) OlympusAccessControlled(_authority) {
+    constructor(IKlimaAuthority _authority, IERC20 _klima) KlimaAccessControlled(_authority) {
         klima = _klima;
     }
 

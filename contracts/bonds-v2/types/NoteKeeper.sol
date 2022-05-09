@@ -3,7 +3,6 @@ pragma solidity ^0.8.10;
 
 import "../types/FrontEndRewarder.sol";
 
-import "../interfaces/IgOHM.sol";
 import "../interfaces/IStaking.sol";
 import "../interfaces/ITreasury.sol";
 import "../interfaces/INoteKeeper.sol";
@@ -13,20 +12,22 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
     mapping(address => Note[]) public notes; // user deposit data
     mapping(address => mapping(uint256 => address)) private noteTransfers; // change note ownership
 
-    IwsKLIMA internal immutable gOHM;
+    IwsKLIMA internal immutable wsKLIMA;
     IStaking internal immutable staking;
     ITreasury internal treasury;
 
     constructor(
-        IOlympusAuthority _authority,
-        IERC20 _ohm,
-        IwsKLIMA _gohm,
+        IKlimaAuthority _authority,
+        IERC20 _klima,
+        IwsKLIMA _wsklima,
         IStaking _staking,
         ITreasury _treasury
-    ) FrontEndRewarder(_authority, _ohm) {
-        gOHM = _gohm;
+    ) FrontEndRewarder(_authority, _klima) {
+
+        wsKLIMA = _wsklima;
         staking = _staking;
         treasury = _treasury;
+
     }
 
     // if treasury address changes on authority, update it
@@ -45,7 +46,7 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
     /**
      * @notice             adds a new Note for a user, stores the front end & DAO rewards, and mints & stakes payout & rewards
      * @param _user        the user that owns the Note
-     * @param _payout      the amount of OHM due to the user
+     * @param _payout      the amount of KLIMA due to the user
      * @param _expiry      the timestamp when the Note is redeemable
      * @param _marketID    the ID of the market deposited into
      * @return index_      the index of the Note in the user's array
@@ -63,7 +64,7 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
         // the new note is pushed to the user's array
         notes[_user].push(
             Note({
-                payout: gOHM.sKLIMATowKLIMA(_payout),
+                payout: wsKLIMA.sKLIMATowKLIMA(_payout),
                 created: uint48(block.timestamp),
                 matured: _expiry,
                 redeemed: 0,
@@ -77,7 +78,7 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
         // mint and stake payout
         treasury.mint(address(this), _payout + rewards);
 
-        // note that only the payout gets staked (front end rewards are in OHM)
+        // note that only the payout gets staked (front end rewards are in KLIMA)
         staking.stake(address(this), _payout, false, true);
     }
 
@@ -87,13 +88,13 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @notice             redeem notes for user
      * @param _user        the user to redeem for
      * @param _indexes     the note indexes to redeem
-     * @param _sendgOHM    send payout as gOHM or sOHM
-     * @return payout_     sum of payout sent, in gOHM
+     * @param _sendwsKLIMA    send payout as wsKLIMA or sKLIMA
+     * @return payout_     sum of payout sent, in wsKLIMA
      */
     function redeem(
         address _user,
         uint256[] memory _indexes,
-        bool _sendgOHM
+        bool _sendwsKLIMA
     ) public override returns (uint256 payout_) {
         uint48 time = uint48(block.timestamp);
 
@@ -106,10 +107,10 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
             }
         }
 
-        if (_sendgOHM) {
-            gOHM.transfer(_user, payout_); // send payout as gOHM
+        if (_sendwsKLIMA) {
+            wsKLIMA.transfer(_user, payout_); // send payout as wsKLIMA
         } else {
-            staking.unwrap(_user, payout_); // unwrap and send payout as sOHM
+            staking.unwrap(_user, payout_); // unwrap and send payout as sKLIMA
         }
     }
 
@@ -117,11 +118,11 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @notice             redeem all redeemable markets for user
      * @dev                if possible, query indexesFor() off-chain and input in redeem() to save gas
      * @param _user        user to redeem all notes for
-     * @param _sendgOHM    send payout as gOHM or sOHM
-     * @return             sum of payout sent, in gOHM
+     * @param _sendwsKLIMA    send payout as wsKLIMA or sKLIMA
+     * @return             sum of payout sent, in wsKLIMA
      */
-    function redeemAll(address _user, bool _sendgOHM) external override returns (uint256) {
-        return redeem(_user, indexesFor(_user), _sendgOHM);
+    function redeemAll(address _user, bool _sendwsKLIMA) external override returns (uint256) {
+        return redeem(_user, indexesFor(_user), _sendwsKLIMA);
     }
 
     /* ========== TRANSFER ========== */
@@ -185,7 +186,7 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @notice             calculate amount available for claim for a single note
      * @param _user        the user that the note belongs to
      * @param _index       the index of the note in the user's array
-     * @return payout_     the payout due, in gOHM
+     * @return payout_     the payout due, in wsKLIMA
      * @return matured_    if the payout can be redeemed
      */
     function pendingFor(address _user, uint256 _index) public view override returns (uint256 payout_, bool matured_) {

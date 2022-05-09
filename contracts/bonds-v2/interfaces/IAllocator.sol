@@ -3,7 +3,7 @@ pragma solidity >=0.8.0;
 // interfaces
 import "./IERC20.sol";
 import "./ITreasuryExtender.sol";
-import "./IOlympusAuthority.sol";
+import "./IKlimaAuthority.sol";
 
 enum AllocatorStatus {
     OFFLINE,
@@ -12,7 +12,7 @@ enum AllocatorStatus {
 }
 
 struct AllocatorInitData {
-    IOlympusAuthority authority;
+    IKlimaAuthority authority;
     ITreasuryExtender extender;
     IERC20[] tokens;
 }

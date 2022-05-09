@@ -41,7 +41,7 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
     /* ======== CONSTRUCTOR ======== */
 
     constructor(
-        IOlympusAuthority _authority,
+        IKlimaAuthority _authority,
         IERC20 _klima,
         IwsKLIMA _wsklima,
         IStaking _staking,

@@ -5,7 +5,7 @@ import "../interfaces/IAllocator.sol";
 import "../interfaces/ITreasury.sol";
 
 // types
-import "../types/OlympusAccessControlledV2.sol";
+import "../types/KlimaAccessControlledV2.sol";
 
 // libraries
 import "../libraries/SafeERC20.sol";
@@ -19,7 +19,7 @@ error BaseAllocator_OnlyExtender(address sender);
 /**
  * @title BaseAllocator
  * @notice
- *  This abstract contract serves as a template for writing new Olympus Allocators.
+ *  This abstract contract serves as a template for writing new Klima Allocators.
  *  Many of the functionalities regarding handling of Treasury funds by the Guardian have
  *  been delegated to the `TreasuryExtender` contract, and thus an explanation for them can be found
  *  in `TreasuryExtender.sol`.
@@ -69,7 +69,7 @@ error BaseAllocator_OnlyExtender(address sender);
  *
  *  This was a short summary of the Allocator lifecycle.
  */
-abstract contract BaseAllocator is OlympusAccessControlledV2, IAllocator {
+abstract contract BaseAllocator is KlimaAccessControlledV2, IAllocator {
     using SafeERC20 for IERC20;
 
     // Indices which represent the ids of the deposits in the `TreasuryExtender`
@@ -87,7 +87,7 @@ abstract contract BaseAllocator is OlympusAccessControlledV2, IAllocator {
     // The extender with which the Allocator communicates.
     ITreasuryExtender public immutable extender;
 
-    constructor(AllocatorInitData memory data) OlympusAccessControlledV2(data.authority) {
+    constructor(AllocatorInitData memory data) KlimaAccessControlledV2(data.authority) {
         _tokens = data.tokens;
         extender = data.extender;
 

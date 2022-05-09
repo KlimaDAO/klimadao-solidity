@@ -14,10 +14,10 @@ interface INoteKeeper {
     function redeem(
         address _user,
         uint256[] memory _indexes,
-        bool _sendgOHM
+        bool _sendwsKLIMA
     ) external returns (uint256);
 
-    function redeemAll(address _user, bool _sendgOHM) external returns (uint256);
+    function redeemAll(address _user, bool _sendwsKLIMA) external returns (uint256);
 
     function pushNote(address to, uint256 index) external;
 
