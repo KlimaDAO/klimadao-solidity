@@ -45,8 +45,9 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
         IERC20 _klima,
         IwsKLIMA _wsklima,
         IStaking _staking,
+        IStakingHelper _stakingHelper,
         ITreasury _treasury
-    ) NoteKeeper(_authority, _klima, _wsklima, _staking, _treasury) {
+    ) NoteKeeper(_authority, _klima, _wsklima, _staking,_stakingHelper, _treasury) {
         // save gas for users by bulk approving stake() transactions
         _klima.approve(address(_staking), 1e45);
     }

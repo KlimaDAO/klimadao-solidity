@@ -3,7 +3,8 @@ pragma solidity ^0.8.10;
 
 import "../types/FrontEndRewarder.sol";
 
-import "../interfaces/IStaking.sol";
+import "../../interfaces/IStaking.sol";
+import "../../interfaces/IStakingHelper.sol";
 import "../interfaces/ITreasury.sol";
 import "../interfaces/INoteKeeper.sol";
 import "../../interfaces/IwsKLIMA.sol";
@@ -14,6 +15,7 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
 
     IwsKLIMA internal immutable wsKLIMA;
     IStaking internal immutable staking;
+    IStakingHelper internal immutable stakingHelper;
     ITreasury internal treasury;
 
     constructor(
@@ -21,11 +23,13 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
         IERC20 _klima,
         IwsKLIMA _wsklima,
         IStaking _staking,
+        IStakingHelper _stakingHelper,
         ITreasury _treasury
     ) FrontEndRewarder(_authority, _klima) {
 
         wsKLIMA = _wsklima;
         staking = _staking;
+        stakingHelper = _stakingHelper;
         treasury = _treasury;
 
     }
@@ -79,7 +83,8 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
         treasury.mint(address(this), _payout + rewards);
 
         // note that only the payout gets staked (front end rewards are in KLIMA)
-        staking.stake(address(this), _payout, false, true);
+        //
+        stakingHelper.stake(_payout);
     }
 
     /* ========== REDEEM ========== */
@@ -107,10 +112,18 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
             }
         }
 
+
         if (_sendwsKLIMA) {
+            // Approve sKLIMA for Wrapping
+            IERC20(wsKLIMA.sKLIMA()).approve(address(wsKLIMA), payout_);
+            // Wrap
+            payout_ = wsKLIMA.wrap(payout_);
+
             wsKLIMA.transfer(_user, payout_); // send payout as wsKLIMA
+
         } else {
-            staking.unwrap(_user, payout_); // unwrap and send payout as sKLIMA
+            // send payout as sKLIMA
+            IERC20(staking.sKLIMA()).transfer(_user, payout_);
         }
     }
 
