@@ -5,11 +5,9 @@ import "./types/Pro/MarketCreator.sol";
 import "./types/Pro/NoteKeeper.sol";
 import "./types/Pro/Rewarder.sol";
 import "./types/Pro/Viewer.sol";
-
 import "../bonds-v2/libraries/SafeERC20.sol";
-
 import "../bonds-v2/interfaces/IERC20Metadata.sol";
-import "./interfaces/IOlympusPro.sol";
+import "./interfaces/IKlimaPro.sol";
 import "./interfaces/IProCall.sol";
 
 /// @title Klima O̶l̶y̶m̶p̶u̶s̶ Pro Depository V2
@@ -19,7 +17,7 @@ import "./interfaces/IProCall.sol";
 /// This contract has been forked to enable inverse bonds only, there is no intention to deploy a KLIMA Pro Product, for
 /// details on that, please visit the Olympus DAO ecosystem.
 
-contract OlympusProV2 is ProMarketCreator, ProViewer, ProNoteKeeper, ProRewarder {
+contract KlimaProV2 is ProMarketCreator, ProViewer, ProNoteKeeper, ProRewarder {
 
     using SafeERC20 for IERC20;
 
