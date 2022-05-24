@@ -12,9 +12,12 @@ import "../bonds-v2/interfaces/IERC20Metadata.sol";
 import "./interfaces/IOlympusPro.sol";
 import "./interfaces/IProCall.sol";
 
-/// @title Olympus Pro Depository V2
+/// @title Klima O̶l̶y̶m̶p̶u̶s̶ Pro Depository V2
 /// @author Zeus, Indigo
 /// Review by: JeffX
+/// Ctrl C'd, Ctrl V'd by: Archimedes
+/// This contract has been forked to enable inverse bonds only, there is no intention to deploy a KLIMA Pro Product, for
+/// details on that, please visit the Olympus DAO ecosystem.
 
 contract OlympusProV2 is ProMarketCreator, ProViewer, ProNoteKeeper, ProRewarder {
 

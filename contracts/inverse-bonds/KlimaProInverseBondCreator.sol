@@ -5,29 +5,29 @@ import "./types/EnumerableMap.sol";
 
 import "../bonds-v2/types/KlimaAccessControlled.sol";
 import "../bonds-v2/interfaces/IKlimaAuthority.sol";
-import "./interfaces/IOlympusPro.sol";
+import "./interfaces/IKlimaPro.sol";
 import "../bonds-v2/interfaces/ITreasury.sol";
 import "../bonds-v2/interfaces/IERC20.sol";
-import "../bonds-v2/interfaces/IOHM.sol";
+import "../bonds-v2/interfaces/IKLIMA.sol";
 
 contract KlimaInverseBondCreator is KlimaAccessControlled {
     using EnumerableMap for EnumerableMap.UintToAddressMap;
 
-    IOlympusPro public depository;
+    IKlimaPro public depository;
     ITreasury public treasury;
-    IOHM public ohm;
+    IKLIMA public klima;
 
     EnumerableMap.UintToAddressMap private markets;
 
-    constructor(IOHM _ohm, ITreasury _treasury, IOlympusPro _depository, IKlimaAuthority _authority)
+    constructor(IKLIMA _klima, ITreasury _treasury, IKlimaPro _depository, IKlimaAuthority _authority)
     KlimaAccessControlled(_authority)
     {
-        ohm = _ohm;
+        klima = _klima;
         treasury = _treasury;
         depository = _depository;
     }
 
-    // creates a market selling reserves for ohm
+    // creates a market selling reserves for klima
     // bonds have no vesting (executes an instant swap)
     // see IProMarketCreator for _market and _intervals arguments
     // _conclusion is concluding timestamp
@@ -37,7 +37,7 @@ contract KlimaInverseBondCreator is KlimaAccessControlled {
         uint32[2] memory _intervals,
         uint256 _conclusion
     ) onlyPolicy external {
-        IERC20[2] memory tokens = [_token, ohm];
+        IERC20[2] memory tokens = [_token, klima];
         bool[2] memory booleans = [false, true];
         uint256[2] memory terms = [0, _conclusion];
 
@@ -76,9 +76,9 @@ contract KlimaInverseBondCreator is KlimaAccessControlled {
         depository.close(_id);
     }
 
-    // burn repurchased ohm
+    // burn repurchased klima
     function burn() external onlyPolicy {
-        ohm.burn(ohm.balanceOf(address(this)));
+        klima.burn(klima.balanceOf(address(this)));
     }
 
     // return the rest of the tokens in this contract
