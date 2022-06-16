@@ -83,7 +83,8 @@ contract KlimaInverseBondCreator is KlimaAccessControlled {
 
     // return the rest of the tokens in this contract
     function returnReserve(address _token, uint256 amount) external onlyPolicy {
-        treasury.deposit(amount, _token, treasury.tokenValue(_token, amount));
+        // Raw Transfer to Treasury, DAO will have to trigger auditReserves if returning Reserve assets.
+        IERC20(_token).transfer(treasury, amount);
     }
 
     // function to get all active markets created by this contract
