@@ -2,7 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-interface IwsKLIMA {
+import "../bonds-v2/interfaces/IERC20.sol";
+
+interface IwsKLIMA is IERC20 {
+
+    function sKLIMA() external returns (address);
+
     function wrap(uint256 _amount) external returns (uint256);
 
     function unwrap(uint256 _amount) external returns (uint256);
