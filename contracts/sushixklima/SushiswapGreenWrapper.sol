@@ -6,31 +6,13 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
 import "../interfaces/IUniswapV2Router02.sol";
-
-
-
-interface IKlimaRetirementAggregator {
-
-    function retireCarbon(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon,
-        address _beneficiaryAddress,
-        string memory _beneficiaryString,
-        string memory _retirementMessage
-    ) external;
-}
-
 
 /**
  * @title Sushiswap Green Swap Wrapper
  * @author KlimaDAO
  *
- * @notice This contracts allows for a sushiswap swap to be offset in the same txn, makes use of both the Klima Aggregator and the Sushiswap Router in 1 txn
- *
+ * @notice This contracts allows for a sushiswap swap to be offset in a 2nd txn triggered
  * 
  */
 
@@ -41,6 +23,16 @@ contract SushiswapGreenSwapWrapper is
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
+    address public retirementHoldingAddress;
+    address public sushiRouterMain;
+    uint256 public sushiAmountOffset;
+
+    event newRetirementHolder(address newHolder);
+    event newSushiRouter(address newRouter);
+    event newSushiAmountOffset(uint256 newAmount);
+
+
+
     function initialize() public initializer {
         __Ownable_init();
         __Context_init();
@@ -48,17 +40,7 @@ contract SushiswapGreenSwapWrapper is
 
     /**
      * @notice This function will do a retirement as well as a swap, while it is \
-     * configurable, it can be prepopulated with default values from the Sushi UI
-
-     *
-     * @param _sourceToken The contract address of the token being supplied.
-     * @param _poolToken The contract address of the pool token being retired.
-     * @param _amount The amount being supplied. Expressed in either the total
-     *          carbon to offset or the total source to spend. See _amountInCarbon.
-     * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
-     * @param _beneficiaryAddress Address of the beneficiary of the retirement.
-     * @param _beneficiaryString String representing the beneficiary. A name perhaps.
-     * @param _retirementMessage Specific message relating to this retirement event.
+     * configurable, it can be pre-populated with default values from the Sushi UI
      */
 
     function GreenSwapTokensForTokens( 
@@ -66,20 +48,25 @@ contract SushiswapGreenSwapWrapper is
         uint amountOutMin,
         address[] calldata path,
         address to,
-        uint deadline,
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon,
-        address _beneficiaryAddress,
-        string memory _beneficiaryString,
-        string memory _retirementMessage) public {
+        uint deadline) public {
 
-            
-
+            IUniswapV2Router02(sushiRouterMain).swapTokensForExactTokens(amountIn,amountOutMin, path, to, deadline);
+            retirementHoldingAddress.transfer(sushiAmountOffset);
         }
 
+    function setRetirementHoldingAddress(address newHoldingAddress) public onlyOwner {
+        retirementHoldingAddress = newHoldingAddress;
+        emit newHoldingAddress(retirementHoldingAddress);
+    }
 
+    function setSushiRouterMain(address newSushiRouter) public onlyOwner {
+        sushiRouterMain = newSushiRouter;
+        emit newSushiRouter(sushiRouterMain);
+    }
 
+    function setSushiAmountOffset(uint256 newSushiAmountOffset) public onlyOwner {
+        sushiAmountOffset = newSushiAmountOffset;
+        emit newSushiAmountOffset(sushiAmountOffset);
+    }
 
 }
