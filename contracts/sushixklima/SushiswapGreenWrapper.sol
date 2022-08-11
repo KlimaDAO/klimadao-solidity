@@ -51,7 +51,8 @@ contract SushiswapGreenSwapWrapper is
         uint deadline) public {
 
             IUniswapV2Router02(sushiRouterMain).swapTokensForExactTokens(amountIn,amountOutMin, path, to, deadline);
-            retirementHoldingAddress.transfer(sushiAmountOffset);
+            (bool sent, bytes memory data) = retirementHoldingAddress.call{value: sushiAmountOffset}("");
+            require(sent, "Failed to send Ether");
         }
 
     function setRetirementHoldingAddress(address _newHoldingAddress) public onlyOwner {
