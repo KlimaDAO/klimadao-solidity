@@ -23,7 +23,7 @@ contract SushiswapGreenSwapWrapper is
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    address public retirementHoldingAddress;
+    address payable public retirementHoldingAddress;
     address public sushiRouterMain;
     uint256 public sushiAmountOffset;
 
@@ -54,18 +54,18 @@ contract SushiswapGreenSwapWrapper is
             retirementHoldingAddress.transfer(sushiAmountOffset);
         }
 
-    function setRetirementHoldingAddress(address newHoldingAddress) public onlyOwner {
-        retirementHoldingAddress = newHoldingAddress;
-        emit newHoldingAddress(retirementHoldingAddress);
+    function setRetirementHoldingAddress(address _newHoldingAddress) public onlyOwner {
+        retirementHoldingAddress = payable(address(_newHoldingAddress));
+        emit newRetirementHolder(_newHoldingAddress);
     }
 
-    function setSushiRouterMain(address newSushiRouter) public onlyOwner {
-        sushiRouterMain = newSushiRouter;
+    function setSushiRouterMain(address _newSushiRouter) public onlyOwner {
+        sushiRouterMain = _newSushiRouter;
         emit newSushiRouter(sushiRouterMain);
     }
 
-    function setSushiAmountOffset(uint256 newSushiAmountOffset) public onlyOwner {
-        sushiAmountOffset = newSushiAmountOffset;
+    function setSushiAmountOffset(uint256 _newSushiAmountOffset) public onlyOwner {
+        sushiAmountOffset = _newSushiAmountOffset;
         emit newSushiAmountOffset(sushiAmountOffset);
     }
 
