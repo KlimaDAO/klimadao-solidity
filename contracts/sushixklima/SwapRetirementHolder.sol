@@ -22,7 +22,8 @@ interface IWrappedAsset {
 
     function deposit() external payable;
     function balanceOf(address user) external;
-
+    function approve(address guy, uint wad) external returns (bool);
+    
 }
 
 
@@ -53,6 +54,8 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
 
         // set first upkeep check at the interval from now
         lastTimeStamp = block.timestamp + _interval;
+
+        interval = _interval;
 
         // set native wrapped asset address
         WrappedNativeAssetAddress = _wrappedNativeAsset;
@@ -86,8 +89,10 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
             uint amountToRetire = pendingRetirementAmounts[retiree];
 
             // Deposit the ETH/MATIC to WETH/WMATIC using fallback function of WETH/WMATIC
-            (bool sent, bytes memory data) = WrappedNativeAssetAddress.call{value: amountToRetire}("");
-            require(sent, "Failed to wrap asset");
+            IWrappedAsset(WrappedNativeAssetAddress).deposit{value: amountToRetire}();
+
+            //Approve for use by aggregator
+            IWrappedAsset(WrappedNativeAssetAddress).approve(address(KlimaAggregator), amountToRetire);
 
             // Retire tonnage using wrapped token asset; fire and forget no checks on amount
 
@@ -103,7 +108,7 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
 
 
         }
-        else {
+        else if (((block.timestamp - lastTimeStamp) > interval && numPendingRetirementAddresses == 0)) {
             // All users have been retired, reset interval
             lastTimeStamp = block.timestamp;
 
