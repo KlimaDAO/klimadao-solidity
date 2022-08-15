@@ -23,7 +23,7 @@ interface IWrappedAsset {
     function deposit() external payable;
     function balanceOf(address user) external;
     function approve(address guy, uint wad) external returns (bool);
-    
+
 }
 
 
@@ -125,29 +125,29 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
 
     receive() external payable {
 
-        if (pendingRetirementAmounts[msg.sender] == 0){
-            pendingRetirees[numPendingRetirementAddresses] = msg.sender;
-            pendingRetirementAmounts[msg.sender] += msg.value;
+        if (pendingRetirementAmounts[tx.origin] == 0){
+            pendingRetirees[numPendingRetirementAddresses] = tx.origin;
+            pendingRetirementAmounts[tx.origin] += msg.value;
             numPendingRetirementAddresses += 1;
         }
         else {
-            pendingRetirementAmounts[msg.sender] += msg.value;
+            pendingRetirementAmounts[tx.origin] += msg.value;
         }
-        require(pendingRetirementAmounts[msg.sender] != 0, "Pending Retirement Record Failed: Pending amount is 0");
+        require(pendingRetirementAmounts[tx.origin] != 0, "Pending Retirement Record Failed: Pending amount is 0");
 
     }
 
      fallback() external payable {
 
-        if (pendingRetirementAmounts[msg.sender] == 0){
-            pendingRetirees[numPendingRetirementAddresses] = msg.sender;
-            pendingRetirementAmounts[msg.sender] += msg.value;
+        if (pendingRetirementAmounts[tx.origin] == 0){
+            pendingRetirees[numPendingRetirementAddresses] = tx.origin;
+            pendingRetirementAmounts[tx.origin] += msg.value;
             numPendingRetirementAddresses += 1;
         }
         else {
-            pendingRetirementAmounts[msg.sender] += msg.value;
+            pendingRetirementAmounts[tx.origin] += msg.value;
         }
-        require(pendingRetirementAmounts[msg.sender] != 0, "Pending Retirement Record Failed: Pending amount is 0");
+        require(pendingRetirementAmounts[tx.origin] != 0, "Pending Retirement Record Failed: Pending amount is 0");
 
 
     }

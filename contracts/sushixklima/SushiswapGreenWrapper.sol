@@ -48,7 +48,11 @@ contract SushiswapGreenSwapWrapper is
         uint amountOutMin,
         address[] calldata path,
         address to,
-        uint deadline) public {
+        uint deadline) public payable {
+
+            // Transfer tokens here and then approve the swap on Sushi
+            IERC20Upgradeable(path[0]).safeTransferFrom(_msgSender(), address(this),amountIn);
+            IERC20Upgradeable(path[0]).safeIncreaseAllowance(sushiRouterMain, amountIn);            
 
             IUniswapV2Router02(sushiRouterMain).swapTokensForExactTokens(amountIn,amountOutMin, path, to, deadline);
             (bool sent, bytes memory data) = retirementHoldingAddress.call{value: sushiAmountOffset}("");
