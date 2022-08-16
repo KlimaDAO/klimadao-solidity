@@ -54,7 +54,10 @@ contract SushiswapGreenSwapWrapper is
             IERC20Upgradeable(path[0]).safeTransferFrom(_msgSender(), address(this),amountIn);
             IERC20Upgradeable(path[0]).safeIncreaseAllowance(sushiRouterMain, amountIn);            
 
+            // Perform Swap
             IUniswapV2Router02(sushiRouterMain).swapTokensForExactTokens(amountIn,amountOutMin, path, to, deadline);
+
+            // Send native asset to retirementHolder address
             (bool sent, bytes memory data) = retirementHoldingAddress.call{value: sushiAmountOffset}("");
             require(sent, "Failed to send Ether");
         }
