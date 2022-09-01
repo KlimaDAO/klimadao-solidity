@@ -49,6 +49,7 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
     event intervalUpdated(uint newInterval);
     event aggregatorAddressUpdated(address newAddress);
     event newPendingRetirement(address retiree, uint256 amount);
+    event newCarbonTokenUpdated(address newCarbonTokenUpdate);
 
     constructor(address _KlimaAggregator, uint _interval, address _wrappedNativeAsset, address _carbonToken) {
         KlimaAggregator = IKlimaRetirementAggregator(_KlimaAggregator);
@@ -76,6 +77,12 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
     function setRetirementInterval(uint newInterval) public onlyManager {
         interval = newInterval;
         emit intervalUpdated(interval);
+    }
+
+    // Change source carbon token, address of erc20
+    function setSourceCarbonToken(address newCarbonToken) public onlyManager {
+        sourceCarbonToken = newCarbonToken;
+        emit newCarbonTokenUpdated(sourceCarbonToken);
     }
 
     function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory /* performData */) {
