@@ -33,14 +33,15 @@ pragma solidity ^0.8.10;
 
 
 import "../helpers/Ownable.sol";
+import "../interfaces/IERC20.sol";
 
 contract ForwardDeposit is Ownable {
 
     address public klimaToken;
 
     mapping(address => bool) public allowedFinancers;
-    mapping(address => bool) public allowedCollateral;
-    mapping(address => bool) public allowedDepositToken;
+    mapping(address => bool) public allowedCollateral;   // Collateral used for the financing BCT/NCT/UBO/NBO/MCO2/etc
+    mapping(address => bool) public allowedDepositToken; // Allowed types of deposit tokens USDC/DAI/USDT/FRAX/etc
     mapping(uint256 => bool) public isActiveTermsID;
 
     ForwardTerms[] public termsRecords; // push only for record keeping
@@ -59,7 +60,10 @@ contract ForwardDeposit is Ownable {
 
     event newTermsSet(ForwardTerms setTerms);
 
-
+    modifier onlyAllowedFinancers() {
+        require( allowedFinancers[msg.sender] == true, "Allowed Financer: Caller is not an allowed financer");
+        _;
+    }
 
     constructor(address _klimaToken) {
 
@@ -87,8 +91,32 @@ contract ForwardDeposit is Ownable {
 
     }
 
-    //@dev 
-    function 
+    //@dev finance the terms set out in a specific ID
+    function financeTerms(address financingToken, uint256 termsID, uint256 amount) public onlyAllowedFinancers {
+            require(allowedDepositToken[financingToken] == true, "Financing Token Not Allowed");
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(termsRecords[termsID].financingDeposited + amount <= termsRecords[termsID].totalFinancing, "Amount exceeds the remaining financing available");
+            // This check is only for USDC which runs a 6 decimal contract
+            if(IERC20(financingToken).decimals() < 18){
+                require(termsRecords[termsID].financingDeposited + (amount.mul(10e12)) <= termsRecords[termsID].totalFinancing, "Amount exceeds the remaining financing available");
+            }
+
+            IERC20(financingToken).transferFrom(msg.sender, address(this), amount);
+
+            if(IERC20(financingToken).decimals() < 18){
+                termsRecords[termsID].financingDeposited += (amount.mul(10e12));
+            }
+            else {
+                termsRecords[termsID].financingDeposited += amount;
+            }
+
+    }
+
+    function depositCarbonCollateral(address _collateralAddress, uint256 termsID, uint256 amount) public {
+
+        
+
+    }
 
     function updateTonsDeliveryAddress(uint256 termsID, address _newDeliveryAddress) public onlyManager {
 
