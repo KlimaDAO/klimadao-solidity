@@ -28,16 +28,18 @@
 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
-/// @title Klima Future Financing Contract
+/// @title Klima Forward Deposit Contract
 /// @author Archimedes
 
 
 import "../helpers/Ownable.sol";
-import "../interfaces/IERC20.sol";
+import "../helpers/interfaces/IERC20.sol";
 
 contract ForwardDeposit is Ownable {
 
     address public klimaToken;
+    address public wsKLIMAToken;
+    uint8   public wsKLIMABonusRequired; // wsKLIMA required as a % of the total collateral (ex 100% collateral + 25% bonus in wsKLIMA for 125% collateral) 3 digits
 
     mapping(address => bool) public allowedFinancers;
     mapping(address => bool) public allowedCollateral;   // Collateral used for the financing BCT/NCT/UBO/NBO/MCO2/etc
@@ -47,12 +49,13 @@ contract ForwardDeposit is Ownable {
     ForwardTerms[] public termsRecords; // push only for record keeping
 
     struct ForwardTerms {
-        uint256 expiry;                 //in Epoch terms
+        uint256 expiry;                 // in Epoch terms
         uint256 totalFinancing;         // in USD terms normalized to 18 Decimals (looking at you USDC)
         uint256 totalCarbonCollateral;  // Collateral required for 100% finance unlock in carbon tons
         uint256 financingDeposited;     // amount of financing deposited up to but less than the total
         uint256 collateralDeposited;    // amount of collateral deposited up to but less than the total
-        uint256 financingBorrowed;      //amount of financing withdrawn by the project
+        uint256 wsKLIMADeposited;       // amount of wsKLIMA deposited
+        uint256 financingBorrowed;      // amount of financing withdrawn by the project
         uint256 tonsDelivered;          // amount of tons delivered to the contract
         address tonsDeliveryAddress;    // address of the TCO2, C3T or other of the tons to be delivered (may be populated later)
         address allowedDepositor;       // address of the allowed depositing address
@@ -65,9 +68,11 @@ contract ForwardDeposit is Ownable {
         _;
     }
 
-    constructor(address _klimaToken) {
+    constructor(address _klimaToken, address _wsklimaToken, uint8 _klimaFee) {
 
         klimaToken = _klimaToken;
+        wsKLIMAToken = _wsklimaToken;
+        wsKLIMABonusRequired = _klimaFee;
 
     }
 
@@ -98,13 +103,14 @@ contract ForwardDeposit is Ownable {
             require(termsRecords[termsID].financingDeposited + amount <= termsRecords[termsID].totalFinancing, "Amount exceeds the remaining financing available");
             // This check is only for USDC which runs a 6 decimal contract
             if(IERC20(financingToken).decimals() < 18){
-                require(termsRecords[termsID].financingDeposited + (amount.mul(10e12)) <= termsRecords[termsID].totalFinancing, "Amount exceeds the remaining financing available");
+                require(termsRecords[termsID].financingDeposited + (amount * (10e12)) <= termsRecords[termsID].totalFinancing, "Amount exceeds the remaining financing available");
             }
-
+            // Transfer asset
             IERC20(financingToken).transferFrom(msg.sender, address(this), amount);
 
+            // Again correct for USDC, all deposits must be noted in Decimal 18 terms
             if(IERC20(financingToken).decimals() < 18){
-                termsRecords[termsID].financingDeposited += (amount.mul(10e12));
+                termsRecords[termsID].financingDeposited += (amount * (10e12));
             }
             else {
                 termsRecords[termsID].financingDeposited += amount;
@@ -112,11 +118,181 @@ contract ForwardDeposit is Ownable {
 
     }
 
-    function depositCarbonCollateral(address _collateralAddress, uint256 termsID, uint256 amount) public {
 
-        
+    //@dev deposit an amount of carbon collateral specified in terms up to a maximum amount
+    //@param _collateralAddress token address of the collateral to transfer (UBO/NBO/NCT/BCT/MCO2 as ERC20)
+    //@param amount Amount to deposit in Decimal 18 (Assumes 18)
+    function depositCarbonCollateral(address _collateralAddress, uint256 termsID, uint256 amount) public {
+            require(allowedCollateral[_collateralAddress] == true, "Collateral Token Not Allowed");
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(termsRecords[termsID].allowedDepositor == msg.sender, "Depositor not allowed");
+            require(termsRecords[termsID].collateralDeposited + amount <= termsRecords[termsID].totalCarbonCollateral, "Amount exceeds the remaining collateral required");
+
+            // Transfer asset
+            IERC20(_collateralAddress).transferFrom(msg.sender, address(this), amount);
+            // Update Record
+            termsRecords[termsID].collateralDeposited += amount;
 
     }
+
+    //@dev deposit an amount of wsKLIMA collateral specified as a percentage of the amount deposited
+    function depositwsKLIMACollateral(uint256 termsID) public {
+            require(termsRecords[termsID].collateralDeposited > 0, "No carbon collateral deposited");
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(termsRecords[termsID].allowedDepositor == msg.sender, "Depositor not allowed");
+
+            // Calculate required wsKLIMA
+            uint256 amountToTxfr = getwsKLIMACollateralRequired(termsID);
+            // Transfer wsKLIMA here
+            IERC20(wsKLIMAToken).transferFrom(msg.sender,address(this), amountToTxfr);
+            // Update record
+            termsRecords[termsID].wsKLIMADeposited += amountToTxfr;
+
+
+    }
+    //@dev withdraw wsKLIMA deposited by a terms owner, checks if any financing was withdrawn and subtracts that from possible amount
+    //
+
+    function withdrawWsKLIMACollateral(uint256 termsID, uint256 amount) public {
+            require(termsRecords[termsID].wsKLIMADeposited > 0, "No wsKLIMA collateral deposited");
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(termsRecords[termsID].allowedDepositor == msg.sender, "Depositor not allowed");
+
+            uint256 maxAmountToWithdraw = getWithdrawableWSKLIMA(termsID);
+
+            require(amount <= maxAmountToWithdraw, "Amount to withdraw exceeds allowable amount");
+
+            termsRecords[termsID].wsKLIMADeposited -= amount;
+
+            IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, amount);
+
+
+    }
+    //@dev withdraw collateral by a terms owner, checks if any financing was withdrawn and subtracts that from possible amount
+
+    function withdrawCollateral(uint256 termsID, address _collateralAddress, uint256 amount) public {
+            require(termsRecords[termsID].collateralDeposited > 0, "No collateral deposited");
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(termsRecords[termsID].allowedDepositor == msg.sender, "Depositor not allowed");
+
+            uint256 maxAmountToWithdraw = getWithdrawableCollateral(termsID);
+
+            require(amount <= maxAmountToWithdraw, "Amount to withdraw exceeds allowable amount");
+
+            IERC20(_collateralAddress).transferFrom(address(this), msg.sender, amount);
+
+            termsRecords[termsID].collateralDeposited -= amount;
+
+
+    }
+    //@dev withdraw available financing for a terms specified by the agreement
+
+    function withdrawFinancing(uint256 termsID, uint256 amount, address financingToken) public {
+            require(termsRecords[termsID].collateralDeposited > 0, "No collateral deposited");
+            require(termsRecords[termsID].wsKLIMADeposited > 0, "No wsKLIMA collateral deposited");  
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(termsRecords[termsID].allowedDepositor == msg.sender, "Depositor not allowed");
+
+            uint256 maxAmountToWithdraw = getWithdrawableFinancing(termsID);
+
+            if(IERC20(financingToken).decimals() < 18){
+                //normalize to 18 decimals
+                require((amount * 10e12) <= maxAmountToWithdraw, "Amount to withdraw exceeds allowable amount");
+
+            }
+            else {
+                require(amount <= maxAmountToWithdraw, "Amount to withdraw exceeds allowable amount");
+            }
+            
+            IERC20(financingToken).transferFrom(address(this), msg.sender, amount);
+
+            termsRecords[termsID].financingBorrowed += amount;
+
+
+    }
+    //@dev emergency return all funds and close financing in a given termsID
+    function emergencyCloseTerms(uint256 termsID) public onlyManager {
+
+
+
+    }
+
+    //@dev in the event of the terms expiring, the collateral is liquidated for the amount that is within the terms. Liquidation amounts will be manually calculated as hopefully this will be rare
+
+    function liquidateCollateral(uint256 termsID, address[] memory financingTokens, uint256[] memory amounts, address[] memory collateralTokensUsed, uint256[] memory collateralAmounts) public onlyManager {
+            require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+            require(block.timestamp > termsRecords[termsID].expiry, "Terms not yet expired");
+
+
+            for(uint i = 0 ; i < financingTokens.length ; i++){
+
+                IERC20(financingTokens[i]).transferFrom(address(this), msg.sender, amounts[i]);
+            }
+
+            IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, termsRecords[termsID].wsKLIMADeposited);
+            IERC20(termsRecords[termsID].tonsDeliveryAddress).transferFrom(address(this), msg.sender, termsRecords[termsID].tonsDelivered);
+
+            for(uint j = 0 ; j < financingTokens.length; j++){
+
+                IERC20(collateralTokensUsed[j]).transferFrom(address(this), msg.sender, collateralAmounts[j]);
+            }
+
+            isActiveTermsID[termsID] == false;
+
+
+    }
+
+    //@dev calculate withdrawable financing for a given ratio of collateral deposited in a termsID
+
+    function getWithdrawableFinancing(uint256 termsID) public view returns (uint256 withdrawableAmount) {
+
+            withdrawableAmount =  (termsRecords[termsID].collateralDeposited/termsRecords[termsID].totalCarbonCollateral) * termsRecords[termsID].financingDeposited;
+
+            return withdrawableAmount;
+
+
+    }
+
+    //@dev use this function to deliver tonnage and return collateral and wsKLIMA to the project user
+
+    function deliverTons() public view {
+
+    }
+
+    //@dev calculate wsKLIMA that is withdrawable, which is only withdrawable after tons are delivered or on liquidation
+
+    function getWithdrawableWSKLIMA(uint256 termsID) public view returns (uint256 withdrawableAmount){
+
+            withdrawableAmount =  (termsRecords[termsID].tonsDelivered/termsRecords[termsID].totalCarbonCollateral) * termsRecords[termsID].wsKLIMADeposited;
+
+            return withdrawableAmount;
+
+
+    }
+
+    //@dev calculate how much collateral can be withdrawn based on the amount financed
+
+    function getWithdrawableCollateral(uint256 termsID) public view returns (uint256 withdrawableAmount){
+
+            uint256 lockedAmount = (termsRecords[termsID].financingBorrowed/termsRecords[termsID].totalFinancing) * termsRecords[termsID].collateralDeposited;
+
+            withdrawableAmount = termsRecords[termsID].collateralDeposited - lockedAmount;
+
+            return withdrawableAmount;
+
+
+    }
+
+    //@dev calculate the required wsKLIMA for withdrawing financing
+
+    function getwsKLIMACollateralRequired(uint256 termsID) public view returns (uint256 amountToTransfer) {
+
+        amountToTransfer = (termsRecords[termsID].collateralDeposited * wsKLIMABonusRequired)/1000;
+
+        return amountToTransfer;
+
+    }
+
 
     function updateTonsDeliveryAddress(uint256 termsID, address _newDeliveryAddress) public onlyManager {
 
@@ -150,6 +326,10 @@ contract ForwardDeposit is Ownable {
 
         allowedDepositToken[_depositTokenAddress] = _newState;
         
+    }
+
+    function updateKlimaFee(uint8 _newFee) public onlyManager {
+        wsKLIMABonusRequired = _newFee;
     }
 
 }
