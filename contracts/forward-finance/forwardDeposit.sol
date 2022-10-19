@@ -210,14 +210,38 @@ contract ForwardDeposit is Ownable {
 
 
     }
-    //@dev emergency return all funds and close financing in a given termsID
-    function emergencyCloseTerms(uint256 termsID) public onlyManager {
+    //@dev emergency return all funds and close financing in a given termsID, amounts are to be manually calculated to be able to subtract tons delivered/collateral
+    function emergencyCloseTerms(uint256 termsID, address[] memory financingTokens, uint256[] memory amounts, address[] memory collateralTokensUsed, uint256[] memory collateralAmounts) public onlyManager {
+        require(isActiveTermsID[termsID] == true, "Terms ID not Active");
 
+
+                    for(uint i = 0 ; i < financingTokens.length ; i++){
+
+                IERC20(financingTokens[i]).transferFrom(address(this), msg.sender, amounts[i]);
+            }
+
+            uint256 wsKLIMAtoTxfr = getWithdrawableWSKLIMA(termsID);
+
+            IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, (termsRecords[termsID].wsKLIMADeposited-wsKLIMAtoTxfr));
+            IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, (termsRecords[termsID].wsKLIMAtoTxfr));
+
+
+            IERC20(termsRecords[termsID].tonsDeliveryAddress).transferFrom(address(this), msg.sender, termsRecords[termsID].tonsDelivered);
+
+
+            // TODO: Rework this to either be 1 token per TermsID or accept a mapping. Applies to other functions like Liquidate as well. 
+            for(uint j = 0 ; j < collateralTokensUsed.length; j++){
+
+                IERC20(collateralTokensUsed[j]).transferFrom(address(this),msg.sender , collateralAmounts[j]);
+            }
+
+            isActiveTermsID[termsID] == false;
 
 
     }
 
-    //@dev in the event of the terms expiring, the collateral is liquidated for the amount that is within the terms. Liquidation amounts will be manually calculated as hopefully this will be rare
+    //@dev in the event of the terms expiring, the collateral is liquidated for the amount that is within the terms. 
+    //     Liquidation amounts will be manually calculated as hopefully this will be rare.
 
     function liquidateCollateral(uint256 termsID, address[] memory financingTokens, uint256[] memory amounts, address[] memory collateralTokensUsed, uint256[] memory collateralAmounts) public onlyManager {
             require(isActiveTermsID[termsID] == true, "Terms ID not Active");
@@ -232,7 +256,7 @@ contract ForwardDeposit is Ownable {
             IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, termsRecords[termsID].wsKLIMADeposited);
             IERC20(termsRecords[termsID].tonsDeliveryAddress).transferFrom(address(this), msg.sender, termsRecords[termsID].tonsDelivered);
 
-            for(uint j = 0 ; j < financingTokens.length; j++){
+            for(uint j = 0 ; j < collateralTokensUsed.length; j++){
 
                 IERC20(collateralTokensUsed[j]).transferFrom(address(this), msg.sender, collateralAmounts[j]);
             }
@@ -255,7 +279,27 @@ contract ForwardDeposit is Ownable {
 
     //@dev use this function to deliver tonnage and return collateral and wsKLIMA to the project user
 
-    function deliverTons() public view {
+    function deliverTons(uint256 termsID, uint256 amount, address _collateralAddress) public  {
+
+        require(isActiveTermsID[termsID] == true, "Terms ID not Active");
+        require(termsRecords[termsID].allowedDepositor == msg.sender, "Depositor not allowed");
+
+        IERC20(termsRecords[termsID].tonsDeliveryAddress).transferFrom(msg.sender,address(this), amount);
+
+        termsRecords[termsID].tonsDelivered += amount;
+
+        uint256 amountWSKLIMAToTxfr = getWithdrawableWSKLIMA(termsID);
+
+        IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, amountWSKLIMAToTxfr);
+
+        termsRecords[termsID].wsKLIMADeposited -= amountWSKLIMAToTxfr;
+
+        uint256 collateralToTxfr = getWithdrawableCollateral(termsID);
+
+        IERC20(_collateralAddress).transferFrom(address(this), msg.sender, collateralToTxfr);
+
+        termsRecords[termsID].collateralDeposited -= collateralToTxfr;
+
 
     }
 
