@@ -7,15 +7,15 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "../interfaces/IUniswapV2Pair.sol";
-import "../interfaces/IUniswapV2Router02.sol";
-import "../interfaces/IStaking.sol";
-import "../interfaces/IStakingHelper.sol";
-import "../interfaces/IwsKLIMA.sol";
-import "../interfaces/IKlimaCarbonRetirements.sol";
-import "../interfaces/IToucanPool.sol";
-import "../interfaces/IToucanCarbonOffsets.sol";
-import "../interfaces/IKlimaRetirementAggregator.sol";
+import "./interfaces/IUniswapV2Pair.sol";
+import "./interfaces/IUniswapV2Router02.sol";
+import "./interfaces/IStaking.sol";
+import "./interfaces/IStakingHelper.sol";
+import "./interfaces/IwsKLIMA.sol";
+import "./interfaces/IKlimaCarbonRetirements.sol";
+import "./interfaces/IToucanPool.sol";
+import "./interfaces/IToucanCarbonOffsets.sol";
+import "./interfaces/IKlimaRetirementAggregator.sol";
 
 contract RetireToucanCarbon is
     Initializable,

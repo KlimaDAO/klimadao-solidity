@@ -14,7 +14,6 @@ import "../interfaces/IwsKLIMA.sol";
 /// Review by: JeffX
 /// Ctrl C'd, Ctrl V'd by: Archimedes
 
-
 contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
     /* ======== DEPENDENCIES ======== */
 
@@ -22,10 +21,19 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
 
     /* ======== EVENTS ======== */
 
-    event CreateMarket(uint256 indexed id, address indexed baseToken, address indexed quoteToken, uint256 initialPrice);
+    event CreateMarket(
+        uint256 indexed id,
+        address indexed baseToken,
+        address indexed quoteToken,
+        uint256 initialPrice
+    );
     event CloseMarket(uint256 indexed id);
     event Bond(uint256 indexed id, uint256 amount, uint256 price);
-    event Tuned(uint256 indexed id, uint64 oldControlVariable, uint64 newControlVariable);
+    event Tuned(
+        uint256 indexed id,
+        uint64 oldControlVariable,
+        uint64 newControlVariable
+    );
 
     /* ======== STATE VARIABLES ======== */
 
@@ -47,7 +55,16 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
         IStaking _staking,
         IStakingHelper _stakingHelper,
         ITreasury _treasury
-    ) NoteKeeper(_authority, _klima, _wsklima, _staking,_stakingHelper, _treasury) {
+    )
+        NoteKeeper(
+            _authority,
+            _klima,
+            _wsklima,
+            _staking,
+            _stakingHelper,
+            _treasury
+        )
+    {
         // save gas for users by bulk approving stake() transactions
         _klima.approve(address(_staking), 1e45);
     }
@@ -106,7 +123,9 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
          *
          * 1e18 = KLIMA decimals (9) + price decimals (9)
          */
-        payout_ = ((_amount * 1e18) / price) / (10**metadata[_id].quoteDecimals);
+        payout_ =
+            ((_amount * 1e18) / price) /
+            (10**metadata[_id].quoteDecimals);
 
         // markets have a max payout amount, capping size because deposits
         // do not experience slippage. max payout is recalculated upon tuning
@@ -156,10 +175,20 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
          * is redeemable, the time when payout was redeemed, and the ID
          * of the market deposited into
          */
-        index_ = addNote(_user, payout_, uint48(expiry_), uint48(_id), _referral);
+        index_ = addNote(
+            _user,
+            payout_,
+            uint48(expiry_),
+            uint48(_id),
+            _referral
+        );
 
         // transfer payment to treasury
-        market.quoteToken.safeTransferFrom(msg.sender, address(treasury), _amount);
+        market.quoteToken.safeTransferFrom(
+            msg.sender,
+            address(treasury),
+            _amount
+        );
 
         // if max debt is breached, the market is closed
         // this a circuit breaker
@@ -204,7 +233,11 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
         if (adjustments[_id].active) {
             Adjustment storage adjustment = adjustments[_id];
 
-            (uint64 adjustBy, uint48 secondsSince, bool stillActive) = _controlDecay(_id);
+            (
+                uint64 adjustBy,
+                uint48 secondsSince,
+                bool stillActive
+            ) = _controlDecay(_id);
             terms[_id].controlVariable -= adjustBy;
 
             if (stillActive) {
@@ -245,13 +278,17 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
              * i.e. market has 10 days remaining. deposit interval is 1 day. capacity
              * is 10,000 KLIMA. max payout would be 1,000 KLIMA (10,000 * 1 / 10).
              */
-            markets[_id].maxPayout = uint64((capacity * meta.depositInterval) / timeRemaining);
+            markets[_id].maxPayout = uint64(
+                (capacity * meta.depositInterval) / timeRemaining
+            );
 
             // calculate the ideal total debt to satisfy capacity in the remaining time
             uint256 targetDebt = (capacity * meta.length) / timeRemaining;
 
             // derive a new control variable from the target debt and current supply
-            uint64 newControlVariable = uint64((price * treasury.baseSupply()) / targetDebt);
+            uint64 newControlVariable = uint64(
+                (price * treasury.baseSupply()) / targetDebt
+            );
 
             emit Tuned(_id, terms[_id].controlVariable, newControlVariable);
 
@@ -261,7 +298,12 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
                 // if decrease, control variable change will be carried out over the tune interval
                 // this is because price will be lowered
                 uint64 change = terms[_id].controlVariable - newControlVariable;
-                adjustments[_id] = Adjustment(change, _time, meta.tuneInterval, true);
+                adjustments[_id] = Adjustment(
+                    change,
+                    _time,
+                    meta.tuneInterval,
+                    true
+                );
             }
             metadata[_id].lastTune = _time;
         }
@@ -299,14 +341,20 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
          *
          * 1e18 = klima decimals (9) + initial price decimals (9)
          */
-        uint64 targetDebt = uint64(_booleans[0] ? ((_market[0] * 1e18) / _market[1]) / 10**decimals : _market[0]);
+        uint64 targetDebt = uint64(
+            _booleans[0]
+                ? ((_market[0] * 1e18) / _market[1]) / 10**decimals
+                : _market[0]
+        );
 
         /*
          * max payout is the amount of capacity that should be utilized in a deposit
          * interval. for example, if capacity is 1,000 KLIMA, there are 10 days to conclusion,
          * and the preferred deposit interval is 1 day, max payout would be 100 KLIMA.
          */
-        uint64 maxPayout = uint64((targetDebt * _intervals[0]) / secondsToConclusion);
+        uint64 maxPayout = uint64(
+            (targetDebt * _intervals[0]) / secondsToConclusion
+        );
 
         /*
          * max debt serves as a circuit breaker for the market. let's say the quote
@@ -327,7 +375,8 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
          * debt ratio = total debt / supply
          * therefore, control variable = price / debt ratio
          */
-        uint256 controlVariable = (_market[1] * treasury.baseSupply()) / targetDebt;
+        uint256 controlVariable = (_market[1] * treasury.baseSupply()) /
+            targetDebt;
 
         // depositing into, or getting info for, the created market uses this ID
         id_ = markets.length;
@@ -367,7 +416,12 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
 
         marketsForQuote[address(_quoteToken)].push(id_);
 
-        emit CreateMarket(id_, address(klima), address(_quoteToken), _market[1]);
+        emit CreateMarket(
+            id_,
+            address(klima),
+            address(_quoteToken),
+            _market[1]
+        );
     }
 
     /**
@@ -410,7 +464,9 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      * l = length of program
      */
     function marketPrice(uint256 _id) public view override returns (uint256) {
-        return (currentControlVariable(_id) * debtRatio(_id)) / (10**metadata[_id].quoteDecimals);
+        return
+            (currentControlVariable(_id) * debtRatio(_id)) /
+            (10**metadata[_id].quoteDecimals);
     }
 
     /**
@@ -422,7 +478,12 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      *
      * @dev 1e18 = klima decimals (9) + market price decimals (9)
      */
-    function payoutFor(uint256 _amount, uint256 _id) external view override returns (uint256) {
+    function payoutFor(uint256 _amount, uint256 _id)
+        external
+        view
+        override
+        returns (uint256)
+    {
         Metadata memory meta = metadata[_id];
         return (_amount * 1e18) / marketPrice(_id) / 10**meta.quoteDecimals;
     }
@@ -434,7 +495,9 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      * @return             debt ratio for market in quote decimals
      */
     function debtRatio(uint256 _id) public view override returns (uint256) {
-        return (currentDebt(_id) * (10**metadata[_id].quoteDecimals)) / treasury.baseSupply();
+        return
+            (currentDebt(_id) * (10**metadata[_id].quoteDecimals)) /
+            treasury.baseSupply();
     }
 
     /**
@@ -476,7 +539,8 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      * @param _id          ID of market
      */
     function isLive(uint256 _id) public view override returns (bool) {
-        return (markets[_id].capacity != 0 && terms[_id].conclusion > block.timestamp);
+        return (markets[_id].capacity != 0 &&
+            terms[_id].conclusion > block.timestamp);
     }
 
     /**
@@ -503,7 +567,12 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      * @notice             returns an array of all active market IDs for a given quote token
      * @param _token       quote token to check for
      */
-    function liveMarketsFor(address _token) external view override returns (uint256[] memory) {
+    function liveMarketsFor(address _token)
+        external
+        view
+        override
+        returns (uint256[] memory)
+    {
         uint256[] memory mkts = marketsForQuote[_token];
         uint256 num;
 
@@ -533,7 +602,9 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      * @return                  price for market in KLIMA decimals
      */
     function _marketPrice(uint256 _id) internal view returns (uint256) {
-        return (terms[_id].controlVariable * _debtRatio(_id)) / (10**metadata[_id].quoteDecimals);
+        return
+            (terms[_id].controlVariable * _debtRatio(_id)) /
+            (10**metadata[_id].quoteDecimals);
     }
 
     /**
@@ -543,7 +614,9 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
      * @return                  current debt for market in quote decimals
      */
     function _debtRatio(uint256 _id) internal view returns (uint256) {
-        return (markets[_id].totalDebt * (10**metadata[_id].quoteDecimals)) / treasury.baseSupply();
+        return
+            (markets[_id].totalDebt * (10**metadata[_id].quoteDecimals)) /
+            treasury.baseSupply();
     }
 
     /**
@@ -568,6 +641,8 @@ contract KlimaBondDepositoryV2 is IBondDepository, NoteKeeper {
         secondsSince_ = uint48(block.timestamp) - info.lastAdjustment;
 
         active_ = secondsSince_ < info.timeToAdjusted;
-        decay_ = active_ ? (info.change * secondsSince_) / info.timeToAdjusted : info.change;
+        decay_ = active_
+            ? (info.change * secondsSince_) / info.timeToAdjusted
+            : info.change;
     }
 }

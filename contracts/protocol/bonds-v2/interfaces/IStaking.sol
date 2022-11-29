@@ -9,7 +9,9 @@ interface IStaking {
         bool _claim
     ) external returns (uint256);
 
-    function claim(address _recipient, bool _rebasing) external returns (uint256);
+    function claim(address _recipient, bool _rebasing)
+        external
+        returns (uint256);
 
     function forfeit() external returns (uint256);
 
@@ -22,9 +24,13 @@ interface IStaking {
         bool _rebasing
     ) external returns (uint256);
 
-    function wrap(address _to, uint256 _amount) external returns (uint256 gBalance_);
+    function wrap(address _to, uint256 _amount)
+        external
+        returns (uint256 gBalance_);
 
-    function unwrap(address _to, uint256 _amount) external returns (uint256 sBalance_);
+    function unwrap(address _to, uint256 _amount)
+        external
+        returns (uint256 sBalance_);
 
     function rebase() external;
 
@@ -35,4 +41,8 @@ interface IStaking {
     function totalStaked() external view returns (uint256);
 
     function supplyInWarmup() external view returns (uint256);
+
+    function sKLIMA() external returns (address);
+
+    function KLIMA() external returns (address);
 }
