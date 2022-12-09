@@ -5,13 +5,13 @@ const chalk = require("chalk");
 require("@nomiclabs/hardhat-etherscan");
 require("@tenderly/hardhat-tenderly");
 require("hardhat-deploy");
+require("@nomicfoundation/hardhat-chai-matchers")
 require("@nomiclabs/hardhat-ethers");
 require("@openzeppelin/hardhat-upgrades");
 
 require("dotenv").config();
 
 require("@nomiclabs/hardhat-etherscan");
-require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 
@@ -31,6 +31,44 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
+task('diamondABI', 'Generates ABI file for diamond, includes all ABIs of facets and subdirectories', async () => {
+  var walk = function (dir) {
+    var results = [];
+    var list = fs.readdirSync(dir);
+    list.forEach(function (file) {
+      file = dir + '/' + file;
+      var stat = fs.statSync(file);
+      if (stat && stat.isDirectory()) {
+        /* Recurse into a subdirectory */
+        results = results.concat(walk(file));
+      } else {
+        /* Is a file */
+        results.push(file.substring(1));
+      }
+    });
+    return results;
+  }
+
+  const basePath = '/contracts/infinity/diamond/facets'
+  const libraryBasePath = '/contracts/libraries/'
+  let files = walk('.' + basePath)
+  let abi = []
+  for (var file of files) {
+    var jsonFile
+    if (file.includes('Facet')) {
+      var baseName = /[^/]*$/.exec(file)[0];
+      jsonFile = baseName.replace('sol', 'json');
+      let json = fs.readFileSync(`./artifacts${file}/${jsonFile}`)
+
+      json = JSON.parse(json)
+      abi.push(...json.abi)
+    }
+  }
+  abi = JSON.stringify(abi.filter((item, pos) => abi.map((a) => a.name).indexOf(item.name) == pos), null, 4)
+  fs.writeFileSync('./abi/KlimaInfinity.json', abi)
+  console.log('ABI written to abi/KlimaInfinity.json')
+})
+
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -40,6 +78,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 module.exports = {
   solidity: {
     compilers: [
+      {
+        version: "0.8.16",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
       {
         version: "0.8.11",
         settings: {
@@ -127,6 +174,12 @@ module.exports = {
     mumbai: {
       url: "https://polygon-mumbai.infura.io/v3/f16fe897786f47149695118b395db6e3",
       gasPrice: 5e9,
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545/",
+      timeout: 100000,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
