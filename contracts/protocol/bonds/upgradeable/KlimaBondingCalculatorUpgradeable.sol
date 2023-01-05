@@ -1,9 +1,6 @@
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.4;
-
 
 // ██╗  ██╗██╗     ██╗███╗   ███╗ █████╗     ██████╗  █████╗  ██████╗
 // ██║ ██╔╝██║     ██║████╗ ████║██╔══██╗    ██╔══██╗██╔══██╗██╔═══██╗
@@ -12,12 +9,9 @@ pragma solidity ^0.8.4;
 // ██║  ██╗███████╗██║██║ ╚═╝ ██║██║  ██║    ██████╔╝██║  ██║╚██████╔╝
 // ╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝
 
-
-
-import  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 library Babylonian {
-
     function sqrt(uint256 x) internal pure returns (uint256) {
         if (x == 0) return 0;
 
@@ -63,9 +57,8 @@ library Babylonian {
 }
 
 library BitMath {
-
     function mostSignificantBit(uint256 x) internal pure returns (uint8 r) {
-        require(x > 0, 'BitMath::mostSignificantBit: zero');
+        require(x > 0, "BitMath::mostSignificantBit: zero");
 
         if (x >= 0x100000000000000000000000000000000) {
             x >>= 128;
@@ -99,90 +92,110 @@ library BitMath {
     }
 }
 
-import "../../helpers/libraries/SafeMath.sol";
-import "../../helpers/libraries/Address.sol";
-import "../../helpers/libraries/FullMath.sol";
-import "../../helpers/libraries/FixedPoint.sol";
-import "../../helpers/libraries/Counters.sol";
-import "../../helpers/libraries/SafeERC20.sol";
+import "../../../helpers/libraries/SafeMath.sol";
+import "../../../helpers/libraries/Address.sol";
+import "../../../helpers/libraries/FullMath.sol";
+import "../../../helpers/libraries/FixedPoint.sol";
+import "../../../helpers/libraries/Counters.sol";
+import "../../../helpers/libraries/SafeERC20.sol";
 
 //import "../../helpers/interfaces/IERC2612Permit.sol";
-import "../../helpers/interfaces/IERC20.sol";
-import "../../helpers/interfaces/ITreasury.sol";
-import "../../helpers/interfaces/IBondCalculator.sol";
-import "../../helpers/interfaces/IStaking.sol";
-import "../../helpers/interfaces/IStakingHelper.sol";
+import "../../../helpers/interfaces/IERC20.sol";
+import "../../../helpers/interfaces/ITreasury.sol";
+import "../../../helpers/interfaces/IBondCalculator.sol";
+import "../../../helpers/interfaces/IStaking.sol";
+import "../../../helpers/interfaces/IStakingHelper.sol";
 
-import "../../helpers/abstracts/ERC20.sol";
-import "../../helpers/abstracts/ERC20Permit.sol";
-
-
-
-
+import "../../../helpers/abstracts/ERC20.sol";
+import "../../../helpers/abstracts/ERC20Permit.sol";
 
 interface IUniswapV2ERC20 {
-    function totalSupply() external view returns (uint);
+    function totalSupply() external view returns (uint256);
 }
 
 interface IUniswapV2Pair is IUniswapV2ERC20 {
-    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
-    function token0() external view returns ( address );
-    function token1() external view returns ( address );
+    function getReserves()
+        external
+        view
+        returns (
+            uint112 reserve0,
+            uint112 reserve1,
+            uint32 blockTimestampLast
+        );
+
+    function token0() external view returns (address);
+
+    function token1() external view returns (address);
 }
 
-import "../../helpers/interfaces/IBondCalculator.sol";
+import "../../../helpers/interfaces/IBondCalculator.sol";
 
-contract KlimaBondingCalculatorUpgradeable is IBondCalculator, OwnableUpgradeable {
-
+contract KlimaBondingCalculatorUpgradeable is
+    IBondCalculator,
+    OwnableUpgradeable
+{
     using FixedPoint for *;
-    using SafeMath for uint;
+    using SafeMath for uint256;
     using SafeMath for uint112;
 
     address public KLIMA;
 
-    constructor() {
+    constructor() {}
 
-    }
-
-    function initialize(address _KLIMA) initializer public {
+    function initialize(address _KLIMA) public initializer {
         __Ownable_init();
         __KlimaBondingCalculatorUpgradeable_init(_KLIMA);
     }
 
-    function __KlimaBondingCalculatorUpgradeable_init(address _KLIMA) initializer internal {
-        require( _KLIMA != address(0) );
+    function __KlimaBondingCalculatorUpgradeable_init(address _KLIMA)
+        internal
+        initializer
+    {
+        require(_KLIMA != address(0));
         KLIMA = _KLIMA;
     }
 
-    function getKValue( address _pair ) public view returns( uint k_ ) {
-        uint token0 = IERC20( IUniswapV2Pair( _pair ).token0() ).decimals();
-        uint token1 = IERC20( IUniswapV2Pair( _pair ).token1() ).decimals();
-        uint decimals = token0.add( token1 ).sub( IERC20( _pair ).decimals() );
+    function getKValue(address _pair) public view returns (uint256 k_) {
+        uint256 token0 = IERC20(IUniswapV2Pair(_pair).token0()).decimals();
+        uint256 token1 = IERC20(IUniswapV2Pair(_pair).token1()).decimals();
+        uint256 decimals = token0.add(token1).sub(IERC20(_pair).decimals());
 
-        (uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
-        k_ = reserve0.mul(reserve1).div( 10 ** decimals );
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(_pair)
+            .getReserves();
+        k_ = reserve0.mul(reserve1).div(10**decimals);
     }
 
-    function getTotalValue( address _pair ) public view returns ( uint _value ) {
-        _value = getKValue( _pair ).sqrrt().mul(2);
+    function getTotalValue(address _pair) public view returns (uint256 _value) {
+        _value = getKValue(_pair).sqrrt().mul(2);
     }
 
-    function valuation( address _pair, uint amount_ ) external view override returns ( uint _value ) {
-        uint totalValue = getTotalValue( _pair );
-        uint totalSupply = IUniswapV2Pair( _pair ).totalSupply();
+    function valuation(address _pair, uint256 amount_)
+        external
+        view
+        override
+        returns (uint256 _value)
+    {
+        uint256 totalValue = getTotalValue(_pair);
+        uint256 totalSupply = IUniswapV2Pair(_pair).totalSupply();
 
-        _value = totalValue.mul( FixedPoint.fraction( amount_, totalSupply ).decode112with18() ).div( 1e18 );
+        _value = totalValue
+            .mul(FixedPoint.fraction(amount_, totalSupply).decode112with18())
+            .div(1e18);
     }
 
-    function markdown( address _pair ) external view override returns ( uint ) {
-        ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
+    function markdown(address _pair) external view override returns (uint256) {
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(_pair)
+            .getReserves();
 
-        uint reserve;
-        if ( IUniswapV2Pair( _pair ).token0() == KLIMA ) {
+        uint256 reserve;
+        if (IUniswapV2Pair(_pair).token0() == KLIMA) {
             reserve = reserve1;
         } else {
             reserve = reserve0;
         }
-        return reserve.mul( 2 * ( 10 ** IERC20( KLIMA ).decimals() ) ).div( getTotalValue( _pair ) );
+        return
+            reserve.mul(2 * (10**IERC20(KLIMA).decimals())).div(
+                getTotalValue(_pair)
+            );
     }
 }

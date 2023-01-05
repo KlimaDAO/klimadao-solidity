@@ -3,8 +3,8 @@ pragma solidity ^0.8.10;
 
 import "../types/FrontEndRewarder.sol";
 
-import "../../interfaces/IStaking.sol";
-import "../../interfaces/IStakingHelper.sol";
+import "../interfaces/IStaking.sol";
+import "../interfaces/IStakingHelper.sol";
 import "../interfaces/ITreasury.sol";
 import "../interfaces/INoteKeeper.sol";
 import "../../interfaces/IwsKLIMA.sol";
@@ -26,12 +26,10 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
         IStakingHelper _stakingHelper,
         ITreasury _treasury
     ) FrontEndRewarder(_authority, _klima) {
-
         wsKLIMA = _wsklima;
         staking = _staking;
         stakingHelper = _stakingHelper;
         treasury = _treasury;
-
     }
 
     // if treasury address changes on authority, update it
@@ -112,7 +110,6 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
             }
         }
 
-
         if (_sendwsKLIMA) {
             // Approve sKLIMA for Wrapping
             IERC20(wsKLIMA.sKLIMA()).approve(address(wsKLIMA), payout_);
@@ -120,7 +117,6 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
             payout_ = wsKLIMA.wrap(payout_);
 
             wsKLIMA.transfer(_user, payout_); // send payout as wsKLIMA
-
         } else {
             // send payout as sKLIMA
             IERC20(staking.sKLIMA()).transfer(_user, payout_);
@@ -134,7 +130,11 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @param _sendwsKLIMA    send payout as wsKLIMA or sKLIMA
      * @return             sum of payout sent, in wsKLIMA
      */
-    function redeemAll(address _user, bool _sendwsKLIMA) external override returns (uint256) {
+    function redeemAll(address _user, bool _sendwsKLIMA)
+        external
+        override
+        returns (uint256)
+    {
         return redeem(_user, indexesFor(_user), _sendwsKLIMA);
     }
 
@@ -146,7 +146,10 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @param _index       index of note to approve transfer for
      */
     function pushNote(address _to, uint256 _index) external override {
-        require(notes[msg.sender][_index].created != 0, "Depository: note not found");
+        require(
+            notes[msg.sender][_index].created != 0,
+            "Depository: note not found"
+        );
         noteTransfers[msg.sender][_index] = _to;
     }
 
@@ -155,9 +158,19 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @param _from        the address that approved the note transfer
      * @param _index       the index of the note to transfer (in the sender's array)
      */
-    function pullNote(address _from, uint256 _index) external override returns (uint256 newIndex_) {
-        require(noteTransfers[_from][_index] == msg.sender, "Depository: transfer not found");
-        require(notes[_from][_index].redeemed == 0, "Depository: note redeemed");
+    function pullNote(address _from, uint256 _index)
+        external
+        override
+        returns (uint256 newIndex_)
+    {
+        require(
+            noteTransfers[_from][_index] == msg.sender,
+            "Depository: transfer not found"
+        );
+        require(
+            notes[_from][_index].redeemed == 0,
+            "Depository: note redeemed"
+        );
 
         newIndex_ = notes[msg.sender].length;
         notes[msg.sender].push(notes[_from][_index]);
@@ -174,7 +187,12 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @param _user        the user to query notes for
      * @return             the pending notes for the user
      */
-    function indexesFor(address _user) public view override returns (uint256[] memory) {
+    function indexesFor(address _user)
+        public
+        view
+        override
+        returns (uint256[] memory)
+    {
         Note[] memory info = notes[_user];
 
         uint256 length;
@@ -202,10 +220,18 @@ abstract contract NoteKeeper is INoteKeeper, FrontEndRewarder {
      * @return payout_     the payout due, in wsKLIMA
      * @return matured_    if the payout can be redeemed
      */
-    function pendingFor(address _user, uint256 _index) public view override returns (uint256 payout_, bool matured_) {
+    function pendingFor(address _user, uint256 _index)
+        public
+        view
+        override
+        returns (uint256 payout_, bool matured_)
+    {
         Note memory note = notes[_user][_index];
 
         payout_ = note.payout;
-        matured_ = note.redeemed == 0 && note.matured <= block.timestamp && note.payout != 0;
+        matured_ =
+            note.redeemed == 0 &&
+            note.matured <= block.timestamp &&
+            note.payout != 0;
     }
 }

@@ -7,11 +7,11 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "../interfaces/IUniswapV2Router02.sol";
-import "../interfaces/IwsKLIMA.sol";
-import "../interfaces/IRetireBridgeCommon.sol";
-import "../interfaces/IRetireMossCarbon.sol";
-import "../interfaces/IRetireToucanCarbon.sol";
+import "./interfaces/IUniswapV2Router02.sol";
+import "./interfaces/IwsKLIMA.sol";
+import "./interfaces/IRetireBridgeCommon.sol";
+import "./interfaces/IRetireMossCarbon.sol";
+import "./interfaces/IRetireToucanCarbon.sol";
 
 /**
  * @title KlimaRetirementAggregator
