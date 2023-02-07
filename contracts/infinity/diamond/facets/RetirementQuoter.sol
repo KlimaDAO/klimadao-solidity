@@ -39,4 +39,25 @@ contract RetirementQuoter {
         if (sourceToken == carbonToken) return totalCarbon;
         return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
     }
+
+    function getSourceAmountDefaultRedeem(
+        address sourceToken,
+        address carbonToken,
+        uint256 redeemAmount
+    ) public view returns (uint256 amountIn) {
+        if (sourceToken == carbonToken) return redeemAmount;
+        return LibSwap.getSourceAmount(sourceToken, carbonToken, redeemAmount);
+    }
+
+    function getSourceAmountSpecificRedeem(
+        address sourceToken,
+        address carbonToken,
+        uint256[] memory redeemAmounts
+    ) public view returns (uint256 amountIn) {
+        for (uint256 i; i < redeemAmounts.length; i++) {
+            redeemAmounts[i] += LibToucanCarbon.getSpecificRedeemFee(carbonToken, redeemAmounts[i]);
+            amountIn += redeemAmounts[i];
+        }
+        if (sourceToken != carbonToken) return LibSwap.getSourceAmount(sourceToken, carbonToken, amountIn);
+    }
 }
