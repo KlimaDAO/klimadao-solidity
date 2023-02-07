@@ -20,7 +20,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
      * @return projectTokens   List of underlying tokens received
      * @return amounts         Amounts of underlying tokens received
      */
-    function toucan_redeemExactCarbonPoolDefault(
+    function toucanRedeemExactCarbonPoolDefault(
         address sourceToken,
         address poolToken,
         uint256 amount,
@@ -59,7 +59,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
      * @param toMode               To Mode for where undlerying tokens are sent
      * @return redeemedAmounts     Amounts of underlying tokens redeemed
      */
-    function toucan_redeemExactCarbonPoolSpecific(
+    function toucanRedeemExactCarbonPoolSpecific(
         address sourceToken,
         address poolToken,
         uint256 maxAmountIn,
