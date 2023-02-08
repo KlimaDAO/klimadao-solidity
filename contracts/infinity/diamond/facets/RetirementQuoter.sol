@@ -5,6 +5,7 @@ import "../../libraries/LibAppStorage.sol";
 import "../../libraries/LibRetire.sol";
 import "../../libraries/TokenSwap/LibSwap.sol";
 import "../../C.sol";
+import "../AppStorage.sol";
 
 /**
  * @author Cujo
@@ -12,6 +13,8 @@ import "../../C.sol";
  */
 
 contract RetirementQuoter {
+    AppStorage internal s;
+
     function getSourceAmountSwapOnly(
         address sourceToken,
         address carbonToken,
@@ -54,9 +57,17 @@ contract RetirementQuoter {
         address carbonToken,
         uint256[] memory redeemAmounts
     ) public view returns (uint256 amountIn) {
-        for (uint256 i; i < redeemAmounts.length; i++) {
-            redeemAmounts[i] += LibToucanCarbon.getSpecificRedeemFee(carbonToken, redeemAmounts[i]);
-            amountIn += redeemAmounts[i];
+        // Toucan Calculations
+        if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.TOUCAN) {
+            for (uint256 i; i < redeemAmounts.length; i++) {
+                amountIn += redeemAmounts[i] + LibToucanCarbon.getSpecificRedeemFee(carbonToken, redeemAmounts[i]);
+            }
+        } else if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.C3) {
+            for (uint256 i; i < redeemAmounts.length; i++) {
+                amountIn +=
+                    redeemAmounts[i] +
+                    LibC3Carbon.getExactCarbonSpecificRedeemFee(carbonToken, redeemAmounts[i]);
+            }
         }
         if (sourceToken != carbonToken) return LibSwap.getSourceAmount(sourceToken, carbonToken, amountIn);
     }
