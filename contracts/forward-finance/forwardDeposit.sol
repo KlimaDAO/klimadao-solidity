@@ -223,7 +223,6 @@ contract ForwardDeposit is Ownable {
             uint256 wsKLIMAtoTxfr = getWithdrawableWSKLIMA(termsID);
 
             IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, (termsRecords[termsID].wsKLIMADeposited-wsKLIMAtoTxfr));
-            IERC20(wsKLIMAToken).transferFrom(address(this), msg.sender, (termsRecords[termsID].wsKLIMAtoTxfr));
 
 
             IERC20(termsRecords[termsID].tonsDeliveryAddress).transferFrom(address(this), msg.sender, termsRecords[termsID].tonsDelivered);
