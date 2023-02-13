@@ -73,9 +73,16 @@ contract RetireCarbonFacet is ReentrancyGuard {
             retirementMessage
         );
 
-        // Send any aggregator fees to treasury
+        uint256 daoFee;
+        uint256 treasuryFee;
+
+        // Send any aggregator fees to treasury and the DAO wallet
         if (totalCarbon - retireAmount > 0)
-            LibTransfer.sendToken(IERC20(poolToken), totalCarbon - retireAmount, C.treasury(), LibTransfer.To.EXTERNAL);
+
+            daoFee = LibRetire.getFeeShareDAO(totalCarbon - retireAmount);
+            treasuryFee = totalCarbon - retireAmount - daoFee;
+            LibTransfer.sendToken(IERC20(poolToken), daoFee, C.dao(), LibTransfer.To.EXTERNAL);
+            LibTransfer.sendToken(IERC20(poolToken), treasuryFee, C.treasury(), LibTransfer.To.EXTERNAL);
 
         return LibRetire.getTotalRetirements(beneficiaryAddress);
     }
@@ -138,9 +145,16 @@ contract RetireCarbonFacet is ReentrancyGuard {
             retirementMessage
         );
 
-        // Send any aggregator fees to treasury
+        uint256 daoFee;
+        uint256 treasuryFee;
+
+        // Send any aggregator fees to treasury and the DAO wallet
         if (totalCarbon - redeemedPool > 0)
-            LibTransfer.sendToken(IERC20(poolToken), totalCarbon - redeemedPool, C.treasury(), LibTransfer.To.EXTERNAL);
+
+            daoFee = LibRetire.getFeeShareDAO(totalCarbon - redeemedPool);
+            treasuryFee = totalCarbon - redeemedPool - daoFee;
+            LibTransfer.sendToken(IERC20(poolToken), daoFee, C.dao(), LibTransfer.To.EXTERNAL);
+            LibTransfer.sendToken(IERC20(poolToken), treasuryFee, C.treasury(), LibTransfer.To.EXTERNAL);
 
         return LibRetire.getTotalRetirements(beneficiaryAddress);
     }

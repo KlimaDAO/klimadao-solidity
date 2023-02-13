@@ -242,6 +242,16 @@ library LibRetire {
     }
 
     /**
+     * @notice                  Returns the total fee needed to retire x number of tokens
+     * @param feeAmount         Amount of aggregator fee
+     * @return feeShare         Total DAO fee share
+     */
+    function getFeeShareDAO(uint256 feeAmount) internal view returns (uint256 feeShare) {
+        AppStorage storage s = LibAppStorage.diamondStorage();
+        feeShare = (feeAmount * s.daoFeeShare) / 100000;
+    }
+
+    /**
      * @notice                      Saves the details of the retirement over to KlimaCarbonRetirements and project details within AppStorage
      * @param poolToken             Pool token used to retire
      * @param projectToken          Pool token used to retire

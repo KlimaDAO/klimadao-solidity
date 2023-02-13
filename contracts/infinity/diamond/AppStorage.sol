@@ -52,6 +52,7 @@ struct AppStorage {
     mapping(address => Account.State) a; // Mapping of a user address to account state.
     uint256 lastERC721Received; // Last ERC721 Toucan Retirement Certificate received.
     uint256 fee; // Aggregator fee charged on all retirements to 3 decimals. 1000 = 1%
+    uint256 daoFeeShare; // Share of 'fee' for the DAO wallet, per KIP-33. 3 decimals. 1000 = 1%
     uint256 reentrantStatus; // An intra-transaction state variable to protect against reentrance.
     // Internal Balances
     mapping(address => mapping(IERC20 => uint256)) internalTokenBalance; // A mapping from Klimate address to Token address to Internal Balance. It stores the amount of the Token that the Klimate has stored as an Internal Balance in Klima Infinity.
