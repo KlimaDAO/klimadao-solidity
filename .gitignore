@@ -1,8 +1,11 @@
 node_modules
+out
+cache_forge
 .npm
 .cache
 .env
 .local
+.vscode
 
 #Hardhat files
 cache

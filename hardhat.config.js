@@ -15,6 +15,8 @@ require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 
+require("@nomicfoundation/hardhat-foundry");
+
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
 const DEBUG = false;
