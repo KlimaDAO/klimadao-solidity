@@ -275,6 +275,7 @@ library LibRetire {
 
         // Save the details of the retirement
         s.a[beneficiaryAddress].retirements[currentRetirementIndex].projectTokenAddress = projectToken;
+        s.a[beneficiaryAddress].totalProjectRetired[projectToken] += amount;
     }
 
     /* ========== Account Getters ========== */

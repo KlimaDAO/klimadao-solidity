@@ -34,7 +34,7 @@ contract RetireC3C3TFacet is ReentrancyGuard {
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
-    function c3_retireExactC3T(
+    function c3RetireExactC3T(
         address carbonToken,
         uint256 amount,
         address beneficiaryAddress,
@@ -73,7 +73,7 @@ contract RetireC3C3TFacet is ReentrancyGuard {
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
-    function c3_retireExactC3TWithEntity(
+    function c3RetireExactC3TWithEntity(
         address carbonToken,
         uint256 amount,
         string memory retiringEntityString,

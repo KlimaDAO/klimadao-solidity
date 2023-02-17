@@ -1,6 +1,7 @@
 const { utils } = require("ethers");
 const fs = require("fs");
 const chalk = require("chalk");
+const { daoFeeUpgrade } = require("./scripts/infinity/deploy_dao_fee_split");
 
 require("@nomiclabs/hardhat-etherscan");
 require("@tenderly/hardhat-tenderly");
@@ -12,6 +13,7 @@ require("@openzeppelin/hardhat-upgrades");
 require("dotenv").config();
 
 require("@nomiclabs/hardhat-etherscan");
+require("hardhat-contract-sizer")
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 
@@ -30,6 +32,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     console.log(account.address);
   }
 });
+
+task("upgrade", async () => {
+  account = await ethers.getSigner()
+  await daoFeeUpgrade(true, account)
+})
 
 task('diamondABI', 'Generates ABI file for diamond, includes all ABIs of facets and subdirectories', async () => {
   var walk = function (dir) {
@@ -183,6 +190,13 @@ module.exports = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    polygon: {
+      url: process.env.POLYGON_URL || "",
+      gasPrice: 150e9,
+      timeout: 100000,
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -190,6 +204,11 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+    customChains: [],
+  },
+  polygonscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+    customChains: [],
   },
 };
 
