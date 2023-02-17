@@ -34,7 +34,7 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
-    function toucan_retireExactTCO2(
+    function toucanRetireExactTCO2(
         address carbonToken,
         uint256 amount,
         address beneficiaryAddress,
@@ -73,7 +73,7 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
-    function toucan_retireExactTCO2WithEntity(
+    function toucanRetireExactTCO2WithEntity(
         address carbonToken,
         uint256 amount,
         string memory retiringEntityString,
