@@ -191,7 +191,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "c3_retireExactC3T",
+        "name": "c3RetireExactC3T",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -240,7 +240,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "c3_retireExactC3TWithEntity",
+        "name": "c3RetireExactC3TWithEntity",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -382,7 +382,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "toucan_retireExactTCO2",
+        "name": "toucanRetireExactTCO2",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -431,7 +431,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "toucan_retireExactTCO2WithEntity",
+        "name": "toucanRetireExactTCO2WithEntity",
         "outputs": [
             {
                 "internalType": "uint256",
