@@ -207,7 +207,6 @@ library LibToucanCarbon {
      * @notice                      Simple wrapper to use redeem Toucan pools using the default list
      * @param poolToken             Pool token to redeem
      * @param amount                Amount of tokens being redeemed
-     * @param fromMode              Where to receive pool tokens
      * @param toMode                Where to send TCO2 tokens
      * @return projectTokens        TCO2 token addresses redeemed
      * @return amounts              TCO2 token amounts redeemed
@@ -215,10 +214,8 @@ library LibToucanCarbon {
     function redeemPoolAuto(
         address poolToken,
         uint256 amount,
-        LibTransfer.From fromMode,
         LibTransfer.To toMode
     ) internal returns (address[] memory projectTokens, uint256[] memory amounts) {
-        LibTransfer.receiveToken(IERC20(poolToken), amount, msg.sender, fromMode);
         (projectTokens, amounts) = IToucanPool(poolToken).redeemAuto2(amount);
         for (uint256 i; i < projectTokens.length; i++) {
             LibTransfer.sendToken(IERC20(projectTokens[i]), amounts[i], msg.sender, toMode);
@@ -230,7 +227,6 @@ library LibToucanCarbon {
      * @param poolToken             Pool token to redeem
      * @param projectTokens         Project tokens to redeem
      * @param amounts               Token amounts to redeem
-     * @param fromMode              Where to receive pool tokens
      * @param toMode                Where to send TCO2 tokens
      * @return redeemedAmounts      TCO2 token amounts redeemed
      */
@@ -238,18 +234,11 @@ library LibToucanCarbon {
         address poolToken,
         address[] memory projectTokens,
         uint256[] memory amounts,
-        LibTransfer.From fromMode,
         LibTransfer.To toMode
     ) internal returns (uint256[] memory) {
-        uint256 sum;
         uint256[] memory beforeBalances = new uint256[](projectTokens.length);
         uint256[] memory redeemedAmounts = new uint256[](projectTokens.length);
-        for (uint256 i; i < projectTokens.length; i++) {
-            beforeBalances[i] = IERC20(projectTokens[i]).balanceOf(address(this));
-            sum = sum + amounts[i];
-        }
 
-        LibTransfer.receiveToken(IERC20(poolToken), sum, msg.sender, fromMode);
         IToucanPool(poolToken).redeemMany(projectTokens, amounts);
 
         for (uint256 i; i < projectTokens.length; i++) {

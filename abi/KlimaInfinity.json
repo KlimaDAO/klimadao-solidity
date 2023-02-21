@@ -3,12 +3,22 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "poolToken",
                 "type": "address"
             },
             {
                 "internalType": "uint256",
                 "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxAmountIn",
                 "type": "uint256"
             },
             {
@@ -22,7 +32,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "c3_redeemPoolDefault",
+        "name": "c3RedeemPoolDefault",
         "outputs": [
             {
                 "internalType": "address[]",
@@ -42,8 +52,18 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "poolToken",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxAmountIn",
+                "type": "uint256"
             },
             {
                 "internalType": "address[]",
@@ -66,7 +86,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "c3_redeemPoolSpecific",
+        "name": "c3RedeemPoolSpecific",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -171,7 +191,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "c3_retireExactC3T",
+        "name": "c3RetireExactC3T",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -220,7 +240,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "c3_retireExactC3TWithEntity",
+        "name": "c3RetireExactC3TWithEntity",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -235,12 +255,22 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "poolToken",
                 "type": "address"
             },
             {
                 "internalType": "uint256",
                 "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxAmountIn",
                 "type": "uint256"
             },
             {
@@ -254,7 +284,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "toucan_redeemPoolDefault",
+        "name": "toucanRedeemExactCarbonPoolDefault",
         "outputs": [
             {
                 "internalType": "address[]",
@@ -274,8 +304,18 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "poolToken",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxAmountIn",
+                "type": "uint256"
             },
             {
                 "internalType": "address[]",
@@ -298,7 +338,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "toucan_redeemPoolSpecific",
+        "name": "toucanRedeemExactCarbonPoolSpecific",
         "outputs": [
             {
                 "internalType": "uint256[]",
@@ -342,7 +382,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "toucan_retireExactTCO2",
+        "name": "toucanRetireExactTCO2",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -391,7 +431,7 @@
                 "type": "uint8"
             }
         ],
-        "name": "toucan_retireExactTCO2WithEntity",
+        "name": "toucanRetireExactTCO2WithEntity",
         "outputs": [
             {
                 "internalType": "uint256",
