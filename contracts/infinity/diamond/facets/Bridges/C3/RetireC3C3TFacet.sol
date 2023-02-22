@@ -59,7 +59,7 @@ contract RetireC3C3TFacet is ReentrancyGuard {
             retirementMessage
         );
 
-        return s.a[beneficiaryAddress].totalRetirements;
+        return LibRetire.getTotalRetirements(beneficiaryAddress);
     }
 
     /**
@@ -99,6 +99,6 @@ contract RetireC3C3TFacet is ReentrancyGuard {
             retirementMessage
         );
 
-        return s.a[beneficiaryAddress].totalRetirements;
+        return LibRetire.getTotalRetirements(beneficiaryAddress);
     }
 }
