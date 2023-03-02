@@ -17,6 +17,7 @@ library C {
     address private constant STAKING = 0x25d28a24Ceb6F81015bB0b2007D795ACAc411b4d;
     address private constant STAKING_HELPER = 0x4D70a031Fc76DA6a9bC0C922101A05FA95c3A227;
     address private constant TREASURY = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
+    address private constant DAO = 0x65A5076C0BA74e5f3e069995dc3DAB9D197d995c;
 
     // Standard Swap ERC20s
     address private constant USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
@@ -63,6 +64,10 @@ library C {
 
     function treasury() internal pure returns (address) {
         return TREASURY;
+    }
+
+    function dao() internal pure returns (address) {
+        return DAO;
     }
 
     function klima() internal pure returns (address) {

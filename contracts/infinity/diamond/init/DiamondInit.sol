@@ -64,6 +64,7 @@ contract DiamondInit {
 
         // Retirement convenience fee
         s.fee = 1000;
+        s.daoFeeShare = 80000;
 
         // Default BCT Swap setup
         s.swap[C.bct()][C.usdc()].swapDexes = [0];
