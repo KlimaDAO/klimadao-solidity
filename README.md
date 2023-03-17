@@ -2,34 +2,45 @@
 
 ## Local Development
 
+Install foundry:
+
+https://book.getfoundry.sh/getting-started/installation
+
+For Linux and MacOS users:
+
 ```
-npm i
-npx hardhat compile
+curl -L https://foundry.paradigm.xyz | bash
 ```
 
-_NOTE: if you would like to to start a containerized development environment, run `docker-compose up` prior to the previous commands._
+This will download foundryup. Then install Foundry by running:
+
+```
+foundryup
+```
 
 ## Deploy
 
-Deploy the Klima tokens (KLIMA, sKLIMA, wsKLIMA).
-```
-npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_Tokens.js
-```
+These examples use a localhost fork running on the `anvil` command
 
-Update `.env` with the KLIMA address from the previous step and with the BCT
-address and deploy the Klima treasury.
-```
-npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_treasury.js
-```
-Note that sKLIMA is not set at the treasury contract and needs to be a separate
-transaction to add it as it stands.
+### Base Protocol Contracts
 
-Update `.env` with the sKLIMA address from the first step and the treasury
-address from the previous step. Also, configure the desired parameters for
-the first epoch number, block, and epoch length in the deploy script below.
-```
-npx hardhat run --network <network_name> ./scripts/deploy_KLIMA_staking.js
-```
+- Deploy the Klima tokens (KLIMA, sKLIMA, wsKLIMA).
+
+  ```
+  forge script script/deployProtocolTokens.s.sol:DeployKlimaProtocolTokens --fork-url http://localhost:8545 --broadcast --ffi
+  ```
+
+- Update `.env` with the KLIMA and sKLIMA addresses from the previous step and deploy the Klima treasury.
+
+  ```
+  forge script script/deployProtocolTreasury.s.sol:DeployKlimaTreasury --fork-url http://localhost:8545 --broadcast --ffi
+  ```
+
+- Update `.env` with the treasury address from the previous step. Also, configure the desired parameters for the first epoch number, block, and epoch length in the deploy script below.
+
+  ```
+  forge script script/deployProtocolStaking.s.sol:DeployKlimaStaking --fork-url http://localhost:8545 --broadcast --ffi
+  ```
 
 ## Deprecated Contracts
 
