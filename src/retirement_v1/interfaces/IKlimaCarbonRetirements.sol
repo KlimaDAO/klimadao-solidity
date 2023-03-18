@@ -23,6 +23,7 @@ interface IKlimaCarbonRetirements {
         returns (
             address,
             uint256,
+            string memory,
             string memory
         );
 

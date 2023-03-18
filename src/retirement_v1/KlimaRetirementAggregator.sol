@@ -12,6 +12,7 @@ import "./interfaces/IwsKLIMA.sol";
 import "./interfaces/IRetireBridgeCommon.sol";
 import "./interfaces/IRetireMossCarbon.sol";
 import "./interfaces/IRetireToucanCarbon.sol";
+import "./interfaces/IRetireC3Carbon.sol";
 
 /**
  * @title KlimaRetirementAggregator
@@ -88,6 +89,35 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
             _poolToken,
             _amount,
             _amountInCarbon,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _msgSender()
+        );
+    }
+
+    function retireCarbon(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        string memory _retireEntityString,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage
+    ) public {
+        require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+
+        (uint256 sourceAmount, ) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
+
+        IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+
+        _retireCarbon(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon,
+            _retireEntityString,
             _beneficiaryAddress,
             _beneficiaryString,
             _retirementMessage,
@@ -189,6 +219,75 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
                 _poolToken,
                 _amount,
                 _amountInCarbon,
+                "KlimaDAO Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree
+            );
+        } else if (poolBridge[_poolToken] == 2) {
+            IRetireC3Carbon(bridgeHelper[2]).retireC3(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree
+            );
+        }
+    }
+
+    function _retireCarbon(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        string memory _retireEntityString,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address _retiree
+    ) internal {
+        (uint256 sourceAmount, ) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
+
+        require(
+            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount,
+            "Source tokens not transferred."
+        );
+
+        IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(bridgeHelper[poolBridge[_poolToken]], sourceAmount);
+
+        if (poolBridge[_poolToken] == 0) {
+            IRetireMossCarbon(bridgeHelper[0]).retireMoss(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree
+            );
+        } else if (poolBridge[_poolToken] == 1) {
+            IRetireToucanCarbon(bridgeHelper[1]).retireToucan(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _retireEntityString,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree
+            );
+        } else if (poolBridge[_poolToken] == 2) {
+            IRetireC3Carbon(bridgeHelper[2]).retireC3(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
                 _beneficiaryAddress,
                 _beneficiaryString,
                 _retirementMessage,
@@ -236,6 +335,37 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
             _poolToken,
             _amount,
             _amountInCarbon,
+            _beneficiaryAddress,
+            _beneficiaryString,
+            _retirementMessage,
+            _msgSender(),
+            _carbonList
+        );
+    }
+
+    function retireCarbonSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        string memory _retireEntityString,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address[] memory _carbonList
+    ) public {
+        //require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+
+        (uint256 sourceAmount, ) = getSourceAmountSpecific(_sourceToken, _poolToken, _amount, _amountInCarbon);
+
+        IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+
+        _retireCarbonSpecific(
+            _sourceToken,
+            _poolToken,
+            _amount,
+            _amountInCarbon,
+            _retireEntityString,
             _beneficiaryAddress,
             _beneficiaryString,
             _retirementMessage,
@@ -306,6 +436,67 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
             // Reserve for possible future use.
         } else if (poolBridge[_poolToken] == 1) {
             IRetireToucanCarbon(bridgeHelper[1]).retireToucanSpecific(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                "KlimaDAO Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree,
+                _carbonList
+            );
+        } else if (poolBridge[_poolToken] == 2) {
+            IRetireC3Carbon(bridgeHelper[2]).retireC3Specific(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree,
+                _carbonList
+            );
+        }
+    }
+
+    function _retireCarbonSpecific(
+        address _sourceToken,
+        address _poolToken,
+        uint256 _amount,
+        bool _amountInCarbon,
+        string memory _retireEntityString,
+        address _beneficiaryAddress,
+        string memory _beneficiaryString,
+        string memory _retirementMessage,
+        address _retiree,
+        address[] memory _carbonList
+    ) internal {
+        require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        // Only Toucan and C3 currently allow specific retirement.
+        require(poolBridge[_poolToken] == 1 || poolBridge[_poolToken] == 2, "Pool does not allow specific.");
+
+        _prepareRetireSpecific(_sourceToken, _poolToken, _amount, _amountInCarbon);
+
+        if (poolBridge[_poolToken] == 0) {
+            // Reserve for possible future use.
+        } else if (poolBridge[_poolToken] == 1) {
+            IRetireToucanCarbon(bridgeHelper[1]).retireToucanSpecific(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _amountInCarbon,
+                _retireEntityString,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                _retiree,
+                _carbonList
+            );
+        } else if (poolBridge[_poolToken] == 2) {
+            IRetireC3Carbon(bridgeHelper[2]).retireC3Specific(
                 _sourceToken,
                 _poolToken,
                 _amount,

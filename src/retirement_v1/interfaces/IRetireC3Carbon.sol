@@ -1,26 +1,24 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.0;
 
-interface IRetireToucanCarbon {
-    function retireToucan(
+interface IRetireC3Carbon {
+    function retireC3(
         address _sourceToken,
         address _poolToken,
         uint256 _amount,
         bool _amountInCarbon,
-        string memory _retireEntityString,
         address _beneficiaryAddress,
         string memory _beneficiaryString,
         string memory _retirementMessage,
         address _retiree
     ) external;
 
-    function retireToucanSpecific(
+    function retireC3Specific(
         address _sourceToken,
         address _poolToken,
         uint256 _amount,
         bool _amountInCarbon,
-        string memory _retireEntityString,
         address _beneficiaryAddress,
         string memory _beneficiaryString,
         string memory _retirementMessage,
