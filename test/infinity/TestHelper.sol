@@ -1,50 +1,67 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.16;
 
-/******************************************************************************\
-* Authors: Cujo <rawr@cujowolf.dev>
-* EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
+import {Test, console, stdError} from "forge-std/Test.sol";
+import {stdMath} from "forge-std/StdMath.sol";
+import {Strings} from "oz/utils/Strings.sol";
 
-* Script to deploy Infinity diamond with Cut, Loupe, Ownership and Infinity facets
-/******************************************************************************/
+import {Users} from "test/helpers/Users.sol";
 
-import "forge-std/Script.sol";
-import "../src/infinity/interfaces/IDiamondCut.sol";
-import {Diamond} from "../src/infinity/Diamond.sol";
-import "../src/infinity/facets/DiamondCutFacet.sol";
-import "../src/infinity/facets/DiamondLoupeFacet.sol";
-import "../src/infinity/facets/OwnershipFacet.sol";
-import {RedeemC3PoolFacet} from "../src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
-import {RetireC3C3TFacet} from "../src/infinity/facets/Bridges/C3/RetireC3C3TFacet.sol";
-import {RedeemToucanPoolFacet} from "../src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
-import {RetireToucanTCO2Facet} from "../src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
-import {RetireCarbonFacet} from "../src/infinity/facets/Retire/RetireCarbonFacet.sol";
-import {RetireInfoFacet} from "../src/infinity/facets/Retire/RetireInfoFacet.sol";
-import {RetireSourceFacet} from "../src/infinity/facets/Retire/RetireSourceFacet.sol";
-import {RetirementQuoter} from "../src/infinity/facets/RetirementQuoter.sol";
-import {DiamondInit} from "../src/infinity/init/DiamondInit.sol";
-import "../test/infinity/HelperContract.sol";
+import "src/retirement_v1/interfaces/IKlimaCarbonRetirements.sol";
 
-contract DeployInfinityScript is Script, HelperContract {
-    function run() external returns (address) {
-        //read env variables and choose EOA for transaction signing
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address deployerAddress = vm.envAddress("PUBLIC_KEY");
+// Diamond Deployment
+import "../../src/infinity/interfaces/IDiamondCut.sol";
+import {Diamond} from "src/infinity/Diamond.sol";
+import "src/infinity/facets/DiamondCutFacet.sol";
+import "src/infinity/facets/DiamondLoupeFacet.sol";
+import "src/infinity/facets/OwnershipFacet.sol";
+import {RedeemC3PoolFacet} from "src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
+import {RetireC3C3TFacet} from "src/infinity/facets/Bridges/C3/RetireC3C3TFacet.sol";
+import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
+import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
+import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
+import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
+import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
+import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
+import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
+import "./HelperContract.sol";
 
-        vm.startBroadcast(deployerPrivateKey);
+abstract contract TestHelper is Test, HelperContract {
+    using Strings for uint;
 
+    // Users
+    Users users;
+    address user;
+    address user2;
+
+    // Diamond deployment public key
+    address deployerAddress = vm.envAddress("PUBLIC_KEY");
+
+    DiamondCutFacet dCutF;
+    DiamondLoupeFacet dLoupeF;
+    OwnershipFacet ownerF;
+    RedeemC3PoolFacet c3RedeemF;
+    RetireC3C3TFacet c3RetireF;
+    RedeemToucanPoolFacet toucanRedeemF;
+    RetireToucanTCO2Facet toucanRetireF;
+    RetireCarbonFacet retireCarbonF;
+    RetireInfoFacet retireInfoF;
+    RetireSourceFacet retireSourceF;
+    RetirementQuoter retirementQuoterF;
+
+    function setupInfinity() internal returns (address) {
         //deploy facets and init contract
-        DiamondCutFacet dCutF = new DiamondCutFacet();
-        DiamondLoupeFacet dLoupeF = new DiamondLoupeFacet();
-        OwnershipFacet ownerF = new OwnershipFacet();
-        RedeemC3PoolFacet c3RedeemF = new RedeemC3PoolFacet();
-        RetireC3C3TFacet c3RetireF = new RetireC3C3TFacet();
-        RedeemToucanPoolFacet toucanRedeemF = new RedeemToucanPoolFacet();
-        RetireToucanTCO2Facet toucanRetireF = new RetireToucanTCO2Facet();
-        RetireCarbonFacet retireCarbonF = new RetireCarbonFacet();
-        RetireInfoFacet retireInfoF = new RetireInfoFacet();
-        RetireSourceFacet retireSourceF = new RetireSourceFacet();
-        RetirementQuoter retirementQuoterF = new RetirementQuoter();
+        dCutF = new DiamondCutFacet();
+        dLoupeF = new DiamondLoupeFacet();
+        ownerF = new OwnershipFacet();
+        c3RedeemF = new RedeemC3PoolFacet();
+        c3RetireF = new RetireC3C3TFacet();
+        toucanRedeemF = new RedeemToucanPoolFacet();
+        toucanRetireF = new RetireToucanTCO2Facet();
+        retireCarbonF = new RetireCarbonFacet();
+        retireInfoF = new RetireInfoFacet();
+        retireSourceF = new RetireSourceFacet();
+        retirementQuoterF = new RetirementQuoter();
 
         DiamondInit diamondInit = new DiamondInit();
 
@@ -137,8 +154,26 @@ contract DeployInfinityScript is Script, HelperContract {
         Diamond diamond = new Diamond(deployerAddress, address(dCutF));
         IDiamondCut(address(diamond)).diamondCut(cut, address(diamondInit), abi.encodeWithSignature("init()"));
 
-        vm.stopBroadcast();
+        return address(diamond);
+    }
 
-        return (address(diamond));
+    function initUser() internal {
+        users = new Users();
+        address[] memory _user = new address[](2);
+        _user = users.createUsers(2);
+        user = _user[0];
+        user2 = _user[1];
+    }
+
+    //////////// EVM Helpers ////////////
+
+    function increaseTime(uint _seconds) internal {
+        vm.warp(block.timestamp + _seconds);
+    }
+
+    modifier prank(address from) {
+        vm.startPrank(from);
+        _;
+        vm.stopPrank();
     }
 }
