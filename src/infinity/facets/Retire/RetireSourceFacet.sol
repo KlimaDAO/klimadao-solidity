@@ -18,7 +18,7 @@ contract RetireSourceFacet is ReentrancyGuard {
         uint retiredAmount
     );
 
-    /* ========== Default Redepmtion Retirements ========== */
+    /* ========== Default Redemption Retirements ========== */
 
     /**
      * @notice                     Retires an exact amount of a source token using default redemption
