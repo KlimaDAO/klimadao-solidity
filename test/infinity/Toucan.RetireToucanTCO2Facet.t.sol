@@ -5,32 +5,22 @@ import "../../src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 
 import {console} from "../../lib/forge-std/src/console.sol";
 
-
-interface IRetireToucanTCO2Facet {
-    function toucanRetireExactTCO2(
-        address carbonToken,
-        uint amount,
-        address beneficiaryAddress,
-        string calldata beneficiaryString,
-        string calldata retirementMessage,
-        LibTransfer.From fromMode
-    ) external returns (uint retirementIndex);
-
-    function toucanRetireExactTCO2WithEntity(
-        address carbonToken,
-        uint amount,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage,
-        LibTransfer.From fromMode
-    ) external returns (uint retirementIndex);
-}
-
 contract RetireToucanTCO2FacetTest is HelperContract {
-    IRetireToucanTCO2Facet retireToucanTCO2Facet;
+    event CarbonRetired(
+        LibRetire.CarbonBridge carbonBridge,
+        address indexed retiringAddress,
+        string retiringEntityString,
+        address indexed beneficiaryAddress,
+        string beneficiaryString,
+        string retirementMessage,
+        address indexed carbonPool,
+        address poolToken,
+        uint retiredAmount
+    );
+
+    RetireToucanTCO2Facet retireToucanTCO2Facet;
     IERC20 carbonToken;
-    uint256 amountToRetire = 100 * 1e18;
+    uint256 defaultCarbonRetireAmount = 100 * 1e18;
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
     string entity = "Test Entity";
@@ -51,8 +41,7 @@ contract RetireToucanTCO2FacetTest is HelperContract {
 
 
     function setUp() public {
-        retireToucanTCO2Facet = IRetireToucanTCO2Facet(0x8cE54d9625371fb2a068986d32C85De8E6e995f8);
-
+        retireToucanTCO2Facet = RetireToucanTCO2Facet(0x8cE54d9625371fb2a068986d32C85De8E6e995f8);
 
         // Set up the carbonToken address and a carbonTokenHolder with a balance
         carbonToken = IERC20(0xC645b80Fd8a23A1459D59626bA3f872e8A59D4cb); // TCO2-VCS-191-2010
@@ -60,8 +49,7 @@ contract RetireToucanTCO2FacetTest is HelperContract {
         KlimaTreasury = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
 
         beneficiaryAddress = 0x000000000000000000000000000000000000dEaD;
-
-        uint256 initialBalance = carbonToken.balanceOf(address(this));
+        
         uint256 amountToTransfer = 100 * 1e18; // Assuming TCO2 token has 18 decimals
 
         uint newBalance = swipeERC20Tokens(address(carbonToken), amountToTransfer, carbonTokenHolder, address(this));
@@ -75,28 +63,35 @@ contract RetireToucanTCO2FacetTest is HelperContract {
         uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         uint expectedRetirements = currentRetirements +1;
-        uint expectedCarbonRetired = currentTotalCarbon + amountToRetire;
-        uint expectedBalance = initialBalance - amountToRetire;
+        uint expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+        uint expectedBalance = initialBalance - defaultCarbonRetireAmount;
 
-        // Start recording logs
-        vm.recordLogs();
+        // Set up expectEmit
+        vm.expectEmit(true, true, true, true);
+
+        // Emit expected CarbonRetired event
+        emit CarbonRetired(
+            LibRetire.CarbonBridge.TOUCAN,
+            address(this),
+            "KlimaDAO Retirement Aggregator",
+            beneficiaryAddress,
+            beneficiary,
+            message,
+            address(0),
+            address(carbonToken),
+            defaultCarbonRetireAmount
+        );
 
 
         // Call the toucanRetireExactTCO2 function and verify the retirement index
         uint256 retirementIndex = retireToucanTCO2Facet.toucanRetireExactTCO2(
             address(carbonToken),
-            amountToRetire,
+            defaultCarbonRetireAmount,
             beneficiaryAddress,
             beneficiary,
             message,
             LibTransfer.From.EXTERNAL
         );
-
-        // Get the recorded logs
-        Vm.Log[] memory entries = vm.getRecordedLogs();
-
-        //Verify the CarbonRetired event emitted
-        assertEq(entries[6].topics[0], keccak256("CarbonRetired(uint8,address,string,address,string,string,address,address,uint256)"));
 
         // No tokens left in contract
         assertEq(expectedBalance, carbonToken.balanceOf(address(this)));
@@ -104,27 +99,6 @@ contract RetireToucanTCO2FacetTest is HelperContract {
         // Account state values updated
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), expectedRetirements);
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
-
-
-        // Read indexed parameters from topics
-        address retiringAddress = address(uint160(uint256(entries[6].topics[1])));
-        address emitted_BeneficiaryAddr = address(uint160(uint256(entries[6].topics[2])));
-        address emitted_carbonPool = address(uint160(uint256(entries[6].topics[3]))); 
-
-        // Decode non-indexed parameters from data
-        (LibRetire.CarbonBridge carbonBridge, string memory retiringEntityString, string memory beneficiaryString, string memory retirementMessage, address carbonTokenRetired, uint256 retiredAmount) = abi.decode(entries[6].data, (LibRetire.CarbonBridge, string, string, string, address, uint256));
-
-        // verify details of CarbonRetired event emitted
-        assertEq(0, uint8(carbonBridge));
-        assertEq(address(this), retiringAddress);
-        assertEq("KlimaDAO Retirement Aggregator", retiringEntityString);
-        assertEq(beneficiaryAddress, emitted_BeneficiaryAddr);
-        assertEq(address(0),emitted_carbonPool); // no pool for direct TCO2 retirement
-        assertEq(address(carbonToken), carbonTokenRetired);
-        assertEq(amountToRetire, retiredAmount, "Incorrect amount retired");
-        assertEq(retirementIndex, LibRetire.getTotalRetirements(beneficiaryAddress));
-        assertEq(beneficiary, beneficiaryString);
-        assertEq(message, retirementMessage);
 
     }
 
@@ -135,16 +109,29 @@ contract RetireToucanTCO2FacetTest is HelperContract {
         uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         uint expectedRetirements = currentRetirements +1;
-        uint expectedCarbonRetired = currentTotalCarbon + amountToRetire;
-        uint expectedBalance = initialBalance - amountToRetire;
+        uint expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+        uint expectedBalance = initialBalance - defaultCarbonRetireAmount;
 
-        // Start recording logs
-        vm.recordLogs();
+        // Set up expectEmit
+        vm.expectEmit(true, true, true, true);
+
+        // Emit expected CarbonRetired event
+        emit CarbonRetired(
+            LibRetire.CarbonBridge.TOUCAN,
+            address(this),
+            entity,
+            beneficiaryAddress,
+            beneficiary,
+            message,
+            address(0),
+            address(carbonToken),
+            defaultCarbonRetireAmount
+        );
 
         // Call the toucanRetireExactTCO2WithEntity function
         uint256 retirementIndex = retireToucanTCO2Facet.toucanRetireExactTCO2WithEntity(
             address(carbonToken),
-            amountToRetire,
+            defaultCarbonRetireAmount,
             entity,
             beneficiaryAddress,
             beneficiary,
@@ -152,38 +139,12 @@ contract RetireToucanTCO2FacetTest is HelperContract {
             LibTransfer.From.EXTERNAL
         );
 
-        // Get the recorded logs
-        Vm.Log[] memory entries = vm.getRecordedLogs();
-
-        //Verify the CarbonRetired event emitted
-        assertEq(entries[6].topics[0], keccak256("CarbonRetired(uint8,address,string,address,string,string,address,address,uint256)"));
-
         // No tokens left in contract
         assertEq(expectedBalance, carbonToken.balanceOf(address(this)));
 
         // Account state values updated
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), expectedRetirements);
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
-
-        // Read indexed parameters from topics
-        address retiringAddress = address(uint160(uint256(entries[6].topics[1])));
-        address emitted_BeneficiaryAddr = address(uint160(uint256(entries[6].topics[2])));
-        address emitted_carbonPool = address(uint160(uint256(entries[6].topics[3]))); 
-
-        // Decode non-indexed parameters from data
-        (LibRetire.CarbonBridge carbonBridge, string memory retiringEntityString, string memory beneficiaryString, string memory retirementMessage, address carbonTokenRetired, uint256 retiredAmount) = abi.decode(entries[6].data, (LibRetire.CarbonBridge, string, string, string, address, uint256));
-
-        // verify details of CarbonRetired event emitted
-        assertEq(0, uint8(carbonBridge));
-        assertEq(address(this), retiringAddress);
-        assertEq(entity, retiringEntityString);
-        assertEq(beneficiaryAddress, emitted_BeneficiaryAddr);
-        assertEq(address(0),emitted_carbonPool); // no pool for direct TCO2 retirement
-        assertEq(address(carbonToken), carbonTokenRetired);
-        assertEq(amountToRetire, retiredAmount, "Incorrect amount retired");
-        assertEq(retirementIndex, LibRetire.getTotalRetirements(beneficiaryAddress));
-        assertEq(beneficiary, beneficiaryString);
-        assertEq(message, retirementMessage);
         
     }
 

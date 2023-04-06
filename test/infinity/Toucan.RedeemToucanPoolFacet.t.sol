@@ -1,50 +1,15 @@
 pragma solidity ^0.8.16;
 
 import "./HelperContract.sol";
-import "../../src/infinity/interfaces/IToucan.sol";
 import "../../src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
-import "../../src/infinity/libraries/Bridges/LibToucanCarbon.sol";
 import "../../src/infinity/libraries/LibRetire.sol";
+import "../../src/infinity/facets/RetirementQuoter.sol";
 
 import {console} from "../../lib/forge-std/src/console.sol";
 
-
-interface IRetirementQuoter {
-    function getSourceAmountDefaultRedeem(address sourceToken, address carbonToken, uint redeemAmount)
-        external
-        view
-        returns (uint amountIn);
-
-    function getSourceAmountSpecificRedeem(address sourceToken, address carbonToken, uint[] memory redeemAmounts)
-        external
-        view
-        returns (uint amountIn);
-}
-
-interface IRedeemToucanPoolFacet {
-    function toucanRedeemExactCarbonPoolSpecific(
-        address sourceToken,
-        address poolToken,
-        uint maxAmountIn,
-        address[] memory projectTokens,
-        uint[] memory amounts,
-        LibTransfer.From fromMode,
-        LibTransfer.To toMode
-    ) external returns (uint[] memory redeemedAmounts);
-
-    function toucanRedeemExactCarbonPoolDefault(
-        address sourceToken,
-        address poolToken,
-        uint amount,
-        uint maxAmountIn,
-        LibTransfer.From fromMode,
-        LibTransfer.To toMode
-    ) external returns (address[] memory projectTokens, uint[] memory amounts);
-}
-
 contract RedeemToucanPoolFacetTest is HelperContract {
-    IRedeemToucanPoolFacet redeemToucanPoolFacet;
-    IRetirementQuoter quoterFacet;
+    RedeemToucanPoolFacet redeemToucanPoolFacet;
+    RetirementQuoter quoterFacet;
 
     address bctDefaultProjectAddress = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
     address nctDefaultProjectAddress = 0x6362364A37F34d39a1f4993fb595dAB4116dAf0d;
@@ -70,8 +35,8 @@ contract RedeemToucanPoolFacetTest is HelperContract {
 
 
     function setUp() public {
-        redeemToucanPoolFacet = IRedeemToucanPoolFacet(diamond);
-        quoterFacet = IRetirementQuoter(diamond);
+        redeemToucanPoolFacet = RedeemToucanPoolFacet(diamond);
+        quoterFacet = RetirementQuoter(diamond);
     }
 
     function test_toucanRedeemExactCarbonPoolDefault_redeemBCT_usingBCT() public {

@@ -2,48 +2,14 @@ pragma solidity ^0.8.16;
 
 import "./HelperContract.sol";
 import "../../src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
+import "../../src/infinity/facets/RetirementQuoter.sol";
 
 import {console} from "../../lib/forge-std/src/console.sol";
 
 
-interface IRetirementQuoter {
-    function getSourceAmountDefaultRedeem(address sourceToken, address carbonToken, uint redeemAmount)
-        external
-        view
-        returns (uint amountIn);
-
-    function getSourceAmountSpecificRedeem(address sourceToken, address carbonToken, uint[] memory redeemAmounts)
-        external
-        view
-        returns (uint amountIn);
-}
-
-interface IRedeemC3PoolFacet {
-
-    function c3RedeemPoolDefault(
-        address sourceToken,
-        address poolToken,
-        uint amount,
-        uint maxAmountIn,
-        LibTransfer.From fromMode,
-        LibTransfer.To toMode
-    ) external returns (address[] memory projectTokens, uint[] memory amounts);
-
-    function c3RedeemPoolSpecific(
-        address sourceToken,
-        address poolToken,
-        uint maxAmountIn,
-        address[] memory projectTokens,
-        uint[] memory amounts,
-        LibTransfer.From fromMode,
-        LibTransfer.To toMode
-    ) external returns (uint[] memory redeemedAmounts);
-
-}
-
 contract RedeemC3PoolFacetTest is HelperContract {
-    IRedeemC3PoolFacet redeemC3PoolFacet;
-    IRetirementQuoter quoterFacet;
+    RedeemC3PoolFacet redeemC3PoolFacet;
+    RetirementQuoter quoterFacet;
 
     address uboDefaultProjectAddress = 0xD6Ed6fAE5b6535CAE8d92f40f5FF653dB807A4EA;
     address nboDefaultProjectAddress = 0xb6eA7a53FC048D6d3B80b968D696E39482B7e578;
@@ -68,8 +34,8 @@ contract RedeemC3PoolFacetTest is HelperContract {
     address NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
 
     function setUp() public {
-        redeemC3PoolFacet = IRedeemC3PoolFacet(diamond);
-        quoterFacet = IRetirementQuoter(diamond);
+        redeemC3PoolFacet = RedeemC3PoolFacet(diamond);
+        quoterFacet = RetirementQuoter(diamond);
     }
 
     function test_c3RedeemPoolDefault_redeemUBO_usingUBO() public {
