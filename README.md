@@ -42,6 +42,13 @@ These examples use a localhost fork running on the `anvil` command
   forge script script/deployProtocolStaking.s.sol:DeployKlimaStaking --fork-url http://localhost:8545 --broadcast --ffi
   ```
 
+### Infinity Diamond Deployment
+
+- Deploy the base Diamond, facet implementations, and perform the diamon cut with the following script.
+  ```
+  forge script script/deployInfinity.s.sol:DeployInfinityScript --fork-url http://localhost:8545 --broadcast --ffi
+  ```
+
 ## Deprecated Contracts
 
 Note that the `AlphaKlimaRedeemUpgradeable` will fail to get built by default, and therefore has been marked deprecated.
