@@ -85,7 +85,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         return LibRetire.getTotalRetirements(beneficiaryAddress);
     }
 
-    /* ========== Specific Redepmtion Retirements ========== */
+    /* ========== Specific Redemption Retirements ========== */
 
     /**
      * @notice                     Retires an exact amount of carbon using specific redemption

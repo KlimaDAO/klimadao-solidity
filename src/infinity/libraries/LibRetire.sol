@@ -28,7 +28,7 @@ library LibRetire {
         C3
     }
 
-    /* ========== Default Redepmtion Retirements ========== */
+    /* ========== Default Redemption Retirements ========== */
 
     /**
      * @notice                     Retire received carbon based on the bridge of the provided pool tokens using default redemption
@@ -83,7 +83,7 @@ library LibRetire {
         }
     }
 
-    /* ========== Specific Redepmtion Retirements ========== */
+    /* ========== Specific Redemption Retirements ========== */
 
     /**
      * @notice                     Retire received carbon based on the bridge of the provided pool tokens using specific redemption

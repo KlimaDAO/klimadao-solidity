@@ -12,6 +12,7 @@ import "../../lib/solidity-stringutils/strings.sol";
 import "../../src/infinity/interfaces/IDiamond.sol";
 import "../../src/infinity/interfaces/IDiamondLoupe.sol";
 import "../../lib/forge-std/src/Test.sol";
+import "../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     using strings for *;
@@ -156,4 +157,28 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     ) external view returns (bytes4[] memory facetFunctionSelectors_) {}
 
     function facets() external view returns (Facet[] memory facets_) {}
+
+    function swipeERC20Tokens(address token, uint transferAmount, address sender, address receiver) public returns (uint newReceiverBalance) {
+        uint256 initialSenderBalance = IERC20(token).balanceOf(sender);
+        require(transferAmount <= initialSenderBalance);
+
+        uint256 initialReceiverBalance = IERC20(token).balanceOf(receiver);
+
+        // Impersonate sender
+        vm.prank(sender);
+
+        // Approve the test contract to spend tokens on behalf of sender
+        IERC20(token).approve(address(this), transferAmount);
+
+        // Transfer ERC20 tokens from sender to receiver
+        IERC20(token).transferFrom(sender, receiver, transferAmount);
+
+        // Check if the receiver contract received the tokens
+        uint256 newBalance = IERC20(token).balanceOf(receiver);
+        assertEq(newBalance, (initialReceiverBalance + transferAmount));
+
+        // Reset msg.sender to the test contract
+        vm.prank(address(this));
+        return newBalance;
+    }
 }
