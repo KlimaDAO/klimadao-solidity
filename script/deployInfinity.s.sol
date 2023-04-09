@@ -26,6 +26,10 @@ import {DiamondInit} from "../src/infinity/init/DiamondInit.sol";
 import "../test/infinity/HelperContract.sol";
 
 contract DeployInfinityScript is Script, HelperContract {
+    DiamondCutFacet dCutF;
+    DiamondLoupeFacet dLoupeF;
+    OwnershipFacet ownerF;
+
     function run() external returns (address) {
         //read env variables and choose EOA for transaction signing
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -34,9 +38,9 @@ contract DeployInfinityScript is Script, HelperContract {
         vm.startBroadcast(deployerPrivateKey);
 
         //deploy facets and init contract
-        DiamondCutFacet dCutF = new DiamondCutFacet();
-        DiamondLoupeFacet dLoupeF = new DiamondLoupeFacet();
-        OwnershipFacet ownerF = new OwnershipFacet();
+        dCutF = new DiamondCutFacet();
+        dLoupeF = new DiamondLoupeFacet();
+        ownerF = new OwnershipFacet();
         RedeemC3PoolFacet c3RedeemF = new RedeemC3PoolFacet();
         RetireC3C3TFacet c3RetireF = new RetireC3C3TFacet();
         RedeemToucanPoolFacet toucanRedeemF = new RedeemToucanPoolFacet();
