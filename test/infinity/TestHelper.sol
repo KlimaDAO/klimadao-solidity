@@ -14,7 +14,7 @@ import "../../src/infinity/interfaces/IDiamondCut.sol";
 import {Diamond} from "src/infinity/Diamond.sol";
 import "src/infinity/facets/DiamondCutFacet.sol";
 import "src/infinity/facets/DiamondLoupeFacet.sol";
-import "src/infinity/facets/OwnershipFacet.sol";
+import {OwnershipFacet} from "src/infinity/facets/OwnershipFacet.sol";
 import {RedeemC3PoolFacet} from "src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
 import {RetireC3C3TFacet} from "src/infinity/facets/Bridges/C3/RetireC3C3TFacet.sol";
 import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
@@ -24,6 +24,7 @@ import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
+import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -155,6 +156,28 @@ abstract contract TestHelper is Test, HelperContract {
         IDiamondCut(address(diamond)).diamondCut(cut, address(diamondInit), abi.encodeWithSignature("init()"));
 
         return address(diamond);
+    }
+
+    function addConstantsGetter(address infinityDiamond) internal {
+        ownerF = OwnershipFacet(infinityDiamond);
+
+        vm.startPrank(ownerF.owner());
+
+        ConstantsGetter constantF = new ConstantsGetter();
+
+        // FacetCut array which contains the three standard facets to be added
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(constantF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("ConstantsGetter")
+            })
+        );
+
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        vm.stopPrank();
     }
 
     function initUser() internal {
