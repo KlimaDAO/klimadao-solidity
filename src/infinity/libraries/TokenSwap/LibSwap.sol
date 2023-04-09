@@ -9,9 +9,10 @@ pragma solidity ^0.8.16;
 import "../../C.sol";
 import "../LibAppStorage.sol";
 import "../LibKlima.sol";
-import "./LibUniswapV2Swap.sol";
 import "../Token/LibTransfer.sol";
+import "./LibUniswapV2Swap.sol";
 import "./LibTridentSwap.sol";
+import "./LibTreasurySwap.sol";
 
 library LibSwap {
     using LibTransfer for IERC20;
@@ -38,7 +39,7 @@ library LibSwap {
         if (sourceToken == C.sKlima() || sourceToken == C.wsKlima()) sourceToken = C.klima();
 
         // Check RB balance and use if possible
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBonds()) >= carbonAmount)
+        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= carbonAmount)
             return swapWithRetirementBonds(sourceToken, carbonToken, sourceAmount, carbonAmount);
 
         // If source token is not defined in the default, swap to USDC on Sushiswap.
@@ -195,7 +196,11 @@ library LibSwap {
     /* ========== Smaller Specific Swap Functions ========== */
 
     function swapToKlimaFromUsdc(uint256 sourceAmount, uint256 klimaAmount) internal returns (uint256 klimaReceived) {
-        return _performToExactSwap(0, C.sushiRouter(), [C.usdc(), C.klima()], sourceAmount, klimaAmount);
+        address[] memory path = new address[](2);
+        path[0] = C.usdc();
+        path[1] = C.klima();
+
+        return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
     }
 
     function swapToKlimaFromOther(
@@ -203,7 +208,11 @@ library LibSwap {
         uint256 sourceAmount,
         uint256 klimaAmount
     ) internal returns (uint256 klimaReceived) {
-        return _performToExactSwap(0, C.sushiRouter(), [sourceToken, C.usdc(), C.klima()], sourceAmount, klimaAmount);
+        address[] memory path = new address[](3);
+        path[0] = sourceToken;
+        path[1] = C.usdc();
+        path[2] = C.klima();
+        return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
     }
 
     function swapWithRetirementBonds(
@@ -213,7 +222,7 @@ library LibSwap {
         uint256 carbonAmount
     ) internal returns (uint256 carbonRecieved) {
         if (sourceToken == C.klima()) {
-            LibTreasurySwap.swapPool(carbonToken, sourceAmount, carbonAmount);
+            LibTreasurySwap.swapToExact(carbonToken, sourceAmount, carbonAmount);
             return carbonAmount;
         }
 
@@ -229,7 +238,7 @@ library LibSwap {
             );
         }
 
-        LibTreasurySwap.swapPool(carbonToken, sourceAmount, carbonAmount);
+        LibTreasurySwap.swapToExact(carbonToken, sourceAmount, carbonAmount);
         return carbonAmount;
     }
 

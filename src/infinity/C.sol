@@ -43,6 +43,7 @@ library C {
     address private constant TOUCAN_RETIRE_CERT = 0x5e377f16E4ec6001652befD737341a28889Af002;
     address private constant MOSS_CARBON_CHAIN = 0xeDAEFCf60e12Bd331c092341D5b3d8901C1c05A8;
     address private constant KLIMA_CARBON_RETIREMENTS = 0xac298CD34559B9AcfaedeA8344a977eceff1C0Fd;
+    address private constant KLIMA_RETIREMENT_BOND = 0xa595f0d598DaF144e5a7ca91E6D9A5bAA09dDeD0;
 
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;
@@ -118,5 +119,9 @@ library C {
 
     function klimaCarbonRetirements() internal pure returns (address) {
         return KLIMA_CARBON_RETIREMENTS;
+    }
+
+    function klimaRetirementBond() internal pure returns (address) {
+        return KLIMA_RETIREMENT_BOND;
     }
 }

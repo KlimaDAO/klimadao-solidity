@@ -4,7 +4,8 @@
   "description": "KlimaDAO Solidity contracts for the protocol",
   "main": "index.js",
   "scripts": {
-    "test": "forge t -vvv --ffi"
+    "test": "forge t -vvv --ffi",
+    "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL}"
   },
   "repository": {
     "type": "git",
