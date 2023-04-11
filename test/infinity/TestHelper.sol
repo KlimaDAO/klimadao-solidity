@@ -199,4 +199,11 @@ abstract contract TestHelper is Test, HelperContract {
         _;
         vm.stopPrank();
     }
+
+    //////////// Other Helpers ////////////
+
+    function randomish(uint maxValue) internal view returns (uint) {
+        uint seed = uint(keccak256(abi.encodePacked(block.timestamp)));
+        return (seed % (maxValue + 1));
+    }
 }

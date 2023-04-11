@@ -9,6 +9,8 @@ interface IC3Pool {
 
     function getFreeRedeemAddresses() external view returns (address[] memory);
 
+    function getERC20Tokens() external view returns (address[] memory);
+
     function feeRedeem() external view returns (uint);
 }
 
