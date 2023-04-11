@@ -20,7 +20,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
     address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
-    address SUSHI_BENTO = 0x0319000133d3AdA02600f0875d2cf03D442C3367;
+    address SUSHI_BENTO = vm.envAddress("SUSHI_BENTO");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
