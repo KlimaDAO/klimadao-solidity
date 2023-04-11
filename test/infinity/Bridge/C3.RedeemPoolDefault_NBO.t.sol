@@ -11,7 +11,7 @@ import "../../helpers/AssertionHelper.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
-contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
+contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
     RedeemC3PoolFacet redeemC3PoolFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
@@ -29,7 +29,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
-    address UBO;
+    address NBO;
     address DEFAULT_PROJECT;
 
     uint defaultCarbonRetireAmount = 100 * 1e18;
@@ -47,50 +47,52 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
-        UBO = constantsFacet.ubo();
+        NBO = constantsFacet.nbo();
 
-        DEFAULT_PROJECT = IC3Pool(UBO).getFreeRedeemAddresses()[0];
+        DEFAULT_PROJECT = IC3Pool(NBO).getFreeRedeemAddresses()[0];
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
-        redeemUBO(UBO, redeemAmount);
+    function test_c3RedeemPoolDefault_redeemNBO_usingNBO_fuzz(uint redeemAmount) public {
+        redeemNBO(NBO, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
-        redeemUBO(USDC, redeemAmount);
+    function test_c3RedeemPoolDefault_redeemNBO_usingUSDC_fuzz(uint redeemAmount) public {
+        redeemNBO(USDC, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
-        redeemUBO(KLIMA, redeemAmount);
+    function test_c3RedeemPoolDefault_redeemNBO_usingKLIMA_fuzz(uint redeemAmount) public {
+        redeemNBO(KLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
-        redeemUBO(SKLIMA, redeemAmount);
+    function test_c3RedeemPoolDefault_redeemNBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+        redeemNBO(SKLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
-        redeemUBO(WSKLIMA, redeemAmount);
+    function test_c3RedeemPoolDefault_redeemNBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+        redeemNBO(WSKLIMA, redeemAmount);
     }
 
     function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-        sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, UBO, redeemAmount);
+        sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, NBO, redeemAmount);
 
         address sourceTarget;
 
-        if (sourceToken == UBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
+        if (sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
         else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
         else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
+
+        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
 
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function redeemUBO(address sourceToken, uint redeemAmount) internal {
-        vm.assume(redeemAmount < IERC20(UBO).balanceOf(SUSHI_BENTO));
+    function redeemNBO(address sourceToken, uint redeemAmount) internal {
+        vm.assume(redeemAmount < IERC20(NBO).balanceOf(SUSHI_BENTO));
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
         uint initialBalance = IERC20(sourceToken).balanceOf(diamond);
-        uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.ubo());
+        uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.nbo());
 
         if (redeemAmount > poolBalance) {
             console.log("Balance greater than pool");
@@ -98,7 +100,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
 
             redeemC3PoolFacet.c3RedeemPoolDefault(
                 sourceToken,
-                UBO,
+                NBO,
                 redeemAmount,
                 sourceAmount,
                 LibTransfer.From.EXTERNAL,
@@ -107,15 +109,15 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         } else {
             (address[] memory projectTokens, uint[] memory amounts) = redeemC3PoolFacet.c3RedeemPoolDefault(
                 sourceToken,
-                UBO,
+                NBO,
                 redeemAmount,
                 sourceAmount,
                 LibTransfer.From.EXTERNAL,
                 LibTransfer.To.EXTERNAL
             );
 
-            // Update redeemedAmount if source was not UBO, since you can't swap to an exact amount in Trident.
-            if (sourceToken != UBO) redeemAmount = amounts[0];
+            // Update redeemedAmount if source was not NBO, since you can't swap to an exact amount in Trident.
+            if (sourceToken != NBO) redeemAmount = amounts[0];
 
             // No tokens left in contract
             assertZeroTokenBalance(DEFAULT_PROJECT, diamond);
