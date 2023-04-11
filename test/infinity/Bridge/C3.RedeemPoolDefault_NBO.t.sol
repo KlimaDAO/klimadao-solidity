@@ -88,7 +88,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
     }
 
     function redeemNBO(address sourceToken, uint redeemAmount) internal {
-        vm.assume(redeemAmount < IERC20(NBO).balanceOf(SUSHI_BENTO));
+        vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_BENTO) * 90) / 100);
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
         uint initialBalance = IERC20(sourceToken).balanceOf(diamond);

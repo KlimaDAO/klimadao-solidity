@@ -48,9 +48,9 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
 
     /**
      * @notice                     Redeems default underlying carbon tokens from a C3 Pool
-     * @param sourceToken      Source token to use in the redemption
+     * @param sourceToken          Source token to use in the redemption
      * @param poolToken            Pool token to redeem
-     * @param maxAmountIn      Max amount of source token to spend
+     * @param maxAmountIn          Max amount of source token to spend
      * @param projectTokens        Underlying tokens to redeem
      * @param amounts              Amounts of underlying tokens to redeem
      * @param fromMode             From Mode for transfering tokens

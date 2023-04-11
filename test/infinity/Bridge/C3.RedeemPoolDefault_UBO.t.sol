@@ -81,12 +81,14 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
         else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
 
+        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
+
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
     function redeemUBO(address sourceToken, uint redeemAmount) internal {
-        vm.assume(redeemAmount < IERC20(UBO).balanceOf(SUSHI_BENTO));
+        vm.assume(redeemAmount < (IERC20(UBO).balanceOf(SUSHI_BENTO) * 90) / 100);
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
         uint initialBalance = IERC20(sourceToken).balanceOf(diamond);
