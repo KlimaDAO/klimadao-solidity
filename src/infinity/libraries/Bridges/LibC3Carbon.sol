@@ -143,7 +143,12 @@ library LibC3Carbon {
         IC3ProjectToken(projectToken).offsetFor(amount, beneficiaryAddress, beneficiaryString, retirementMessage);
 
         LibRetire.saveRetirementDetails(
-            poolToken, projectToken, amount, beneficiaryAddress, beneficiaryString, retirementMessage
+            poolToken,
+            projectToken,
+            amount,
+            beneficiaryAddress,
+            beneficiaryString,
+            retirementMessage
         );
 
         emit CarbonRetired(
@@ -165,11 +170,10 @@ library LibC3Carbon {
      * @param amount               Amount of tokens to redeem and retire
      * @return poolFeeAmount       Additional C3 pool tokens needed for the redemption
      */
-    function getExactCarbonSpecificRedeemFee(address poolToken, uint amount)
-        internal
-        view
-        returns (uint poolFeeAmount)
-    {
+    function getExactCarbonSpecificRedeemFee(
+        address poolToken,
+        uint amount
+    ) internal view returns (uint poolFeeAmount) {
         uint feeRedeem = IC3Pool(poolToken).feeRedeem();
         uint feeDivider = 10_000; // This is hardcoded in current C3 contract.
 
@@ -182,16 +186,15 @@ library LibC3Carbon {
      * @param amount               Amount of tokens to redeem and retire
      * @return retireAmount        Amount of C3T that can be specifically redeemed from a given pool amount
      */
-    function getExactSourceSpecificRetireAmount(address poolToken, uint amount)
-        internal
-        view
-        returns (uint retireAmount)
-    {
+    function getExactSourceSpecificRetireAmount(
+        address poolToken,
+        uint amount
+    ) internal view returns (uint retireAmount) {
         // Backing into a redemption amount from a total pool token amount
         uint feeRedeem = IC3Pool(poolToken).feeRedeem();
         uint feeDivider = 10_000; // This is hardcoded in current C3 contract.
 
-        retireAmount = amount - ((amount * feeDivider) / (feeDivider + feeRedeem));
+        retireAmount = (amount * feeDivider) / (feeDivider + feeRedeem);
     }
 
     /**
@@ -202,10 +205,11 @@ library LibC3Carbon {
      * @return allProjectTokens    Default redeem C3T list from the pool
      * @return amounts             Amount of C3T that was redeemed from the pool
      */
-    function redeemPoolAuto(address poolToken, uint amount, LibTransfer.To toMode)
-        internal
-        returns (address[] memory allProjectTokens, uint[] memory amounts)
-    {
+    function redeemPoolAuto(
+        address poolToken,
+        uint amount,
+        LibTransfer.To toMode
+    ) internal returns (address[] memory allProjectTokens, uint[] memory amounts) {
         allProjectTokens = IC3Pool(poolToken).getFreeRedeemAddresses();
         amounts = new uint256[](allProjectTokens.length);
 

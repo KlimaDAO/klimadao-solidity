@@ -15,48 +15,48 @@ import "../AppStorage.sol";
 contract RetirementQuoter {
     AppStorage internal s;
 
-    function getSourceAmountSwapOnly(address sourceToken, address carbonToken, uint amountOut)
-        public
-        view
-        returns (uint amountIn)
-    {
+    function getSourceAmountSwapOnly(
+        address sourceToken,
+        address carbonToken,
+        uint amountOut
+    ) public view returns (uint amountIn) {
         return LibSwap.getSourceAmount(sourceToken, carbonToken, amountOut);
     }
 
-    function getSourceAmountDefaultRetirement(address sourceToken, address carbonToken, uint retireAmount)
-        public
-        view
-        returns (uint amountIn)
-    {
+    function getSourceAmountDefaultRetirement(
+        address sourceToken,
+        address carbonToken,
+        uint retireAmount
+    ) public view returns (uint amountIn) {
         uint totalCarbon = LibRetire.getTotalCarbon(retireAmount);
         if (sourceToken == carbonToken) return totalCarbon;
         return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
     }
 
-    function getSourceAmountSpecificRetirement(address sourceToken, address carbonToken, uint retireAmount)
-        public
-        view
-        returns (uint amountIn)
-    {
+    function getSourceAmountSpecificRetirement(
+        address sourceToken,
+        address carbonToken,
+        uint retireAmount
+    ) public view returns (uint amountIn) {
         uint totalCarbon = LibRetire.getTotalCarbonSpecific(carbonToken, retireAmount);
         if (sourceToken == carbonToken) return totalCarbon;
         return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
     }
 
-    function getSourceAmountDefaultRedeem(address sourceToken, address carbonToken, uint redeemAmount)
-        public
-        view
-        returns (uint amountIn)
-    {
+    function getSourceAmountDefaultRedeem(
+        address sourceToken,
+        address carbonToken,
+        uint redeemAmount
+    ) public view returns (uint amountIn) {
         if (sourceToken == carbonToken) return redeemAmount;
         return LibSwap.getSourceAmount(sourceToken, carbonToken, redeemAmount);
     }
 
-    function getSourceAmountSpecificRedeem(address sourceToken, address carbonToken, uint[] memory redeemAmounts)
-        public
-        view
-        returns (uint amountIn)
-    {
+    function getSourceAmountSpecificRedeem(
+        address sourceToken,
+        address carbonToken,
+        uint[] memory redeemAmounts
+    ) public view returns (uint amountIn) {
         // Toucan Calculations
         if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.TOUCAN) {
             for (uint i; i < redeemAmounts.length; i++) {
@@ -65,11 +65,35 @@ contract RetirementQuoter {
         } else if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.C3) {
             for (uint i; i < redeemAmounts.length; i++) {
                 amountIn +=
-                    redeemAmounts[i] + LibC3Carbon.getExactCarbonSpecificRedeemFee(carbonToken, redeemAmounts[i]);
+                    redeemAmounts[i] +
+                    LibC3Carbon.getExactCarbonSpecificRedeemFee(carbonToken, redeemAmounts[i]);
             }
         }
         if (sourceToken != carbonToken) {
             return LibSwap.getSourceAmount(sourceToken, carbonToken, amountIn);
+        }
+    }
+
+    function getRetireAmountSourceDefault(
+        address sourceToken,
+        address carbonToken,
+        uint amount
+    ) public view returns (uint amountOut) {
+        if (sourceToken == carbonToken) return amount;
+        uint totalSwap = LibSwap.getDefaultAmountOut(sourceToken, carbonToken, amount);
+        return totalSwap - LibRetire.getFee(totalSwap);
+    }
+
+    function getRetireAmountSourceSpecific(
+        address sourceToken,
+        address carbonToken,
+        uint amount
+    ) public view returns (uint amountOut) {
+        uint totalCarbon = amount;
+        if (sourceToken != carbonToken) totalCarbon = LibSwap.getDefaultAmountOut(sourceToken, carbonToken, amount);
+        amountOut = totalCarbon - LibRetire.getFee(totalCarbon);
+        if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.C3) {
+            amountOut = LibC3Carbon.getExactSourceSpecificRetireAmount(carbonToken, amountOut);
         }
     }
 }

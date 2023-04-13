@@ -42,6 +42,8 @@ contract RetireSourceFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint retirementIndex) {
+        require(maxAmountIn > 0, "Cannot retire zero tonnes");
+
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         /// @dev Initial value set assuming source == pool.
@@ -54,6 +56,7 @@ contract RetireSourceFacet is ReentrancyGuard {
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
             totalCarbon = LibSwap.swapExactSourceToCarbonDefault(sourceToken, poolToken, maxAmountIn);
+            require(totalCarbon > 0, "Swap returned nothing");
         }
 
         // Record the amount to retire based on the current fee.
@@ -103,6 +106,8 @@ contract RetireSourceFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint retirementIndex) {
+        require(maxAmountIn > 0, "Cannot retire zero tonnes");
+
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         /// @dev Initial value set assuming source == pool.
@@ -115,6 +120,7 @@ contract RetireSourceFacet is ReentrancyGuard {
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
             totalCarbon = LibSwap.swapExactSourceToCarbonDefault(sourceToken, poolToken, maxAmountIn);
+            require(totalCarbon > 0, "Swap returned nothing");
         }
 
         // Record the amount to retire based on the current fee.
@@ -137,7 +143,10 @@ contract RetireSourceFacet is ReentrancyGuard {
         // Send any aggregator fees to treasury
         if (totalCarbon - redeemedAmount > 0) {
             LibTransfer.sendToken(
-                IERC20(poolToken), totalCarbon - redeemedAmount, C.treasury(), LibTransfer.To.EXTERNAL
+                IERC20(poolToken),
+                totalCarbon - redeemedAmount,
+                C.treasury(),
+                LibTransfer.To.EXTERNAL
             );
         }
 
