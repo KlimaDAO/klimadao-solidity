@@ -25,6 +25,7 @@ import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.so
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
+import {DustFacet} from "src/infinity/facets/DustFacet.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -180,6 +181,30 @@ abstract contract TestHelper is Test, HelperContract {
         vm.stopPrank();
     }
 
+    function sendDustToTreasury(address infinityDiamond) internal {
+        ownerF = OwnershipFacet(infinityDiamond);
+
+        vm.startPrank(ownerF.owner());
+
+        DustFacet dustF = new DustFacet();
+
+        // FacetCut array which contains the three standard facets to be added
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(dustF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("DustFacet")
+            })
+        );
+
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        DustFacet wrappedDust = DustFacet(infinityDiamond);
+        wrappedDust.sendDust();
+        vm.stopPrank();
+    }
+
     function initUser() internal {
         users = new Users();
         address[] memory _user = new address[](2);
@@ -204,6 +229,6 @@ abstract contract TestHelper is Test, HelperContract {
 
     function randomish(uint maxValue) internal view returns (uint) {
         uint seed = uint(keccak256(abi.encodePacked(block.timestamp)));
-        return (seed % (maxValue + 1));
+        return (seed % (maxValue));
     }
 }

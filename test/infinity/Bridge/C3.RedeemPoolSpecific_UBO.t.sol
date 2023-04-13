@@ -50,6 +50,8 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         UBO = constantsFacet.ubo();
 
         projects = IC3Pool(UBO).getERC20Tokens();
+
+        sendDustToTreasury(diamond);
     }
 
     function test_c3RedeemPoolSpecific_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
@@ -103,10 +105,9 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
 
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint initialBalance = IERC20(sourceToken).balanceOf(diamond);
         uint poolBalance = IERC20(specificProject).balanceOf(constantsFacet.ubo());
 
-        if (redeemAmount > poolBalance) {
+        if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 
@@ -135,7 +136,7 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
 
             // No tokens left in contract
             assertZeroTokenBalance(specificProject, diamond);
-            assertEq(initialBalance, IERC20(sourceToken).balanceOf(diamond));
+            assertZeroTokenBalance(UBO, diamond);
 
             // Caller has default project tokens
             assertEq(redeemAmount, amounts[0]);

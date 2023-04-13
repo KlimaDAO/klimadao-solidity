@@ -50,6 +50,8 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
         NBO = constantsFacet.nbo();
 
         DEFAULT_PROJECT = IC3Pool(NBO).getFreeRedeemAddresses()[0];
+
+        sendDustToTreasury(diamond);
     }
 
     function test_c3RedeemPoolDefault_redeemNBO_usingNBO_fuzz(uint redeemAmount) public {
@@ -91,10 +93,9 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_BENTO) * 90) / 100);
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint initialBalance = IERC20(sourceToken).balanceOf(diamond);
         uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.nbo());
 
-        if (redeemAmount > poolBalance) {
+        if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 
@@ -121,7 +122,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
 
             // No tokens left in contract
             assertZeroTokenBalance(DEFAULT_PROJECT, diamond);
-            assertEq(initialBalance, IERC20(sourceToken).balanceOf(diamond));
+            assertZeroTokenBalance(NBO, diamond);
 
             // Caller has default project tokens
             assertEq(projectTokens[0], DEFAULT_PROJECT);
