@@ -54,7 +54,7 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
         UBO = constantsFacet.ubo();
-        NBO = constantsFacet.ubo();
+        NBO = constantsFacet.nbo();
 
         projectsUBO = IC3Pool(UBO).getERC20Tokens();
         projectsNBO = IC3Pool(NBO).getERC20Tokens();

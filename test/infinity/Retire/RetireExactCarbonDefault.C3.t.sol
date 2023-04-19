@@ -54,7 +54,7 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
         UBO = constantsFacet.ubo();
-        NBO = constantsFacet.ubo();
+        NBO = constantsFacet.nbo();
 
         DEFAULT_PROJECT_UBO = IC3Pool(UBO).getFreeRedeemAddresses()[0];
         DEFAULT_PROJECT_NBO = IC3Pool(NBO).getFreeRedeemAddresses()[0];

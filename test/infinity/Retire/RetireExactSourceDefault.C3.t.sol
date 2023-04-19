@@ -56,7 +56,7 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
         UBO = constantsFacet.ubo();
-        NBO = constantsFacet.ubo();
+        NBO = constantsFacet.nbo();
 
         DEFAULT_PROJECT_UBO = IC3Pool(UBO).getFreeRedeemAddresses()[0];
         DEFAULT_PROJECT_NBO = IC3Pool(NBO).getFreeRedeemAddresses()[0];
@@ -133,7 +133,6 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
         address projectToken = poolToken == UBO ? DEFAULT_PROJECT_UBO : DEFAULT_PROJECT_NBO;
         uint poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
-        // if (sourceAmount == 0) vm.expectRevert();
         uint retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
 
         if (retireAmount > poolBalance || sourceAmount == 0) {
