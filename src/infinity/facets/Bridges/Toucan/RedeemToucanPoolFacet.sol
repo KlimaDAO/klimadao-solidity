@@ -29,6 +29,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
         LibTransfer.To toMode
     ) external nonReentrant returns (address[] memory projectTokens, uint[] memory amounts) {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
+        require(amount > 0, "Cannot redeem zero tokens");
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
@@ -79,6 +80,8 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
             amounts[i] += LibToucanCarbon.getSpecificRedeemFee(poolToken, amounts[i]);
             totalCarbon += amounts[i];
         }
+
+        require(totalCarbon > 0, "Cannot redeem zero tokens");
 
         uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
