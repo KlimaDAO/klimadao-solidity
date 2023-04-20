@@ -93,8 +93,6 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 10) / 100);
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(NCT);
-
         if (redeemAmount == 0) {
             vm.expectRevert();
 

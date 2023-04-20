@@ -92,7 +92,9 @@ contract RetirementQuoter {
         uint totalCarbon = amount;
         if (sourceToken != carbonToken) totalCarbon = LibSwap.getDefaultAmountOut(sourceToken, carbonToken, amount);
         amountOut = totalCarbon - LibRetire.getFee(totalCarbon);
-        if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.C3) {
+        if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.TOUCAN) {
+            amountOut = LibToucanCarbon.getSpecificRetireAmount(carbonToken, amountOut);
+        } else if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.C3) {
             amountOut = LibC3Carbon.getExactSourceSpecificRetireAmount(carbonToken, amountOut);
         }
     }
