@@ -51,6 +51,7 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
 
         projects = IC3Pool(UBO).getERC20Tokens();
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

@@ -55,6 +55,7 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
 
         projects = IToucanPool(NCT).getScoredTCO2s();
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

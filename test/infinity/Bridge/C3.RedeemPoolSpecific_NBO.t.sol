@@ -51,6 +51,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
 
         projects = IC3Pool(NBO).getERC20Tokens();
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

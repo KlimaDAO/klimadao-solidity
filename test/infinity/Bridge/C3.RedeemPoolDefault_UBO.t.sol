@@ -51,6 +51,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
 
         DEFAULT_PROJECT = IC3Pool(UBO).getFreeRedeemAddresses()[0];
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

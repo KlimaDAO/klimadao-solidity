@@ -60,6 +60,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         projectsBCT = IToucanPool(BCT).getScoredTCO2s();
         projectsNCT = IToucanPool(NCT).getScoredTCO2s();
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

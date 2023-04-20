@@ -59,6 +59,7 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
         DEFAULT_PROJECT_UBO = IC3Pool(UBO).getFreeRedeemAddresses()[0];
         DEFAULT_PROJECT_NBO = IC3Pool(NBO).getFreeRedeemAddresses()[0];
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

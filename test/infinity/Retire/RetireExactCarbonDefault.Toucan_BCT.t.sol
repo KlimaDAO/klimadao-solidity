@@ -55,6 +55,7 @@ contract RetireExactCarbonDefaultToucanBCT is TestHelper, AssertionHelper {
 
         DEFAULT_PROJECT = IToucanPool(BCT).getScoredTCO2s()[0];
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

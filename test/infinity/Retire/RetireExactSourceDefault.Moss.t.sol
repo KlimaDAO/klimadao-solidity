@@ -51,6 +51,7 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
         WSKLIMA = constantsFacet.wsKlima();
         MCO2 = constantsFacet.mco2();
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

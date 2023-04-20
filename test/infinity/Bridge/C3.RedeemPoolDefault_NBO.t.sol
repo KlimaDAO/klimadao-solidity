@@ -51,6 +51,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
 
         DEFAULT_PROJECT = IC3Pool(NBO).getFreeRedeemAddresses()[0];
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

@@ -60,6 +60,7 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         DEFAULT_PROJECT_BCT = IToucanPool(BCT).getScoredTCO2s()[0];
         DEFAULT_PROJECT_NCT = IToucanPool(NCT).getScoredTCO2s()[0];
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

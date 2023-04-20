@@ -61,6 +61,7 @@ contract retireExactSourceSpecificC3 is TestHelper, AssertionHelper {
         projectsUBO = IC3Pool(UBO).getERC20Tokens();
         projectsNBO = IC3Pool(NBO).getERC20Tokens();
 
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 
