@@ -102,8 +102,12 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
         retireExactC3(WSKLIMA, NBO, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint retireAmount) internal returns (uint sourceAmount) {
-        sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, UBO, retireAmount);
+    function getSourceTokens(
+        address sourceToken,
+        address poolToken,
+        uint retireAmount
+    ) internal returns (uint sourceAmount) {
+        sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, poolToken, retireAmount);
 
         address sourceTarget;
 
@@ -119,7 +123,7 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
 
     function retireExactC3(address sourceToken, address poolToken, uint retireAmount) public {
         vm.assume(retireAmount < (IERC20(poolToken).balanceOf(SUSHI_BENTO) * 90) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, retireAmount);
+        uint sourceAmount = getSourceTokens(sourceToken, poolToken, retireAmount);
 
         uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
