@@ -79,7 +79,8 @@ contract RetirementQuoter {
         address carbonToken,
         uint amount
     ) public view returns (uint amountOut) {
-        if (sourceToken == carbonToken) return amount;
+        if (sourceToken == carbonToken) return amount - LibRetire.getFee(amount);
+
         uint totalSwap = LibSwap.getDefaultAmountOut(sourceToken, carbonToken, amount);
         return totalSwap - LibRetire.getFee(totalSwap);
     }
@@ -90,8 +91,11 @@ contract RetirementQuoter {
         uint amount
     ) public view returns (uint amountOut) {
         uint totalCarbon = amount;
+
         if (sourceToken != carbonToken) totalCarbon = LibSwap.getDefaultAmountOut(sourceToken, carbonToken, amount);
+
         amountOut = totalCarbon - LibRetire.getFee(totalCarbon);
+
         if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.TOUCAN) {
             amountOut = LibToucanCarbon.getSpecificRetireAmount(carbonToken, amountOut);
         } else if (s.poolBridge[carbonToken] == LibRetire.CarbonBridge.C3) {
