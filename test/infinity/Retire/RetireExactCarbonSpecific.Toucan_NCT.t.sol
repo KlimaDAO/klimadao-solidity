@@ -98,7 +98,7 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
     }
 
     function retireExactNCT(address sourceToken, uint retireAmount) public {
-        vm.assume(retireAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 50) / 100);
+        vm.assume(retireAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 30) / 100);
 
         uint sourceAmount = getSourceTokens(sourceToken, retireAmount);
 

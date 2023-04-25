@@ -125,7 +125,6 @@ contract retireExactSourceSpecificC3 is TestHelper, AssertionHelper {
     }
 
     function retireExactSource(address sourceToken, address poolToken, uint sourceAmount) public {
-        // vm.assume(sourceAmount < (IERC20(poolToken).balanceOf(SUSHI_BENTO) * 90) / 100);
         getSourceTokens(sourceToken, sourceAmount);
 
         uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
@@ -136,7 +135,6 @@ contract retireExactSourceSpecificC3 is TestHelper, AssertionHelper {
             : projectsNBO[randomish(projectsNBO.length)];
         uint poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
-        // if (sourceAmount == 0) vm.expectRevert();
         uint retireAmount = quoterFacet.getRetireAmountSourceSpecific(sourceToken, poolToken, sourceAmount);
 
         if (retireAmount > poolBalance || sourceAmount == 0) {

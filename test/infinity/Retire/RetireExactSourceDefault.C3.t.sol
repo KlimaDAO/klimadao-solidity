@@ -125,7 +125,6 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
     }
 
     function retireExactSource(address sourceToken, address poolToken, uint sourceAmount) public {
-        // vm.assume(sourceAmount < (IERC20(poolToken).balanceOf(SUSHI_BENTO) * 90) / 100);
         getSourceTokens(sourceToken, sourceAmount);
 
         uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);

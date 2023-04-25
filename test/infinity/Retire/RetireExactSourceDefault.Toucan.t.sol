@@ -124,15 +124,12 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
     }
 
     function retireExactSource(address sourceToken, address poolToken, uint sourceAmount) public {
-        // vm.assume(sourceAmount < (IERC20(poolToken).balanceOf(SUSHI_BENTO) * 90) / 100);
-
         getSourceTokens(sourceToken, sourceAmount);
 
         uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         address projectToken = poolToken == BCT ? DEFAULT_PROJECT_BCT : DEFAULT_PROJECT_NCT;
-        // uint poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
         uint retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
         uint poolAmount = poolToken == BCT
