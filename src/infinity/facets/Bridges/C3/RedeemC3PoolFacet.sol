@@ -25,6 +25,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         LibTransfer.To toMode
     ) external nonReentrant returns (address[] memory projectTokens, uint[] memory amounts) {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
+        require(amount > 0, "Cannot redeem zero tokens");
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
@@ -48,9 +49,9 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
 
     /**
      * @notice                     Redeems default underlying carbon tokens from a C3 Pool
-     * @param sourceToken      Source token to use in the redemption
+     * @param sourceToken          Source token to use in the redemption
      * @param poolToken            Pool token to redeem
-     * @param maxAmountIn      Max amount of source token to spend
+     * @param maxAmountIn          Max amount of source token to spend
      * @param projectTokens        Underlying tokens to redeem
      * @param amounts              Amounts of underlying tokens to redeem
      * @param fromMode             From Mode for transfering tokens
@@ -75,6 +76,8 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
             totalCarbon += amounts[i] + LibC3Carbon.getExactCarbonSpecificRedeemFee(poolToken, amounts[i]);
         }
 
+        require(totalCarbon > 0, "Cannot redeem zero tokens");
+
         uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         if (sourceToken != poolToken) {
@@ -92,5 +95,12 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(receivedAmount >= totalCarbon, "Not enough pool tokens");
 
         redeemedAmounts = LibC3Carbon.redeemPoolSpecific(poolToken, projectTokens, amounts, toMode);
+
+        // Check for any redeem dust and send to the treasury
+        /// @dev This is due to the fact that you can't swap for an exact token amount in Trident
+
+        uint poolBalance = IERC20(poolToken).balanceOf(address(this));
+        if (poolBalance > 0)
+            LibTransfer.sendToken(IERC20(poolToken), poolBalance, C.treasury(), LibTransfer.To.EXTERNAL);
     }
 }

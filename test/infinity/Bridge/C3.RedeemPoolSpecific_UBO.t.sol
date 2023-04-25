@@ -11,7 +11,7 @@ import "../../helpers/AssertionHelper.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
-contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
+contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
     RedeemC3PoolFacet redeemC3PoolFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
@@ -30,7 +30,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
     address SKLIMA;
     address WSKLIMA;
     address UBO;
-    address DEFAULT_PROJECT;
+    address[] projects;
 
     uint defaultCarbonRetireAmount = 100 * 1e18;
 
@@ -49,34 +49,36 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         WSKLIMA = constantsFacet.wsKlima();
         UBO = constantsFacet.ubo();
 
-        DEFAULT_PROJECT = IC3Pool(UBO).getFreeRedeemAddresses()[0];
+        projects = IC3Pool(UBO).getERC20Tokens();
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
+    function test_c3RedeemPoolSpecific_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
         redeemUBO(UBO, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_c3RedeemPoolSpecific_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
         redeemUBO(USDC, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_c3RedeemPoolSpecific_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
         redeemUBO(KLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_c3RedeemPoolSpecific_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
         redeemUBO(SKLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_c3RedeemPoolSpecific_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
         redeemUBO(WSKLIMA, redeemAmount);
     }
 
     function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-        sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, UBO, redeemAmount);
+        uint[] memory amounts = new uint[](1);
+        amounts[0] = redeemAmount;
+        sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, UBO, amounts);
 
         address sourceTarget;
 
@@ -92,28 +94,40 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
 
     function redeemUBO(address sourceToken, uint redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(UBO).balanceOf(SUSHI_BENTO) * 90) / 100);
+
+        uint projectIndex = randomish(projects.length);
+        address specificProject = projects[projectIndex];
+
+        address[] memory projectRedeem = new address[](1);
+        uint[] memory amountRedeem = new uint[](1);
+
+        projectRedeem[0] = specificProject;
+        amountRedeem[0] = redeemAmount;
+
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.ubo());
+        uint poolBalance = IERC20(specificProject).balanceOf(constantsFacet.ubo());
 
         if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 
-            redeemC3PoolFacet.c3RedeemPoolDefault(
+            redeemC3PoolFacet.c3RedeemPoolSpecific(
                 sourceToken,
                 UBO,
-                redeemAmount,
                 sourceAmount,
+                projectRedeem,
+                amountRedeem,
                 LibTransfer.From.EXTERNAL,
                 LibTransfer.To.EXTERNAL
             );
         } else {
-            (address[] memory projectTokens, uint[] memory amounts) = redeemC3PoolFacet.c3RedeemPoolDefault(
+            uint[] memory amounts = redeemC3PoolFacet.c3RedeemPoolSpecific(
                 sourceToken,
                 UBO,
-                redeemAmount,
                 sourceAmount,
+                projectRedeem,
+                amountRedeem,
                 LibTransfer.From.EXTERNAL,
                 LibTransfer.To.EXTERNAL
             );
@@ -122,13 +136,12 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
             if (sourceToken != UBO) redeemAmount = amounts[0];
 
             // No tokens left in contract
-            assertZeroTokenBalance(DEFAULT_PROJECT, diamond);
+            assertZeroTokenBalance(specificProject, diamond);
             assertZeroTokenBalance(UBO, diamond);
 
             // Caller has default project tokens
-            assertEq(projectTokens[0], DEFAULT_PROJECT);
             assertEq(redeemAmount, amounts[0]);
-            assertEq(IERC20(DEFAULT_PROJECT).balanceOf(address(this)), amounts[0]);
+            assertEq(IERC20(specificProject).balanceOf(address(this)), amounts[0]);
         }
     }
 }

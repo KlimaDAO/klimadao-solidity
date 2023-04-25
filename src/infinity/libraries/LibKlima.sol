@@ -23,6 +23,16 @@ library LibKlima {
     }
 
     /**
+     * @notice                  Returns sKLIMA amount for provided wsKLIMA amount
+     * @param amount            wsKLIMA provided
+     * @return unwrappedAmount    sKLIMA amount
+     */
+    function toUnwrappedAmount(uint amount) internal view returns (uint unwrappedAmount) {
+        // @dev Account for rounding differences in wsKLIMA contract.
+        return IwsKLIMA(C.wsKlima()).wKLIMATosKLIMA(amount);
+    }
+
+    /**
      * @notice                  Unwraps and unstakes provided wsKLIMA amount
      * @param amount            wsKLIMA provided
      * @return unwrappedAmount    Final KLIMA amount

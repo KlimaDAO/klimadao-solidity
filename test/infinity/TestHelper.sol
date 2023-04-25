@@ -25,6 +25,7 @@ import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.so
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
+import {DustFacet} from "src/infinity/facets/DustFacet.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -180,6 +181,138 @@ abstract contract TestHelper is Test, HelperContract {
         vm.stopPrank();
     }
 
+    function upgradeCurrentDiamond(address infinityDiamond) internal {
+        ownerF = OwnershipFacet(infinityDiamond);
+
+        vm.startPrank(ownerF.owner());
+
+        //deploy facets and init contract
+        c3RedeemF = new RedeemC3PoolFacet();
+        c3RetireF = new RetireC3C3TFacet();
+        toucanRedeemF = new RedeemToucanPoolFacet();
+        toucanRetireF = new RetireToucanTCO2Facet();
+        retireCarbonF = new RetireCarbonFacet();
+        retireInfoF = new RetireInfoFacet();
+        retireSourceF = new RetireSourceFacet();
+        retirementQuoterF = new RetirementQuoter();
+
+        // FacetCut array which contains the three standard facets to be added
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](9);
+
+        // Klima Infinity specific facets
+
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(c3RedeemF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RedeemC3PoolFacet")
+            })
+        );
+
+        cut[1] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(c3RetireF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireC3C3TFacet")
+            })
+        );
+
+        cut[2] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(toucanRedeemF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RedeemToucanPoolFacet")
+            })
+        );
+
+        cut[3] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(toucanRetireF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireToucanTCO2Facet")
+            })
+        );
+
+        cut[4] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireCarbonF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireCarbonFacet")
+            })
+        );
+
+        cut[5] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireInfoF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireInfoFacet")
+            })
+        );
+
+        cut[6] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireSourceF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireSourceFacet")
+            })
+        );
+
+        bytes4[] memory currentSelectors = new bytes4[](5);
+        currentSelectors[0] = bytes4(0xf8262473);
+        currentSelectors[1] = bytes4(0xf0ff264c);
+        currentSelectors[2] = bytes4(0x16950775);
+        currentSelectors[3] = bytes4(0x79f5e053);
+        currentSelectors[4] = bytes4(0x7eed24a2);
+        bytes4[] memory newSelectors = new bytes4[](2);
+        newSelectors[0] = bytes4(0x8298360e);
+        newSelectors[1] = bytes4(0x58bdb8e8);
+
+        cut[7] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retirementQuoterF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: currentSelectors
+            })
+        );
+
+        cut[8] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retirementQuoterF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: newSelectors
+            })
+        );
+
+        // deploy diamond and perform diamondCut
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+
+        vm.stopPrank();
+    }
+
+    function sendDustToTreasury(address infinityDiamond) internal {
+        ownerF = OwnershipFacet(infinityDiamond);
+
+        vm.startPrank(ownerF.owner());
+
+        DustFacet dustF = new DustFacet();
+
+        // FacetCut array which contains the three standard facets to be added
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(dustF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("DustFacet")
+            })
+        );
+
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        DustFacet wrappedDust = DustFacet(infinityDiamond);
+        wrappedDust.sendDust();
+        vm.stopPrank();
+    }
+
     function initUser() internal {
         users = new Users();
         address[] memory _user = new address[](2);
@@ -198,5 +331,12 @@ abstract contract TestHelper is Test, HelperContract {
         vm.startPrank(from);
         _;
         vm.stopPrank();
+    }
+
+    //////////// Other Helpers ////////////
+
+    function randomish(uint maxValue) internal view returns (uint) {
+        uint seed = uint(keccak256(abi.encodePacked(block.timestamp)));
+        return (seed % (maxValue));
     }
 }

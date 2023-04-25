@@ -12,6 +12,8 @@ interface IToucanPool {
     function feeRedeemDivider() external pure returns (uint);
 
     function redeemFeeExemptedAddresses(address) external view returns (bool);
+
+    function getScoredTCO2s() external view returns (address[] memory);
 }
 
 interface IToucanCarbonOffsets {

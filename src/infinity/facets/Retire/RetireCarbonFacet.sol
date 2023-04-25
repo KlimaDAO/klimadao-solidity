@@ -44,6 +44,8 @@ contract RetireCarbonFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint retirementIndex) {
+        require(retireAmount > 0, "Cannot retire zero tonnes");
+
         uint totalCarbon = LibRetire.getTotalCarbon(retireAmount);
 
         if (sourceToken == poolToken) {
@@ -113,6 +115,8 @@ contract RetireCarbonFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint retirementIndex) {
+        require(retireAmount > 0, "Cannot retire zero tonnes");
+
         uint totalCarbon = LibRetire.getTotalCarbonSpecific(poolToken, retireAmount);
 
         if (sourceToken == poolToken) {

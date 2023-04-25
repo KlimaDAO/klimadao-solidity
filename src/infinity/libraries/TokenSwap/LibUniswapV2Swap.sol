@@ -10,14 +10,20 @@ import "../../interfaces/IUniswapV2Router02.sol";
 import "../Token/LibApprove.sol";
 
 library LibUniswapV2Swap {
-    function swapTokensForExactTokens(address router, address[] memory path, uint amountIn, uint amountOut)
-        internal
-        returns (uint)
-    {
+    function swapTokensForExactTokens(
+        address router,
+        address[] memory path,
+        uint amountIn,
+        uint amountOut
+    ) internal returns (uint) {
         LibApprove.approveToken(IERC20(path[0]), router, amountIn);
 
         uint[] memory amountsOut = IUniswapV2Router02(router).swapTokensForExactTokens(
-            amountOut, amountIn, path, address(this), block.timestamp
+            amountOut,
+            amountIn,
+            path,
+            address(this),
+            block.timestamp
         );
 
         return amountsOut[path.length - 1];
@@ -29,7 +35,11 @@ library LibUniswapV2Swap {
         LibApprove.approveToken(IERC20(path[0]), router, amount);
 
         amountsOut = IUniswapV2Router02(router).swapExactTokensForTokens(
-            amount, amountsOut[path.length - 1], path, address(this), block.timestamp
+            amount,
+            amountsOut[path.length - 1],
+            path,
+            address(this),
+            block.timestamp
         );
 
         return amountsOut[path.length - 1];
@@ -38,5 +48,10 @@ library LibUniswapV2Swap {
     function getAmountIn(address router, address[] memory path, uint amount) internal view returns (uint) {
         uint[] memory amountsIn = IUniswapV2Router02(router).getAmountsIn(amount, path);
         return amountsIn[0];
+    }
+
+    function getAmountOut(address router, address[] memory path, uint amount) internal view returns (uint) {
+        uint[] memory amountsOut = IUniswapV2Router02(router).getAmountsOut(amount, path);
+        return amountsOut[amountsOut.length - 1];
     }
 }
