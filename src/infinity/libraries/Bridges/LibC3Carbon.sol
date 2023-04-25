@@ -226,6 +226,8 @@ library LibC3Carbon {
             LibTransfer.sendToken(IERC20(allProjectTokens[i]), balance, msg.sender, toMode);
             amount -= balance;
         }
+
+        require(amount == 0, "Didn't redeem all tons");
     }
 
     /**
