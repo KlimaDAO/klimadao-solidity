@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "oz/access/Ownable2Step.sol";
 
 import "../interfaces/IKlimaInfinity.sol";
-import "../interfaces/IKLIMA.sol";
+import {IKlima, SafeERC20} from "../interfaces/IKLIMA.sol";
 import "../interfaces/IUniswapV2Pair.sol";
 
 contract CarbonRetirementBondDepository is Ownable2Step {
