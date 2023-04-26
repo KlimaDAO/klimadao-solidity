@@ -2,37 +2,31 @@
 pragma solidity 0.8.19;
 
 import "../../helpers/AssertionHelper.sol";
+import "../helpers/DeploymentHelper.sol";
 
 import {CarbonRetirementBondDepository} from "../../../src/protocol/bonds/CarbonRetirementBondDepository.sol";
+import {RetirementBondAllocator} from "../../../src/protocol/allocators/RetirementBondAllocator.sol";
 import {KlimaTreasury} from "../../../src/protocol/staking/utils/KlimaTreasury.sol";
 
-contract RetireBondFundMarketTest is AssertionHelper {
+contract RetireBondFundMarketTest is AssertionHelper, DeploymentHelper {
     CarbonRetirementBondDepository retireBond;
+    RetirementBondAllocator allocator;
     KlimaTreasury treasury;
 
-    address infinityDiamond = vm.envAddress("INFINITY_ADDRESS");
+    address POLICY = vm.envAddress("POLICY_MSIG");
+
     address BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
     address NCT = 0xD838290e877E0188a4A44700463419ED96c16107;
     address MCO2 = 0xAa7DbD1598251f856C12f63557A4C4397c253Cea;
     address UBO = 0x2B3eCb0991AF0498ECE9135bcD04013d7993110c;
     address NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
-    address klima = vm.envAddress("KLIMA_ERC20_ADDRESS");
-    address SUSHI_LP = vm.envAddress("SUSHI_BCT_LP");
 
     function setUp() public {
-        retireBond = new CarbonRetirementBondDepository();
-        treasury = KlimaTreasury(retireBond.TREASURY());
+        (address retireBondAddress, address allocatorAddress) = deployRetirementBondWithAllocator();
+        retireBond = CarbonRetirementBondDepository(retireBondAddress);
+        allocator = RetirementBondAllocator(allocatorAddress);
 
-        // Set up and toggle new contract within treasury
-        vm.startPrank(retireBond.DAO());
-
-        treasury.queue(KlimaTreasury.MANAGING.RESERVEMANAGER, address(retireBond));
-
-        vm.roll(treasury.ReserveManagerQueue(address(retireBond)));
-
-        treasury.toggle(KlimaTreasury.MANAGING.RESERVEMANAGER, address(retireBond), address(0));
-
-        vm.stopPrank();
+        toggleRetirementBondAllocatorWithTreasury(allocatorAddress);
     }
 
     function test_fundWithBct() public {
@@ -81,25 +75,30 @@ contract RetireBondFundMarketTest is AssertionHelper {
     }
 
     function test_fundWithBct_revert_insufficientReserves() public {
+        vm.prank(allocator.owner());
         vm.expectRevert("Insufficient reserves");
-        retireBond.fundMarket(BCT, 15_000_000 * 1e18);
+        allocator.fundBonds(BCT, 15_000_000 * 1e18);
     }
 
     function test_fundWithBct_revert_notOwner() public {
         vm.prank(retireBond.DAO());
         vm.expectRevert("Ownable: caller is not the owner");
-        retireBond.fundMarket(BCT, 15_000_000 * 1e18);
+        allocator.fundBonds(BCT, 15_000_000 * 1e18);
     }
 
     function fundBonds(address token, uint amount) internal {
-        retireBond.fundMarket(token, amount);
+        vm.prank(allocator.owner());
+        allocator.fundBonds(token, amount);
 
         assertTokenBalance(token, address(retireBond), amount);
+        assertZeroTokenBalance(token, address(allocator));
     }
 
     function returnBonds(address token) internal {
-        retireBond.closeMarket(token);
+        vm.prank(allocator.owner());
+        allocator.closeBonds(token);
 
         assertZeroTokenBalance(token, address(retireBond));
+        assertZeroTokenBalance(token, address(allocator));
     }
 }

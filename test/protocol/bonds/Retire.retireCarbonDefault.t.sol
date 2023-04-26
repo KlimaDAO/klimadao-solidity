@@ -2,13 +2,16 @@
 pragma solidity 0.8.19;
 
 import "../../helpers/AssertionHelper.sol";
+import "../helpers/DeploymentHelper.sol";
 
 import {CarbonRetirementBondDepository} from "../../../src/protocol/bonds/CarbonRetirementBondDepository.sol";
+import {RetirementBondAllocator} from "../../../src/protocol/allocators/RetirementBondAllocator.sol";
 import {KlimaTreasury} from "../../../src/protocol/staking/utils/KlimaTreasury.sol";
 import {IC3Pool} from "../../../src/infinity/interfaces/IC3.sol";
 
-contract RetireBondRetireCarbonDefaultTest is AssertionHelper {
+contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper {
     CarbonRetirementBondDepository retireBond;
+    RetirementBondAllocator allocator;
     KlimaTreasury treasury;
 
     // Retirement details
@@ -33,22 +36,13 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper {
     address DEFAULT_PROJECT_NBO;
 
     function setUp() public {
-        retireBond = CarbonRetirementBondDepository(deployedRetireBonds);
-        treasury = KlimaTreasury(retireBond.TREASURY());
+        (address retireBondAddress, address allocatorAddress) = deployRetirementBondWithAllocator();
+        retireBond = CarbonRetirementBondDepository(retireBondAddress);
+        allocator = RetirementBondAllocator(allocatorAddress);
 
-        // Set up and toggle new contract within treasury
-        vm.startPrank(retireBond.DAO());
+        toggleRetirementBondAllocatorWithTreasury(allocatorAddress);
 
-        treasury.queue(KlimaTreasury.MANAGING.RESERVEMANAGER, address(retireBond));
-
-        vm.roll(treasury.ReserveManagerQueue(address(retireBond)));
-
-        treasury.toggle(KlimaTreasury.MANAGING.RESERVEMANAGER, address(retireBond), address(0));
-
-        vm.stopPrank();
-
-        address owner = retireBond.owner();
-        vm.startPrank(owner);
+        vm.startPrank(vm.envAddress("POLICY_MSIG"));
 
         retireBond.setPoolReference(BCT, vm.envAddress("SUSHI_BCT_LP"));
         retireBond.updateMaxSlippage(BCT, 200);
@@ -70,11 +64,11 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper {
         retireBond.updateMaxSlippage(NBO, 200);
         retireBond.updateDaoFee(NBO, 3000);
 
-        retireBond.fundMarket(BCT, 1_000_000 * 1e18);
-        retireBond.fundMarket(NCT, 35_000 * 1e18);
-        retireBond.fundMarket(MCO2, 250_000 * 1e18);
-        retireBond.fundMarket(UBO, 35_000 * 1e18);
-        retireBond.fundMarket(NBO, 2_500 * 1e18);
+        allocator.fundBonds(BCT, 1_000_000 * 1e18);
+        allocator.fundBonds(NCT, 35_000 * 1e18);
+        allocator.fundBonds(MCO2, 250_000 * 1e18);
+        allocator.fundBonds(UBO, 35_000 * 1e18);
+        allocator.fundBonds(NBO, 2_500 * 1e18);
         vm.stopPrank();
 
         DEFAULT_PROJECT_UBO = IC3Pool(UBO).getFreeRedeemAddresses()[0];
@@ -148,11 +142,5 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper {
         IERC20(KLIMA).approve(address(this), 1_000_000 * 1e9);
         IERC20(KLIMA).transferFrom(STAKING, address(this), 1_000_000 * 1e9);
         IERC20(KLIMA).approve(address(retireBond), 1_000_000 * 1e9);
-    }
-
-    function fundBonds(address token, uint amount) internal {
-        address owner = retireBond.owner();
-        vm.prank(owner);
-        retireBond.fundMarket(token, amount);
     }
 }

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "oz/access/Ownable.sol";
+import "oz/access/Ownable2Step.sol";
 
 import "../interfaces/IKlimaInfinity.sol";
 import "../interfaces/IKLIMA.sol";
 import "../interfaces/IUniswapV2Pair.sol";
 
-contract CarbonRetirementBondDepository is Ownable {
+contract CarbonRetirementBondDepository is Ownable2Step {
     using SafeERC20 for IKlima;
 
     address public constant KLIMA = 0x4e78011Ce80ee02d2c3e649Fb657E45898257815;
@@ -15,6 +15,7 @@ contract CarbonRetirementBondDepository is Ownable {
     address public constant TREASURY = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
     address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
     uint256 public constant FEE_DIVISOR = 10000;
+    address public allocatorContract;
 
     mapping(address => address) public poolReference;
     mapping(address => uint8) public referenceKlimaPosition;
@@ -80,15 +81,9 @@ contract CarbonRetirementBondDepository is Ownable {
         IKlima(KLIMA).burnFrom(msg.sender, totalKlima - feeAmount);
     }
 
-    function fundMarket(address poolToken, uint256 amount) external onlyOwner {
-        IKlimaTreasury(TREASURY).manage(poolToken, amount);
-    }
-
-    function closeMarket(address poolToken) external onlyOwner {
+    function closeMarket(address poolToken) external {
+        enforceOnlyAllocator();
         IKlima(poolToken).safeTransfer(TREASURY, IKlima(poolToken).balanceOf(address(this)));
-
-        // Extra gas and transfers no tokens, but does trigger a reserve update within the treasury.
-        IKlimaTreasury(TREASURY).manage(poolToken, 0);
     }
 
     function getMarketQuote(address poolToken, uint256 amountOut) internal view returns (uint256 currentPrice) {
@@ -126,5 +121,13 @@ contract CarbonRetirementBondDepository is Ownable {
     function setPoolReference(address poolToken, address referenceToken) external onlyOwner {
         poolReference[poolToken] = referenceToken;
         referenceKlimaPosition[poolToken] = IUniswapV2Pair(referenceToken).token0() == KLIMA ? 0 : 1;
+    }
+
+    function setAllocator(address allocator) external onlyOwner {
+        allocatorContract = allocator;
+    }
+
+    function enforceOnlyAllocator() internal view {
+        require(msg.sender == allocatorContract, "Only allocator can close market");
     }
 }
