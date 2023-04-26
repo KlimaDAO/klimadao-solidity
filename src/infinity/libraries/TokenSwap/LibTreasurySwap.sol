@@ -6,7 +6,7 @@ pragma solidity ^0.8.16;
  * @title LibTreasurySwap
  */
 
-import "../../interfaces/IKlimaRetirementBond.sol";
+import {IKlimaRetirementBond} from "../../interfaces/IKlima.sol";
 import "../Token/LibApprove.sol";
 import "../../C.sol";
 
@@ -16,7 +16,7 @@ library LibTreasurySwap {
     }
 
     function swapToExact(address carbonToken, uint amountIn, uint amountOut) internal {
-        LibApprove.approveToken(IERC20(carbonToken), C.klimaRetirementBond(), amountIn);
+        LibApprove.approveToken(IERC20(C.klima()), C.klimaRetirementBond(), amountIn);
 
         IKlimaRetirementBond(C.klimaRetirementBond()).swapToExact(carbonToken, amountOut);
     }

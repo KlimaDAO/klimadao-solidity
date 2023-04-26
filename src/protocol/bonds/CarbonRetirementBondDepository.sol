@@ -16,17 +16,6 @@ contract CarbonRetirementBondDepository is Ownable {
     address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
     uint256 public constant FEE_DIVISOR = 10000;
 
-    constructor() {
-        // BCT Pool defaults
-        address bct = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
-        address bctKlima = 0x9803c7aE526049210a1725F7487AF26fE2c24614;
-
-        poolReference[bct] = bctKlima;
-        referenceKlimaPosition[bct] = 1;
-        daoFee[bct] = 3000;
-        maxSlippage[bct] = 200;
-    }
-
     mapping(address => address) public poolReference;
     mapping(address => uint8) public referenceKlimaPosition;
     mapping(address => uint256) public daoFee;
@@ -34,11 +23,11 @@ contract CarbonRetirementBondDepository is Ownable {
 
     function swapToExact(address poolToken, uint256 poolAmount) external {
         require(msg.sender == INFINITY, "Caller is not Infinity");
+        require(poolAmount > 0, "Cannot swap for zero tokens");
 
         uint256 klimaNeeded = getKlimaAmount(poolAmount, poolToken);
-        uint256 feeAmount = (klimaNeeded * daoFee[poolToken]) / FEE_DIVISOR;
 
-        transferAndBurnKlima(klimaNeeded, feeAmount);
+        transferAndBurnKlima(klimaNeeded, poolToken);
         IKlima(poolToken).safeTransfer(INFINITY, poolAmount);
     }
 
@@ -50,6 +39,8 @@ contract CarbonRetirementBondDepository is Ownable {
         string memory beneficiaryString,
         string memory retirementMessage
     ) external returns (uint256 retirementIndex) {
+        require(retireAmount > 0, "Cannot retire zero tokens");
+
         // Get the current amount of total pool tokens needed including any applicable fees
         uint256 poolNeeded = IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(
             poolToken,
@@ -57,14 +48,13 @@ contract CarbonRetirementBondDepository is Ownable {
             retireAmount
         );
 
-        require(poolNeeded >= IKlima(poolToken).balanceOf(address(this)), "Not enough pool tokens to retire");
+        require(poolNeeded <= IKlima(poolToken).balanceOf(address(this)), "Not enough pool tokens to retire");
 
         // Get the total rate limited KLIMA needed
         uint256 klimaNeeded = getKlimaAmount(poolNeeded, poolToken);
-        uint256 feeAmount = (klimaNeeded * daoFee[poolToken]) / FEE_DIVISOR;
 
         // Transfer and burn the KLIMA
-        transferAndBurnKlima(klimaNeeded, feeAmount);
+        transferAndBurnKlima(klimaNeeded, poolToken);
 
         IKlima(poolToken).safeIncreaseAllowance(INFINITY, poolNeeded);
 
@@ -82,19 +72,23 @@ contract CarbonRetirementBondDepository is Ownable {
             );
     }
 
-    function transferAndBurnKlima(uint256 totalKlima, uint256 feeAmount) internal {
+    function transferAndBurnKlima(uint256 totalKlima, address poolToken) internal {
         // Transfer and burn the KLIMA
+        uint256 feeAmount = (totalKlima * daoFee[poolToken]) / FEE_DIVISOR;
+
         IKlima(KLIMA).safeTransferFrom(msg.sender, DAO, feeAmount);
         IKlima(KLIMA).burnFrom(msg.sender, totalKlima - feeAmount);
     }
 
     function fundMarket(address poolToken, uint256 amount) external onlyOwner {
-        // TODO: change msg.sender to TREASURY prior to mainnet deploy
-        IKlima(poolToken).safeTransferFrom(msg.sender, address(this), amount);
+        IKlimaTreasury(TREASURY).manage(poolToken, amount);
     }
 
     function closeMarket(address poolToken) external onlyOwner {
         IKlima(poolToken).safeTransfer(TREASURY, IKlima(poolToken).balanceOf(address(this)));
+
+        // Extra gas and transfers no tokens, but does trigger a reserve update within the treasury.
+        IKlimaTreasury(TREASURY).manage(poolToken, 0);
     }
 
     function getMarketQuote(address poolToken, uint256 amountOut) internal view returns (uint256 currentPrice) {
@@ -113,6 +107,9 @@ contract CarbonRetirementBondDepository is Ownable {
 
         // Check inputs through KI due to differences in DEX locations for pools
         klimaNeeded = IKlimaInfinity(INFINITY).getSourceAmountSwapOnly(KLIMA, poolToken, poolAmount);
+
+        // If direct LP quote is 0, use quote from KI
+        if (maxKlima == 0) return klimaNeeded;
 
         // Limit the KLIMA needed
         if (klimaNeeded > maxKlima) klimaNeeded = maxKlima;

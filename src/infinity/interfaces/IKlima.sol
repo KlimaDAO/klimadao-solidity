@@ -19,3 +19,11 @@ interface IwsKLIMA {
 
     function sKLIMATowKLIMA(uint _amount) external view returns (uint);
 }
+
+interface IKlimaRetirementBond {
+    function swapToExact(address poolToken, uint256 amount) external;
+
+    function getKlimaAmount(uint256 poolAmount, address poolToken) external view returns (uint256 klimaNeeded);
+
+    function owner() external returns (address);
+}
