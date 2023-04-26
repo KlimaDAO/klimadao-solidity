@@ -53,6 +53,7 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_retireExactSourceDefault_MCO2_MCO2(uint retireAmount) public {

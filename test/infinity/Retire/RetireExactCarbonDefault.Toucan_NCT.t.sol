@@ -57,6 +57,7 @@ contract RetireExactCarbonDefaultToucanNCT is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_retireExactCarbonDefault_NCT_NCT(uint retireAmount) public {

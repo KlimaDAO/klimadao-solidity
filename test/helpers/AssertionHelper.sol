@@ -13,4 +13,8 @@ abstract contract AssertionHelper is Test {
     function assertZeroTokenBalance(address token, address target) internal {
         assertEq(IERC20(token).balanceOf(target), 0);
     }
+
+    function assertTokenBalance(address token, address target, uint amount) internal {
+        assertEq(IERC20(token).balanceOf(target), amount);
+    }
 }

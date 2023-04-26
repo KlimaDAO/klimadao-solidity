@@ -63,6 +63,7 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_retireExactSourceDefault_UBO_UBO(uint retireAmount) public {

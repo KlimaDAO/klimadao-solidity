@@ -57,6 +57,7 @@ contract RetireExactCarbonSpecificToucanBCT is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_retireExactCarbonSpecific_BCT_BCT(uint retireAmount) public {
