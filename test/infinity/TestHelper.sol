@@ -26,7 +26,7 @@ import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
-import {IKlimaTreasury, IKlimaRetirementBond} from "src/protocol/interfaces/IKLIMA.sol";
+import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -331,14 +331,15 @@ abstract contract TestHelper is Test, HelperContract {
         address NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
 
         address owner = IKlimaRetirementBond(retirementBonds).owner();
+        address allocator = IKlimaRetirementBond(retirementBonds).allocatorContract();
 
         vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
 
-        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, retirementBonds);
+        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
 
-        vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(retirementBonds));
+        vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
 
-        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, retirementBonds, address(0));
+        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
 
         vm.stopPrank();
 
@@ -364,11 +365,11 @@ abstract contract TestHelper is Test, HelperContract {
         IKlimaRetirementBond(retirementBonds).updateMaxSlippage(NBO, 200);
         IKlimaRetirementBond(retirementBonds).updateDaoFee(NBO, 3000);
 
-        IKlimaRetirementBond(retirementBonds).fundMarket(BCT, 1_000_000 * 1e18);
-        IKlimaRetirementBond(retirementBonds).fundMarket(NCT, 35_000 * 1e18);
-        IKlimaRetirementBond(retirementBonds).fundMarket(MCO2, 250_000 * 1e18);
-        IKlimaRetirementBond(retirementBonds).fundMarket(UBO, 35_000 * 1e18);
-        IKlimaRetirementBond(retirementBonds).fundMarket(NBO, 2_500 * 1e18);
+        IRetirementBondAllocator(allocator).fundBonds(BCT, 1_000_000 * 1e18);
+        IRetirementBondAllocator(allocator).fundBonds(NCT, 35_000 * 1e18);
+        IRetirementBondAllocator(allocator).fundBonds(MCO2, 250_000 * 1e18);
+        IRetirementBondAllocator(allocator).fundBonds(UBO, 35_000 * 1e18);
+        IRetirementBondAllocator(allocator).fundBonds(NBO, 2_500 * 1e18);
 
         vm.stopPrank();
     }

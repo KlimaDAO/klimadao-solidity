@@ -25,6 +25,8 @@ interface IKlimaTreasury {
 interface IKlimaRetirementBond {
     function owner() external returns (address);
 
+    function allocatorContract() external returns (address);
+
     function DAO() external returns (address);
 
     function TREASURY() external returns (address);
@@ -36,4 +38,12 @@ interface IKlimaRetirementBond {
     function updateDaoFee(address poolToken, uint256 _daoFee) external;
 
     function setPoolReference(address poolToken, address referenceToken) external;
+}
+
+interface IRetirementBondAllocator {
+    function fundBonds(address token, uint amount) external;
+
+    function closeBonds(address token) external;
+
+    function updateBondContract(address _bondContract) external;
 }
