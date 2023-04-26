@@ -11,6 +11,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Script.sol";
 
 import {CarbonRetirementBondDepository} from "../src/protocol/bonds/CarbonRetirementBondDepository.sol";
+import {RetirementBondAllocator} from "../src/protocol/allocators/RetirementBondAllocator.sol";
 
 contract DeployRetirementBonds is Script {
     function run() external {
@@ -19,11 +20,13 @@ contract DeployRetirementBonds is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        //deploy facets and init contract
-
         CarbonRetirementBondDepository retireBonds = new CarbonRetirementBondDepository();
+        RetirementBondAllocator allocator = new RetirementBondAllocator(address(retireBonds));
+
+        retireBonds.setAllocator(address(allocator));
 
         console.log("Retirement Bonds deployed to %s", address(retireBonds));
+        console.log("Retirement Bond Allocator deployed to %s", address(allocator));
         vm.stopBroadcast();
     }
 }
