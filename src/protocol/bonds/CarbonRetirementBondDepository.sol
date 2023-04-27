@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity =0.8.19;
 
 import "oz/access/Ownable2Step.sol";
 
-import "../interfaces/IKlimaInfinity.sol";
-import {IKlima, SafeERC20} from "../interfaces/IKLIMA.sol";
-import "../interfaces/IUniswapV2Pair.sol";
+import "src/protocol/interfaces/IKlimaInfinity.sol";
+import {IKlima, SafeERC20} from "src/protocol/interfaces/IKLIMA.sol";
+import "src/protocol/interfaces/IUniswapV2Pair.sol";
 
 /**
  * @title CarbonRetirementBondDepository
@@ -111,20 +111,6 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     }
 
     /**
-     * @notice Transfers and burns a specified amount of KLIMA tokens.
-     * A fee is also transferred to the DAO address based on the fee divisor and the configured fee for the pool token.
-     * @param totalKlima The total amount of KLIMA tokens to transfer and burn.
-     * @param poolToken The address of the pool token to burn KLIMA tokens for.
-     */
-    function transferAndBurnKlima(uint256 totalKlima, address poolToken) internal {
-        // Transfer and burn the KLIMA
-        uint256 feeAmount = (totalKlima * daoFee[poolToken]) / FEE_DIVISOR;
-
-        IKlima(KLIMA).safeTransferFrom(msg.sender, DAO, feeAmount);
-        IKlima(KLIMA).burnFrom(msg.sender, totalKlima - feeAmount);
-    }
-
-    /**
      * @notice Closes the market for a specified pool token by transferring all remaining pool tokens to the treasury address.
      * @dev Only the allocator contract can call this function.
      * @param poolToken The address of the pool token to close the market for.
@@ -132,46 +118,6 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     function closeMarket(address poolToken) external {
         enforceOnlyAllocator();
         IKlima(poolToken).safeTransfer(TREASURY, IKlima(poolToken).balanceOf(address(this)));
-    }
-
-    /**
-     * @notice Returns the current market price of the pool token in terms of KLIMA tokens.
-     * @dev Currently all KLIMA LP contracts safely interact with the IUniswapV2Pair abi.
-     * @param poolToken The address of the pool token to get the market quote for.
-     * @param amountOut The amount of pool tokens to get the market quote for.
-     * @return currentPrice The current market price of the pool token in terms of KLIMA tokens.
-     */
-    function getMarketQuote(address poolToken, uint256 amountOut) internal view returns (uint256 currentPrice) {
-        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(poolReference[poolToken]).getReserves();
-
-        currentPrice = referenceKlimaPosition[poolToken] == 0
-            ? (amountOut * (reserve0)) / reserve1
-            : (amountOut * (reserve1)) / reserve0;
-    }
-
-    /**
-     * @notice Calculates the amount of KLIMA tokens needed to retire a specified amount of pool tokens for a pool.
-     * The required amount of KLIMA tokens is calculated based on the current market price of the pool token and the amount of pool tokens to be retired.
-     * If the raw amount needed from the dex exceeds slippage, than the limited amount is returned.
-     * @param poolAmount The amount of pool tokens to retire.
-     * @param poolToken The address of the pool token to retire.
-     * @return klimaNeeded The amount of KLIMA tokens needed to retire the specified amount of pool tokens.
-     */
-    function getKlimaAmount(uint256 poolAmount, address poolToken) public view returns (uint256 klimaNeeded) {
-        /// @dev On extremely small quote amounts this can result in zero
-        uint256 maxKlima = (getMarketQuote(
-            poolToken,
-            (FEE_DIVISOR + maxSlippage[poolToken]) * 1e14 // Get market quote for 1 pool token + slippage percent.
-        ) * poolAmount) / 1e18;
-
-        // Check inputs through KI due to differences in DEX locations for pools
-        klimaNeeded = IKlimaInfinity(INFINITY).getSourceAmountSwapOnly(KLIMA, poolToken, poolAmount);
-
-        // If direct LP quote is 0, use quote from KI
-        if (maxKlima == 0) return klimaNeeded;
-
-        // Limit the KLIMA needed
-        if (klimaNeeded > maxKlima) klimaNeeded = maxKlima;
     }
 
     /**
@@ -209,6 +155,60 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      */
     function setAllocator(address allocator) external onlyOwner {
         allocatorContract = allocator;
+    }
+
+    /**
+     * @notice Calculates the amount of KLIMA tokens needed to retire a specified amount of pool tokens for a pool.
+     * The required amount of KLIMA tokens is calculated based on the current market price of the pool token and the amount of pool tokens to be retired.
+     * If the raw amount needed from the dex exceeds slippage, than the limited amount is returned.
+     * @param poolAmount The amount of pool tokens to retire.
+     * @param poolToken The address of the pool token to retire.
+     * @return klimaNeeded The amount of KLIMA tokens needed to retire the specified amount of pool tokens.
+     */
+    function getKlimaAmount(uint256 poolAmount, address poolToken) public view returns (uint256 klimaNeeded) {
+        /// @dev On extremely small quote amounts this can result in zero
+        uint256 maxKlima = (getMarketQuote(
+            poolToken,
+            (FEE_DIVISOR + maxSlippage[poolToken]) * 1e14 // Get market quote for 1 pool token + slippage percent.
+        ) * poolAmount) / 1e18;
+
+        // Check inputs through KI due to differences in DEX locations for pools
+        klimaNeeded = IKlimaInfinity(INFINITY).getSourceAmountSwapOnly(KLIMA, poolToken, poolAmount);
+
+        // If direct LP quote is 0, use quote from KI
+        if (maxKlima == 0) return klimaNeeded;
+
+        // Limit the KLIMA needed
+        if (klimaNeeded > maxKlima) klimaNeeded = maxKlima;
+    }
+
+    /**
+     * @notice Transfers and burns a specified amount of KLIMA tokens.
+     * A fee is also transferred to the DAO address based on the fee divisor and the configured fee for the pool token.
+     * @param totalKlima The total amount of KLIMA tokens to transfer and burn.
+     * @param poolToken The address of the pool token to burn KLIMA tokens for.
+     */
+    function transferAndBurnKlima(uint256 totalKlima, address poolToken) internal {
+        // Transfer and burn the KLIMA
+        uint256 feeAmount = (totalKlima * daoFee[poolToken]) / FEE_DIVISOR;
+
+        IKlima(KLIMA).safeTransferFrom(msg.sender, DAO, feeAmount);
+        IKlima(KLIMA).burnFrom(msg.sender, totalKlima - feeAmount);
+    }
+
+    /**
+     * @notice Returns the current market price of the pool token in terms of KLIMA tokens.
+     * @dev Currently all KLIMA LP contracts safely interact with the IUniswapV2Pair abi.
+     * @param poolToken The address of the pool token to get the market quote for.
+     * @param amountOut The amount of pool tokens to get the market quote for.
+     * @return currentPrice The current market price of the pool token in terms of KLIMA tokens.
+     */
+    function getMarketQuote(address poolToken, uint256 amountOut) internal view returns (uint256 currentPrice) {
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(poolReference[poolToken]).getReserves();
+
+        currentPrice = referenceKlimaPosition[poolToken] == 0
+            ? (amountOut * (reserve0)) / reserve1
+            : (amountOut * (reserve1)) / reserve0;
     }
 
     /**
