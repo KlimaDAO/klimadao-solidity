@@ -17,6 +17,7 @@ contract RetirementBondAllocator is Ownable2Step {
     function fundBonds(address token, uint amount) external onlyOwner {
         IKlimaTreasury(TREASURY).manage(token, amount);
         IKlima(token).transfer(bondContract, amount);
+        IKlimaRetirementBond(bondContract).openMarket(token);
     }
 
     function closeBonds(address token) external onlyOwner {

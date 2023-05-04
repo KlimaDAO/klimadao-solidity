@@ -31,6 +31,8 @@ interface IKlimaRetirementBond {
 
     function TREASURY() external returns (address);
 
+    function openMarket(address poolToken) external;
+
     function closeMarket(address poolToken) external;
 
     function updateMaxSlippage(address poolToken, uint256 _maxSlippage) external;

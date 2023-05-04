@@ -17,30 +17,42 @@ import "src/protocol/interfaces/IUniswapV2Pair.sol";
 contract CarbonRetirementBondDepository is Ownable2Step {
     using SafeERC20 for IKlima;
 
-    /// @dev Address of the KLIMA token contract.
+    /// @notice Address of the KLIMA token contract.
     address public constant KLIMA = 0x4e78011Ce80ee02d2c3e649Fb657E45898257815;
-    /// @dev Address of the DAO contract.
+    /// @notice Address of the DAO contract.
     address public constant DAO = 0x65A5076C0BA74e5f3e069995dc3DAB9D197d995c;
-    /// @dev Address of the Treasury contract.
+    /// @notice Address of the Treasury contract.
     address public constant TREASURY = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
-    /// @dev address of the Klima Infinity contract.
+    /// @notice address of the Klima Infinity contract.
     address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
-    /// @dev Divisor used for calculating percentages.
+    /// @notice Divisor used for calculating percentages.
     uint256 public constant FEE_DIVISOR = 10000;
-    /// @dev Allocator contract used by policy to fund and close markets.
+    /// @notice Allocator contract used by policy to fund and close markets.
     address public allocatorContract;
 
-    /// @dev Mapping that stores the KLIMA/X LP used for quoting price references.
+    /// @notice Mapping that stores the KLIMA/X LP used for quoting price references.
     mapping(address => address) public poolReference;
 
-    /// @dev Mapping that stores whether the KLIMA is token 0 or token 1 in the LP contract.
+    /// @notice Mapping that stores whether the KLIMA is token 0 or token 1 in the LP contract.
     mapping(address => uint8) public referenceKlimaPosition;
 
-    /// @dev Mapping that stores the DAO fee charged for a specific pool token.
+    /// @notice Mapping that stores the DAO fee charged for a specific pool token.
     mapping(address => uint256) public daoFee;
 
-    /// @dev Mapping that stores the maximum slippage tolerated for a specific pool token.
+    /// @notice Mapping that stores the maximum slippage tolerated for a specific pool token.
     mapping(address => uint256) public maxSlippage;
+
+    event AllocatorChanged(address oldAllocator, address newAllocator);
+    event PoolReferenceChanged(address pool, address oldLp, address newLp);
+    event ReferenceKlimaPositionChanged(address lp, uint8 oldPosition, uint8 newPosition);
+    event DaoFeeChanged(address pool, uint oldFee, uint newFee);
+    event PoolSlippageChanged(address pool, uint oldSlippage, uint newSlippage);
+
+    event MarketOpened(address pool, uint amount);
+    event MarketClosed(address pool, uint amount);
+
+    event CarbonBonded(address pool, uint poolAmount);
+    event KlimaBonded(uint daoFee, uint klimaBurned);
 
     /**
      * @notice Swaps the specified amount of pool tokens for KLIMA tokens.
@@ -56,6 +68,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
         transferAndBurnKlima(klimaNeeded, poolToken);
         IKlima(poolToken).safeTransfer(INFINITY, poolAmount);
+
+        emit CarbonBonded(poolToken, poolAmount);
     }
 
     /**
@@ -96,6 +110,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
         IKlima(poolToken).safeIncreaseAllowance(INFINITY, poolNeeded);
 
+        emit CarbonBonded(poolToken, poolNeeded);
+
         return
             IKlimaInfinity(INFINITY).retireExactCarbonDefault(
                 poolToken,
@@ -111,13 +127,27 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     }
 
     /**
+     * @notice Emits event on market allocation.
+     * @dev Only the allocator contract can call this function.
+     * @param poolToken The address of the pool token to close the market for.
+     */
+    function openMarket(address poolToken) external {
+        enforceOnlyAllocator();
+
+        emit MarketOpened(poolToken, IKlima(poolToken).balanceOf(address(this)));
+    }
+
+    /**
      * @notice Closes the market for a specified pool token by transferring all remaining pool tokens to the treasury address.
      * @dev Only the allocator contract can call this function.
      * @param poolToken The address of the pool token to close the market for.
      */
     function closeMarket(address poolToken) external {
         enforceOnlyAllocator();
-        IKlima(poolToken).safeTransfer(TREASURY, IKlima(poolToken).balanceOf(address(this)));
+        uint currentBalance = IKlima(poolToken).balanceOf(address(this));
+        IKlima(poolToken).safeTransfer(TREASURY, currentBalance);
+
+        emit MarketClosed(poolToken, currentBalance);
     }
 
     /**
@@ -126,7 +156,10 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param _maxSlippage The new maximum slippage percentage.
      */
     function updateMaxSlippage(address poolToken, uint256 _maxSlippage) external onlyOwner {
+        uint oldSlippage = maxSlippage[poolToken];
         maxSlippage[poolToken] = _maxSlippage;
+
+        emit PoolSlippageChanged(poolToken, oldSlippage, maxSlippage[poolToken]);
     }
 
     /**
@@ -135,7 +168,10 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param _daoFee The new DAO fee.
      */
     function updateDaoFee(address poolToken, uint256 _daoFee) external onlyOwner {
+        uint oldFee = daoFee[poolToken];
         daoFee[poolToken] = _daoFee;
+
+        emit DaoFeeChanged(poolToken, oldFee, daoFee[poolToken]);
     }
 
     /**
@@ -145,8 +181,14 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param referenceToken The reference token for the given pool token.
      */
     function setPoolReference(address poolToken, address referenceToken) external onlyOwner {
+        address oldReference = poolReference[poolToken];
+        uint8 oldPosition = referenceKlimaPosition[poolToken];
+
         poolReference[poolToken] = referenceToken;
         referenceKlimaPosition[poolToken] = IUniswapV2Pair(referenceToken).token0() == KLIMA ? 0 : 1;
+
+        emit PoolReferenceChanged(poolToken, oldReference, poolReference[poolToken]);
+        emit ReferenceKlimaPositionChanged(poolReference[poolToken], oldPosition, referenceKlimaPosition[poolToken]);
     }
 
     /**
@@ -154,7 +196,10 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param allocator The address of the allocator contract to set.
      */
     function setAllocator(address allocator) external onlyOwner {
+        address oldAllocator = allocatorContract;
         allocatorContract = allocator;
+
+        emit AllocatorChanged(oldAllocator, allocatorContract);
     }
 
     /**
@@ -194,6 +239,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
         IKlima(KLIMA).safeTransferFrom(msg.sender, DAO, feeAmount);
         IKlima(KLIMA).burnFrom(msg.sender, totalKlima - feeAmount);
+
+        emit KlimaBonded(feeAmount, totalKlima - feeAmount);
     }
 
     /**
