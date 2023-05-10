@@ -80,7 +80,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         projectsNct = IToucanPool(NCT).getScoredTCO2s();
     }
 
-    function test_retireBond_retireCarbonSpecific_BCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_BCT_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(BCT).totalSupply());
 
         getKlima();
@@ -102,7 +102,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         );
     }
 
-    function test_retireBond_retireCarbonSpecific_NCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_NCT_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(NCT).totalSupply());
 
         getKlima();
@@ -124,7 +124,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         );
     }
 
-    function test_retireBond_retireCarbonSpecific_MCO2() public {
+    function test_protocol_retireBond_retireCarbonSpecific_MCO2() public {
         getKlima();
 
         uint retireAmount = 1e18;
@@ -141,7 +141,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         );
     }
 
-    function test_retireBond_retireCarbonSpecific_UBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_UBO_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(UBO).totalSupply());
 
         getKlima();
@@ -161,7 +161,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         );
     }
 
-    function test_retireBond_retireCarbonSpecific_NBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_NBO_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(NBO).totalSupply());
 
         getKlima();

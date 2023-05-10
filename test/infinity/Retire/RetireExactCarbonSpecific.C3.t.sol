@@ -64,43 +64,43 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactCarbonSpecific_UBO_UBO(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_UBO(uint retireAmount) public {
         retireExactC3(UBO, UBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_UBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_USDC(uint retireAmount) public {
         retireExactC3(USDC, UBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_UBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_KLIMA(uint retireAmount) public {
         retireExactC3(KLIMA, UBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_UBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_SKLIMA(uint retireAmount) public {
         retireExactC3(SKLIMA, UBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_UBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_WSKLIMA(uint retireAmount) public {
         retireExactC3(WSKLIMA, UBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_NBO_NBO(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_NBO(uint retireAmount) public {
         retireExactC3(NBO, NBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_NBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_USDC(uint retireAmount) public {
         retireExactC3(USDC, NBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_NBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_KLIMA(uint retireAmount) public {
         retireExactC3(KLIMA, NBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_NBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_SKLIMA(uint retireAmount) public {
         retireExactC3(SKLIMA, NBO, retireAmount);
     }
 
-    function test_retireExactCarbonSpecific_NBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_WSKLIMA(uint retireAmount) public {
         retireExactC3(WSKLIMA, NBO, retireAmount);
     }
 

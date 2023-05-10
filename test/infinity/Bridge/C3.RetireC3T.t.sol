@@ -51,7 +51,7 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
         DEFAULT_PROJECT = IC3Pool(UBO).getFreeRedeemAddresses()[0];
     }
 
-    function test_c3RetireExactC3T() public {
+    function test_infinity_c3RetireExactC3T() public {
         address sourceToken = DEFAULT_PROJECT;
         address carbonToken = DEFAULT_PROJECT;
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, UBO, address(this));
@@ -97,7 +97,7 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
     }
 
-    function test_c3RetireExactC3TWithEntity() public {
+    function test_infinity_c3RetireExactC3TWithEntity() public {
         address sourceToken = DEFAULT_PROJECT;
         address carbonToken = DEFAULT_PROJECT;
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, UBO, address(this));

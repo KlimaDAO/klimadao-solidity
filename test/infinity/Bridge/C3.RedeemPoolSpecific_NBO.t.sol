@@ -55,23 +55,23 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_c3RedeemPoolSpecific_redeemNBO_usingNBO_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingNBO_fuzz(uint redeemAmount) public {
         redeemNBO(NBO, redeemAmount);
     }
 
-    function test_c3RedeemPoolSpecific_redeemNBO_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingUSDC_fuzz(uint redeemAmount) public {
         redeemNBO(USDC, redeemAmount);
     }
 
-    function test_c3RedeemPoolSpecific_redeemNBO_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingKLIMA_fuzz(uint redeemAmount) public {
         redeemNBO(KLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolSpecific_redeemNBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingSKLIMA_fuzz(uint redeemAmount) public {
         redeemNBO(SKLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolSpecific_redeemNBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
         redeemNBO(WSKLIMA, redeemAmount);
     }
 

@@ -56,23 +56,23 @@ contract RetireExactCarbonDefaultMoss is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactCarbonDefault_MCO2_MCO2(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_MCO2_MCO2(uint retireAmount) public {
         retireExactMoss(MCO2, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_MCO2_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_MCO2_USDC(uint retireAmount) public {
         retireExactMoss(USDC, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_MCO2_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_MCO2_KLIMA(uint retireAmount) public {
         retireExactMoss(KLIMA, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_MCO2_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_MCO2_SKLIMA(uint retireAmount) public {
         retireExactMoss(SKLIMA, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_MCO2_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_MCO2_WSKLIMA(uint retireAmount) public {
         retireExactMoss(WSKLIMA, retireAmount);
     }
 

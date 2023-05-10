@@ -57,24 +57,24 @@ contract RetireBondSwapToExactTest is AssertionHelper, DeploymentHelper {
         vm.stopPrank();
     }
 
-    function test_RetireBond_swapToExact_onlyInfinity() public {
+    function test_protocol_RetireBond_swapToExact_onlyInfinity() public {
         vm.expectRevert("Caller is not Infinity");
         retireBond.swapToExact(BCT, 1e18);
     }
 
-    function test_RetireBond_swapToExact_noTokensRevert() public {
+    function test_protocol_RetireBond_swapToExact_noTokensRevert() public {
         vm.prank(retireBond.INFINITY());
         vm.expectRevert("ERC20: transfer amount exceeds balance");
         retireBond.swapToExact(BCT, 1e18);
     }
 
-    function test_RetireBond_swapToExact_noKlimaRevert() public {
+    function test_protocol_RetireBond_swapToExact_noKlimaRevert() public {
         vm.prank(retireBond.INFINITY());
         vm.expectRevert("ERC20: transfer amount exceeds balance");
         retireBond.swapToExact(BCT, 1e18);
     }
 
-    function test_RetireBond_swapToExact(uint retireAmount) public {
+    function test_protocol_RetireBond_swapToExact(uint retireAmount) public {
         // Limit the total amount for fuzzing to an amount that won't break UniV2 quoting
         vm.assume(retireAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 

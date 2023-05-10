@@ -65,43 +65,43 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactSourceDefault_BCT_BCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_BCT(uint retireAmount) public {
         retireExactSource(BCT, BCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_BCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_USDC(uint retireAmount) public {
         retireExactSource(USDC, BCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_BCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_KLIMA(uint retireAmount) public {
         retireExactSource(KLIMA, BCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_BCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_SKLIMA(uint retireAmount) public {
         retireExactSource(SKLIMA, BCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_BCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_WSKLIMA(uint retireAmount) public {
         retireExactSource(WSKLIMA, BCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_NCT_NCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_NCT(uint retireAmount) public {
         retireExactSource(NCT, NCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_NCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_USDC(uint retireAmount) public {
         retireExactSource(USDC, NCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_NCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_KLIMA(uint retireAmount) public {
         retireExactSource(KLIMA, NCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_NCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_SKLIMA(uint retireAmount) public {
         retireExactSource(SKLIMA, NCT, retireAmount);
     }
 
-    function test_retireExactSourceDefault_NCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_WSKLIMA(uint retireAmount) public {
         retireExactSource(WSKLIMA, NCT, retireAmount);
     }
 

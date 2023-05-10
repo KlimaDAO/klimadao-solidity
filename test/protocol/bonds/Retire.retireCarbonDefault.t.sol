@@ -78,7 +78,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         DEFAULT_PROJECT_NBO = IC3Pool(NBO).getFreeRedeemAddresses()[0];
     }
 
-    function test_retireBond_retireCarbonDefault_BCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_BCT_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(BCT).totalSupply());
 
         getKlima();
@@ -98,7 +98,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         retireBond.retireCarbonDefault(BCT, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_retireBond_retireCarbonDefault_NCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_NCT_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(NCT).totalSupply());
 
         getKlima();
@@ -118,7 +118,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         retireBond.retireCarbonDefault(NCT, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_retireBond_retireCarbonDefault_MCO2_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_MCO2_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(MCO2).totalSupply());
 
         // Policy wouldn't allocate more than the amount of tokens available in the LP supply
@@ -141,7 +141,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         retireBond.retireCarbonDefault(MCO2, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_retireBond_retireCarbonDefault_UBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_UBO_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(UBO).totalSupply());
 
         getKlima();
@@ -163,7 +163,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         retireBond.retireCarbonDefault(UBO, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_retireBond_retireCarbonDefault_NBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_NBO_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(NBO).totalSupply());
 
         getKlima();

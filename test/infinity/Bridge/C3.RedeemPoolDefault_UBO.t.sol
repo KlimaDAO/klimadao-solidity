@@ -55,23 +55,23 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
         redeemUBO(UBO, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
         redeemUBO(USDC, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
         redeemUBO(KLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
         redeemUBO(SKLIMA, redeemAmount);
     }
 
-    function test_c3RedeemPoolDefault_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
         redeemUBO(WSKLIMA, redeemAmount);
     }
 

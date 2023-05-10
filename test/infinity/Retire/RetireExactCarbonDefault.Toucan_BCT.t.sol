@@ -60,23 +60,23 @@ contract RetireExactCarbonDefaultToucanBCT is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactCarbonDefault_BCT_BCT(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_BCT(uint retireAmount) public {
         retireExactBCT(BCT, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_BCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_USDC(uint retireAmount) public {
         retireExactBCT(USDC, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_BCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_KLIMA(uint retireAmount) public {
         retireExactBCT(KLIMA, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_BCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_SKLIMA(uint retireAmount) public {
         retireExactBCT(SKLIMA, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_BCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_WSKLIMA(uint retireAmount) public {
         retireExactBCT(WSKLIMA, retireAmount);
     }
 

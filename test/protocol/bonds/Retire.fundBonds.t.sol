@@ -32,58 +32,58 @@ contract RetireBondFundMarketTest is AssertionHelper, DeploymentHelper {
         toggleRetirementBondAllocatorWithTreasury(allocatorAddress);
     }
 
-    function test_retireBond_fundWithBct() public {
+    function test_protocol_retireBond_fundWithBct() public {
         fundBonds(BCT, 1_000_000 * 1e18);
     }
 
-    function test_retireBond_fundWithNct() public {
+    function test_protocol_retireBond_fundWithNct() public {
         fundBonds(NCT, 35_000 * 1e18);
     }
 
-    function test_retireBond_fundWithMco2() public {
+    function test_protocol_retireBond_fundWithMco2() public {
         fundBonds(MCO2, 250_000 * 1e18);
     }
 
-    function test_retireBond_fundWithUbo() public {
+    function test_protocol_retireBond_fundWithUbo() public {
         fundBonds(UBO, 35_000 * 1e18);
     }
 
-    function test_retireBond_fundWithNbo() public {
+    function test_protocol_retireBond_fundWithNbo() public {
         fundBonds(NBO, 2_500 * 1e18);
     }
 
-    function test_retireBond_returnBct() public {
+    function test_protocol_retireBond_returnBct() public {
         fundBonds(BCT, 1_000_000 * 1e18);
         returnBonds(BCT);
     }
 
-    function test_retireBond_returnNct() public {
+    function test_protocol_retireBond_returnNct() public {
         fundBonds(NCT, 35_000 * 1e18);
         returnBonds(NCT);
     }
 
-    function test_retireBond_returnMco2() public {
+    function test_protocol_retireBond_returnMco2() public {
         fundBonds(MCO2, 250_000 * 1e18);
         returnBonds(MCO2);
     }
 
-    function test_retireBond_returnUbo() public {
+    function test_protocol_retireBond_returnUbo() public {
         fundBonds(UBO, 35_000 * 1e18);
         returnBonds(UBO);
     }
 
-    function test_retireBond_returnNbo() public {
+    function test_protocol_retireBond_returnNbo() public {
         fundBonds(NBO, 2_500 * 1e18);
         returnBonds(NBO);
     }
 
-    function test_retireBond_fundWithBct_revert_insufficientReserves() public {
+    function test_protocol_retireBond_fundWithBct_revert_insufficientReserves() public {
         vm.prank(allocator.owner());
         vm.expectRevert("Insufficient reserves");
         allocator.fundBonds(BCT, 15_000_000 * 1e18);
     }
 
-    function test_retireBond_fundWithBct_revert_notOwner() public {
+    function test_protocol_retireBond_fundWithBct_revert_notOwner() public {
         vm.prank(retireBond.DAO());
         vm.expectRevert("Ownable: caller is not the owner");
         allocator.fundBonds(BCT, 15_000_000 * 1e18);

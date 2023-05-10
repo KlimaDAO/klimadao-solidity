@@ -60,23 +60,23 @@ contract RetireExactCarbonDefaultToucanNCT is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactCarbonDefault_NCT_NCT(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_NCT_NCT(uint retireAmount) public {
         retireExactNCT(NCT, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_NCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_NCT_USDC(uint retireAmount) public {
         retireExactNCT(USDC, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_NCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_NCT_KLIMA(uint retireAmount) public {
         retireExactNCT(KLIMA, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_NCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_NCT_SKLIMA(uint retireAmount) public {
         retireExactNCT(SKLIMA, retireAmount);
     }
 
-    function test_retireExactCarbonDefault_NCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_NCT_WSKLIMA(uint retireAmount) public {
         retireExactNCT(WSKLIMA, retireAmount);
     }
 
