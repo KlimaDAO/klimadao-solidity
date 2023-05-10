@@ -88,7 +88,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         uint poolBalance = IERC20(projectsBct[1]).balanceOf(BCT);
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > (1_000_000 * 1e18 * 3333) / 10000) vm.expectRevert("Not enough pool tokens to retire");
+        else if ((retireAmount * 13333) / 10000 > 1_000_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > poolBalance) vm.expectRevert();
 
         retireBond.retireCarbonSpecific(
@@ -110,7 +110,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         uint poolBalance = IERC20(projectsNct[1]).balanceOf(NCT);
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > (35_000 * 1e18 * 1000) / 10000) vm.expectRevert("Not enough pool tokens to retire");
+        else if ((retireAmount * 11211) / 10000 > 35_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > poolBalance) vm.expectRevert();
 
         retireBond.retireCarbonSpecific(
@@ -147,7 +147,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > (35_000 * 1e18 * 225) / 10000) vm.expectRevert("Not enough pool tokens to retire");
+        else if ((retireAmount * 10225) / 10000 > 35_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > IERC20(projectsUbo[1]).balanceOf(UBO)) vm.expectRevert("Not enough amount");
 
         retireBond.retireCarbonSpecific(
@@ -167,7 +167,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > (2_500 * 1e18 * 225) / 10000) vm.expectRevert("Not enough pool tokens to retire");
+        else if ((retireAmount * 10225) / 10000 > 2_500 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > IERC20(projectsNbo[1]).balanceOf(NBO)) vm.expectRevert("Not enough amount");
 
         retireBond.retireCarbonSpecific(
