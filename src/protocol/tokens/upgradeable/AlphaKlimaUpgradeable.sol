@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "ozu/access/OwnableUpgradeable.sol";
-import "ozu/token/ERC20/presets/ERC20PresetFixedSupplyUpgradeable.sol";
+import "ozu-4-5-1/access/OwnableUpgradeable.sol";
+import "ozu-4-5-1/token/ERC20/presets/ERC20PresetFixedSupplyUpgradeable.sol";
 
 contract AlphaKlimaUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableUpgradeable {
     constructor() {}
