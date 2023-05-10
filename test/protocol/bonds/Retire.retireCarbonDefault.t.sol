@@ -14,6 +14,9 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
     RetirementBondAllocator allocator;
     KlimaTreasury treasury;
 
+    event CarbonBonded(address pool, uint poolAmount);
+    event KlimaBonded(uint daoFee, uint klimaBurned);
+
     // Retirement details
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
@@ -82,6 +85,15 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
         else if (retireAmount > 1_000_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else {
+            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, BCT);
+            uint daoFee = (klimaAmount * 3000) / 10000;
+            vm.expectEmit(true, true, true, true);
+            emit KlimaBonded(daoFee, klimaAmount - daoFee);
+
+            vm.expectEmit(true, true, true, true);
+            emit CarbonBonded(BCT, (retireAmount * 101) / 100);
+        }
 
         retireBond.retireCarbonDefault(BCT, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
@@ -93,6 +105,15 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
         else if (retireAmount > 35_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else {
+            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NCT);
+            uint daoFee = (klimaAmount * 3000) / 10000;
+            vm.expectEmit(true, true, true, true);
+            emit KlimaBonded(daoFee, klimaAmount - daoFee);
+
+            vm.expectEmit(true, true, true, true);
+            emit CarbonBonded(NCT, (retireAmount * 101) / 100);
+        }
 
         retireBond.retireCarbonDefault(NCT, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
@@ -107,6 +128,15 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
         else if (retireAmount > 250_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else {
+            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, MCO2);
+            uint daoFee = (klimaAmount * 3000) / 10000;
+            vm.expectEmit(true, true, true, true);
+            emit KlimaBonded(daoFee, klimaAmount - daoFee);
+
+            vm.expectEmit(true, true, true, true);
+            emit CarbonBonded(MCO2, (retireAmount * 101) / 100);
+        }
 
         retireBond.retireCarbonDefault(MCO2, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
@@ -120,6 +150,15 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         else if (retireAmount > 35_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > IERC20(DEFAULT_PROJECT_UBO).balanceOf(UBO))
             vm.expectRevert("Amount exceeds available tokens");
+        else {
+            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, UBO);
+            uint daoFee = (klimaAmount * 3000) / 10000;
+            vm.expectEmit(true, true, true, true);
+            emit KlimaBonded(daoFee, klimaAmount - daoFee);
+
+            vm.expectEmit(true, true, true, true);
+            emit CarbonBonded(UBO, (retireAmount * 101) / 100);
+        }
 
         retireBond.retireCarbonDefault(UBO, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
@@ -133,6 +172,15 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         else if (retireAmount > 2_500 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > IERC20(DEFAULT_PROJECT_NBO).balanceOf(NBO))
             vm.expectRevert("Amount exceeds available tokens");
+        else {
+            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NBO);
+            uint daoFee = (klimaAmount * 3000) / 10000;
+            vm.expectEmit(true, true, true, true);
+            emit KlimaBonded(daoFee, klimaAmount - daoFee);
+
+            vm.expectEmit(true, true, true, true);
+            emit CarbonBonded(NBO, (retireAmount * 101) / 100);
+        }
 
         retireBond.retireCarbonDefault(NBO, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
