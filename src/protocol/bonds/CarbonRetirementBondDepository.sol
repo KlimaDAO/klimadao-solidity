@@ -57,8 +57,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     /**
      * @notice Swaps the specified amount of pool tokens for KLIMA tokens.
      * @dev Only callable by the Infinity contract.
-     * @param poolToken The pool token address.
-     * @param poolAmount The amount of pool tokens to swap.
+     * @param poolToken     The pool token address.
+     * @param poolAmount    The amount of pool tokens to swap.
      */
     function swapToExact(address poolToken, uint256 poolAmount) external {
         require(msg.sender == INFINITY, "Caller is not Infinity");
@@ -75,13 +75,13 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     /**
      * @notice Retires the specified amount of carbon for the given pool token using KI.
      * @dev Requires KLIMA spend approval for the amount returned by getKlimaAmount()
-     * @param poolToken The pool token address.
-     * @param retireAmount The amount of carbon to retire.
-     * @param retiringEntityString The string representing the retiring entity.
-     * @param beneficiaryAddress The address of the beneficiary.
-     * @param beneficiaryString The string representing the beneficiary.
-     * @param retirementMessage The message for the retirement.
-     * @return retirementIndex The index of the retirement transaction.
+     * @param poolToken             The pool token address.
+     * @param retireAmount          The amount of carbon to retire.
+     * @param retiringEntityString  The string representing the retiring entity.
+     * @param beneficiaryAddress    The address of the beneficiary.
+     * @param beneficiaryString     The string representing the beneficiary.
+     * @param retirementMessage     The message for the retirement.
+     * @return retirementIndex      The index of the retirement transaction.
      */
     function retireCarbonDefault(
         address poolToken,
@@ -116,6 +116,64 @@ contract CarbonRetirementBondDepository is Ownable2Step {
             IKlimaInfinity(INFINITY).retireExactCarbonDefault(
                 poolToken,
                 poolToken,
+                poolNeeded,
+                retireAmount,
+                retiringEntityString,
+                beneficiaryAddress,
+                beneficiaryString,
+                retirementMessage,
+                0
+            );
+    }
+
+    /**
+     * @notice Retires the specified amount of carbon for the given pool token using KI.
+     * Uses the provided project token for the underlying credit to retire.
+     * @dev Requires KLIMA spend approval for the amount returned by getKlimaAmount()
+     * @param poolToken             The pool token address.
+     * @param projectToken          The project token to retire.
+     * @param retireAmount          The amount of carbon to retire.
+     * @param retiringEntityString  The string representing the retiring entity.
+     * @param beneficiaryAddress    The address of the beneficiary.
+     * @param beneficiaryString     The string representing the beneficiary.
+     * @param retirementMessage     The message for the retirement.
+     * @return retirementIndex      The index of the retirement transaction.
+     */
+    function retireCarbonSpecific(
+        address poolToken,
+        address projectToken,
+        uint256 retireAmount,
+        string memory retiringEntityString,
+        address beneficiaryAddress,
+        string memory beneficiaryString,
+        string memory retirementMessage
+    ) external returns (uint256 retirementIndex) {
+        require(retireAmount > 0, "Cannot retire zero tokens");
+
+        // Get the current amount of total pool tokens needed including any applicable fees
+        uint256 poolNeeded = IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(
+            poolToken,
+            poolToken,
+            retireAmount
+        );
+
+        require(poolNeeded <= IKlima(poolToken).balanceOf(address(this)), "Not enough pool tokens to retire");
+
+        // Get the total rate limited KLIMA needed
+        uint256 klimaNeeded = getKlimaAmount(poolNeeded, poolToken);
+
+        // Transfer and burn the KLIMA
+        transferAndBurnKlima(klimaNeeded, poolToken);
+
+        IKlima(poolToken).safeIncreaseAllowance(INFINITY, poolNeeded);
+
+        emit CarbonBonded(poolToken, poolNeeded);
+
+        return
+            IKlimaInfinity(INFINITY).retireExactCarbonSpecific(
+                poolToken,
+                poolToken,
+                projectToken,
                 poolNeeded,
                 retireAmount,
                 retiringEntityString,
@@ -177,8 +235,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     /**
      * @notice Sets the reference token for a given pool token. The reference token is used to determine the current price
      * of the pool token in terms of KLIMA. The position of KLIMA in the Uniswap pair for the reference token is also determined.
-     * @param poolToken The pool token for which to set the reference token.
-     * @param referenceToken The reference token for the given pool token.
+     * @param poolToken         The pool token for which to set the reference token.
+     * @param referenceToken    The reference token for the given pool token.
      */
     function setPoolReference(address poolToken, address referenceToken) external onlyOwner {
         address oldReference = poolReference[poolToken];
@@ -206,8 +264,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @notice Calculates the amount of KLIMA tokens needed to retire a specified amount of pool tokens for a pool.
      * The required amount of KLIMA tokens is calculated based on the current market price of the pool token and the amount of pool tokens to be retired.
      * If the raw amount needed from the dex exceeds slippage, than the limited amount is returned.
-     * @param poolAmount The amount of pool tokens to retire.
-     * @param poolToken The address of the pool token to retire.
+     * @param poolAmount    The amount of pool tokens to retire.
+     * @param poolToken     The address of the pool token to retire.
      * @return klimaNeeded The amount of KLIMA tokens needed to retire the specified amount of pool tokens.
      */
     function getKlimaAmount(uint256 poolAmount, address poolToken) public view returns (uint256 klimaNeeded) {
@@ -230,8 +288,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     /**
      * @notice Transfers and burns a specified amount of KLIMA tokens.
      * A fee is also transferred to the DAO address based on the fee divisor and the configured fee for the pool token.
-     * @param totalKlima The total amount of KLIMA tokens to transfer and burn.
-     * @param poolToken The address of the pool token to burn KLIMA tokens for.
+     * @param totalKlima    The total amount of KLIMA tokens to transfer and burn.
+     * @param poolToken     The address of the pool token to burn KLIMA tokens for.
      */
     function transferAndBurnKlima(uint256 totalKlima, address poolToken) internal {
         // Transfer and burn the KLIMA
