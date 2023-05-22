@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity =0.8.19;
 
 import "oz/access/Ownable2Step.sol";
 import "oz/token/ERC20/utils/SafeERC20.sol";
