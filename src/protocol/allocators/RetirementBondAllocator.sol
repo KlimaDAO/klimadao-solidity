@@ -23,7 +23,7 @@ contract RetirementBondAllocator is Ownable2Step {
         bondContract = _bondContract;
     }
 
-    function fundBonds(address token, uint amount) external onlyOwner {
+    function fundBonds(address token, uint256 amount) external onlyOwner {
         // Limit the maximium amount of reserves that can be pulled from the treasury to the lower of the
         // excess reserves or tokens held by the treasury
 
@@ -32,7 +32,7 @@ contract RetirementBondAllocator is Ownable2Step {
         uint256 maxExcessReserves = (currentExcessReserves * maxReservePercent) / PERCENT_DIVISOR;
         uint256 maxTreasuryHoldings = (IKlima(token).balanceOf(TREASURY) * maxReservePercent) / PERCENT_DIVISOR;
 
-        uint maxBondAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
+        uint256 maxBondAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
 
         require(amount <= maxBondAmount, "Bond amount exceeds limit");
 

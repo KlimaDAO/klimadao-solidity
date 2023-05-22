@@ -45,14 +45,14 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     event AllocatorChanged(address oldAllocator, address newAllocator);
     event PoolReferenceChanged(address pool, address oldLp, address newLp);
     event ReferenceKlimaPositionChanged(address lp, uint8 oldPosition, uint8 newPosition);
-    event DaoFeeChanged(address pool, uint oldFee, uint newFee);
-    event PoolSlippageChanged(address pool, uint oldSlippage, uint newSlippage);
+    event DaoFeeChanged(address pool, uint256 oldFee, uint256 newFee);
+    event PoolSlippageChanged(address pool, uint256 oldSlippage, uint256 newSlippage);
 
-    event MarketOpened(address pool, uint amount);
-    event MarketClosed(address pool, uint amount);
+    event MarketOpened(address pool, uint256 amount);
+    event MarketClosed(address pool, uint256 amount);
 
-    event CarbonBonded(address pool, uint poolAmount);
-    event KlimaBonded(uint daoFee, uint klimaBurned);
+    event CarbonBonded(address pool, uint256 poolAmount);
+    event KlimaBonded(uint256 daoFee, uint256 klimaBurned);
 
     /**
      * @notice Swaps the specified amount of pool tokens for KLIMA tokens.
@@ -202,7 +202,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      */
     function closeMarket(address poolToken) external {
         enforceOnlyAllocator();
-        uint currentBalance = IKlima(poolToken).balanceOf(address(this));
+        uint256 currentBalance = IKlima(poolToken).balanceOf(address(this));
         IKlima(poolToken).safeTransfer(TREASURY, currentBalance);
 
         emit MarketClosed(poolToken, currentBalance);
@@ -214,7 +214,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param _maxSlippage The new maximum slippage percentage.
      */
     function updateMaxSlippage(address poolToken, uint256 _maxSlippage) external onlyOwner {
-        uint oldSlippage = maxSlippage[poolToken];
+        uint256 oldSlippage = maxSlippage[poolToken];
         maxSlippage[poolToken] = _maxSlippage;
 
         emit PoolSlippageChanged(poolToken, oldSlippage, maxSlippage[poolToken]);
@@ -226,7 +226,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param _daoFee The new DAO fee.
      */
     function updateDaoFee(address poolToken, uint256 _daoFee) external onlyOwner {
-        uint oldFee = daoFee[poolToken];
+        uint256 oldFee = daoFee[poolToken];
         daoFee[poolToken] = _daoFee;
 
         emit DaoFeeChanged(poolToken, oldFee, daoFee[poolToken]);
