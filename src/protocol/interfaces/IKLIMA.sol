@@ -45,9 +45,13 @@ interface IKlimaRetirementBond {
 }
 
 interface IRetirementBondAllocator {
-    function fundBonds(address token, uint amount) external;
+    function fundBonds(address token, uint256 amount) external;
 
     function closeBonds(address token) external;
 
     function updateBondContract(address _bondContract) external;
+
+    function maxReservePercent() external view returns (uint256);
+
+    function PERCENT_DIVISOR() external view returns (uint256);
 }

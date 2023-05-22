@@ -365,13 +365,25 @@ abstract contract TestHelper is Test, HelperContract {
         IKlimaRetirementBond(retirementBonds).updateMaxSlippage(NBO, 200);
         IKlimaRetirementBond(retirementBonds).updateDaoFee(NBO, 3000);
 
-        IRetirementBondAllocator(allocator).fundBonds(BCT, 1_000_000 * 1e18);
-        IRetirementBondAllocator(allocator).fundBonds(NCT, 35_000 * 1e18);
-        IRetirementBondAllocator(allocator).fundBonds(MCO2, 250_000 * 1e18);
-        IRetirementBondAllocator(allocator).fundBonds(UBO, 35_000 * 1e18);
-        IRetirementBondAllocator(allocator).fundBonds(NBO, 2_500 * 1e18);
+        IRetirementBondAllocator(allocator).fundBonds(BCT, maxBondAmount(BCT, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(NCT, maxBondAmount(NCT, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(MCO2, maxBondAmount(MCO2, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(UBO, maxBondAmount(UBO, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(NBO, maxBondAmount(NBO, allocator));
 
         vm.stopPrank();
+    }
+
+    function maxBondAmount(address token, address allocator) internal returns (uint256 maxAmount) {
+        address treasury = vm.envAddress("KLIMA_TREASURY_ADDRESS");
+        uint256 maxReserve = IRetirementBondAllocator(allocator).maxReservePercent();
+        uint256 maxDivisor = IRetirementBondAllocator(allocator).PERCENT_DIVISOR();
+
+        uint256 currentExcessReserves = IKlimaTreasury(treasury).excessReserves() * 1e9;
+        uint256 maxExcessReserves = (currentExcessReserves * maxReserve) / maxDivisor;
+        uint256 maxTreasuryHoldings = (IERC20(token).balanceOf(treasury) * maxReserve) / maxDivisor;
+
+        maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
 
     //////////// EVM Helpers ////////////
