@@ -3,13 +3,14 @@ pragma solidity 0.8.19;
 
 import "../../helpers/AssertionHelper.sol";
 import "../helpers/DeploymentHelper.sol";
+import "../helpers/TestHelper.sol";
 
 import {CarbonRetirementBondDepository} from "../../../src/protocol/bonds/CarbonRetirementBondDepository.sol";
 import {RetirementBondAllocator} from "../../../src/protocol/allocators/RetirementBondAllocator.sol";
 import {KlimaTreasury} from "../../../src/protocol/staking/utils/KlimaTreasury.sol";
 import {IC3Pool} from "../../../src/infinity/interfaces/IC3.sol";
 
-contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper {
+contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper, TestHelper {
     CarbonRetirementBondDepository retireBond;
     RetirementBondAllocator allocator;
     KlimaTreasury treasury;
@@ -67,11 +68,11 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         retireBond.updateMaxSlippage(NBO, 200);
         retireBond.updateDaoFee(NBO, 3000);
 
-        allocator.fundBonds(BCT, 1_000_000 * 1e18);
-        allocator.fundBonds(NCT, 35_000 * 1e18);
-        allocator.fundBonds(MCO2, 250_000 * 1e18);
-        allocator.fundBonds(UBO, 35_000 * 1e18);
-        allocator.fundBonds(NBO, 2_500 * 1e18);
+        allocator.fundBonds(BCT, maxBondAmount(BCT, address(allocator)));
+        allocator.fundBonds(NCT, maxBondAmount(NCT, address(allocator)));
+        allocator.fundBonds(MCO2, maxBondAmount(MCO2, address(allocator)));
+        allocator.fundBonds(UBO, maxBondAmount(UBO, address(allocator)));
+        allocator.fundBonds(NBO, maxBondAmount(NBO, address(allocator)));
         vm.stopPrank();
 
         DEFAULT_PROJECT_UBO = IC3Pool(UBO).getFreeRedeemAddresses()[0];
@@ -80,11 +81,13 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
 
     function test_protocol_retireBond_retireCarbonDefault_BCT_fuzz(uint retireAmount) public {
         vm.assume(retireAmount <= IERC20(BCT).totalSupply());
+        vm.assume(retireAmount < (IERC20(BCT).balanceOf(vm.envAddress("SUSHI_BCT_LP")) * 50) / 100);
 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > 1_000_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else if (retireAmount > IERC20(BCT).balanceOf(address(retireBond)))
+            vm.expectRevert("Not enough pool tokens to retire");
         else {
             uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, BCT);
             uint daoFee = (klimaAmount * 3000) / 10000;
@@ -104,7 +107,8 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > 35_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else if (retireAmount > IERC20(NCT).balanceOf(address(retireBond)))
+            vm.expectRevert("Not enough pool tokens to retire");
         else {
             uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NCT);
             uint daoFee = (klimaAmount * 3000) / 10000;
@@ -127,7 +131,8 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > 250_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else if (retireAmount > IERC20(MCO2).balanceOf(address(retireBond)))
+            vm.expectRevert("Not enough pool tokens to retire");
         else {
             uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, MCO2);
             uint daoFee = (klimaAmount * 3000) / 10000;
@@ -147,7 +152,8 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > 35_000 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else if (retireAmount > IERC20(UBO).balanceOf(address(retireBond)))
+            vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > IERC20(DEFAULT_PROJECT_UBO).balanceOf(UBO))
             vm.expectRevert("Amount exceeds available tokens");
         else {
@@ -169,7 +175,8 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper 
         getKlima();
 
         if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > 2_500 * 1e18) vm.expectRevert("Not enough pool tokens to retire");
+        else if (retireAmount > IERC20(NBO).balanceOf(address(retireBond)))
+            vm.expectRevert("Not enough pool tokens to retire");
         else if (retireAmount > IERC20(DEFAULT_PROJECT_NBO).balanceOf(NBO))
             vm.expectRevert("Amount exceeds available tokens");
         else {

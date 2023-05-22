@@ -20,6 +20,7 @@ abstract contract DeploymentHelper is Test {
         returns (address retireBondAddress, address allocatorAddress)
     {
         address POLICY = vm.envAddress("POLICY_MSIG");
+        address DAO = vm.envAddress("DAO_MSIG");
 
         CarbonRetirementBondDepository retireBond = new CarbonRetirementBondDepository();
         retireBond.transferOwnership(POLICY);
@@ -32,6 +33,10 @@ abstract contract DeploymentHelper is Test {
         allocator.acceptOwnership();
 
         retireBond.setAllocator(address(allocator));
+        vm.stopPrank();
+
+        vm.startPrank(DAO);
+        allocator.updateMaxReservePercent(5_000); // 5% max
         vm.stopPrank();
 
         return (address(retireBond), address(allocator));

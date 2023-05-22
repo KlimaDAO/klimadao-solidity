@@ -3,12 +3,13 @@ pragma solidity 0.8.19;
 
 import "../../helpers/AssertionHelper.sol";
 import "../helpers/DeploymentHelper.sol";
+import "../helpers/TestHelper.sol";
 
-import {CarbonRetirementBondDepository} from "../../../src/protocol/bonds/CarbonRetirementBondDepository.sol";
-import {RetirementBondAllocator} from "../../../src/protocol/allocators/RetirementBondAllocator.sol";
-import {KlimaTreasury} from "../../../src/protocol/staking/utils/KlimaTreasury.sol";
+import {CarbonRetirementBondDepository} from "src/protocol/bonds/CarbonRetirementBondDepository.sol";
+import {RetirementBondAllocator} from "src/protocol/allocators/RetirementBondAllocator.sol";
+import {KlimaTreasury} from "src/protocol/staking/utils/KlimaTreasury.sol";
 
-contract RetireBondFundMarketTest is AssertionHelper, DeploymentHelper {
+contract RetireBondFundMarketTest is TestHelper, AssertionHelper, DeploymentHelper {
     CarbonRetirementBondDepository retireBond;
     RetirementBondAllocator allocator;
     KlimaTreasury treasury;
@@ -17,6 +18,7 @@ contract RetireBondFundMarketTest is AssertionHelper, DeploymentHelper {
     event MarketClosed(address pool, uint amount);
 
     address POLICY = vm.envAddress("POLICY_MSIG");
+    address TREASURY = vm.envAddress("KLIMA_TREASURY_ADDRESS");
 
     address BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
     address NCT = 0xD838290e877E0188a4A44700463419ED96c16107;
@@ -28,56 +30,60 @@ contract RetireBondFundMarketTest is AssertionHelper, DeploymentHelper {
         (address retireBondAddress, address allocatorAddress) = deployRetirementBondWithAllocator();
         retireBond = CarbonRetirementBondDepository(retireBondAddress);
         allocator = RetirementBondAllocator(allocatorAddress);
+        treasury = KlimaTreasury(TREASURY);
 
         toggleRetirementBondAllocatorWithTreasury(allocatorAddress);
     }
 
-    function test_protocol_retireBond_fundWithBct() public {
-        fundBonds(BCT, 1_000_000 * 1e18);
+    function test_protocol_retireBond_fundWithBct_fuzz(uint256 amount) public {
+        fundBonds(BCT, amount);
     }
 
-    function test_protocol_retireBond_fundWithNct() public {
-        fundBonds(NCT, 35_000 * 1e18);
+    function test_protocol_retireBond_fundWithNct_fuzz(uint256 amount) public {
+        fundBonds(NCT, amount);
     }
 
-    function test_protocol_retireBond_fundWithMco2() public {
-        fundBonds(MCO2, 250_000 * 1e18);
+    function test_protocol_retireBond_fundWithMco2_fuzz(uint256 amount) public {
+        fundBonds(MCO2, amount);
     }
 
-    function test_protocol_retireBond_fundWithUbo() public {
-        fundBonds(UBO, 35_000 * 1e18);
+    function test_protocol_retireBond_fundWithUbo_fuzz(uint256 amount) public {
+        fundBonds(UBO, amount);
     }
 
-    function test_protocol_retireBond_fundWithNbo() public {
-        fundBonds(NBO, 2_500 * 1e18);
+    function test_protocol_retireBond_fundWithNbo_fuzz(uint256 amount) public {
+        fundBonds(NBO, amount);
     }
 
-    function test_protocol_retireBond_returnBct() public {
-        fundBonds(BCT, 1_000_000 * 1e18);
+    function test_protocol_retireBond_returnBct_fuzz(uint256 amount) public {
+        fundBonds(BCT, amount);
         returnBonds(BCT);
     }
 
-    function test_protocol_retireBond_returnNct() public {
-        fundBonds(NCT, 35_000 * 1e18);
+    function test_protocol_retireBond_returnNct_fuzz(uint256 amount) public {
+        fundBonds(NCT, amount);
         returnBonds(NCT);
     }
 
-    function test_protocol_retireBond_returnMco2() public {
-        fundBonds(MCO2, 250_000 * 1e18);
+    function test_protocol_retireBond_returnMco2_fuzz(uint256 amount) public {
+        fundBonds(MCO2, amount);
         returnBonds(MCO2);
     }
 
-    function test_protocol_retireBond_returnUbo() public {
-        fundBonds(UBO, 35_000 * 1e18);
+    function test_protocol_retireBond_returnUbo_fuzz(uint256 amount) public {
+        fundBonds(UBO, amount);
         returnBonds(UBO);
     }
 
-    function test_protocol_retireBond_returnNbo() public {
-        fundBonds(NBO, 2_500 * 1e18);
+    function test_protocol_retireBond_returnNbo_fuzz(uint256 amount) public {
+        fundBonds(NBO, amount);
         returnBonds(NBO);
     }
 
     function test_protocol_retireBond_fundWithBct_revert_insufficientReserves() public {
+        vm.prank(retireBond.DAO());
+        allocator.updateMaxReservePercent(100_000);
+
         vm.prank(allocator.owner());
         vm.expectRevert("Insufficient reserves");
         allocator.fundBonds(BCT, 15_000_000 * 1e18);
@@ -90,18 +96,26 @@ contract RetireBondFundMarketTest is AssertionHelper, DeploymentHelper {
     }
 
     function fundBonds(address token, uint amount) internal {
-        vm.expectEmit(true, true, true, true);
-        emit MarketOpened(token, amount);
+        vm.startPrank(allocator.owner());
 
-        vm.prank(allocator.owner());
-        allocator.fundBonds(token, amount);
+        if (amount > maxBondAmount(token, address(allocator))) {
+            vm.expectRevert("Bond amount exceeds limit");
+            allocator.fundBonds(token, amount);
+        } else {
+            vm.expectEmit(true, true, true, true);
+            emit MarketOpened(token, amount);
 
-        assertTokenBalance(token, address(retireBond), amount);
-        assertZeroTokenBalance(token, address(allocator));
+            allocator.fundBonds(token, amount);
+
+            assertTokenBalance(token, address(retireBond), amount);
+            assertZeroTokenBalance(token, address(allocator));
+        }
+
+        vm.stopPrank();
     }
 
     function returnBonds(address token) internal {
-        uint tokenBalance = IERC20(token).balanceOf(address(retireBond));
+        uint256 tokenBalance = IERC20(token).balanceOf(address(retireBond));
 
         vm.expectEmit(true, true, true, true);
         emit MarketClosed(token, tokenBalance);
