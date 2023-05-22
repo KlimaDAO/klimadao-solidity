@@ -13,6 +13,8 @@ interface IKlima is IERC20 {
 }
 
 interface IKlimaTreasury {
+    function excessReserves() external returns (uint);
+
     function manage(address _token, uint _amount) external;
 
     function queue(uint8 _managing, address _address) external returns (bool);
