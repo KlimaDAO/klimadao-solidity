@@ -335,6 +335,8 @@ abstract contract TestHelper is Test, HelperContract {
 
         vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
 
+        IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
+
         IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
 
         vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));

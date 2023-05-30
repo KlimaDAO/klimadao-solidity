@@ -51,6 +51,8 @@ interface IRetirementBondAllocator {
 
     function updateBondContract(address _bondContract) external;
 
+    function updateMaxReservePercent(uint256 _maxReservePercent) external;
+
     function maxReservePercent() external view returns (uint256);
 
     function PERCENT_DIVISOR() external view returns (uint256);

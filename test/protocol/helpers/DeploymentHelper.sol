@@ -36,7 +36,7 @@ abstract contract DeploymentHelper is Test {
         vm.stopPrank();
 
         vm.startPrank(DAO);
-        allocator.updateMaxReservePercent(5_000); // 5% max
+        allocator.updateMaxReservePercent(500); // 5% max
         vm.stopPrank();
 
         return (address(retireBond), address(allocator));
