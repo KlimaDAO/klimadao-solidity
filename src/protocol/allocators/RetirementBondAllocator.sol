@@ -35,11 +35,19 @@ contract RetirementBondAllocator is Ownable2Step {
     }
 
     /**
+     * @notice Modifier to ensure that the caller is the DAO multi-sig.
+     */
+    modifier onlyDAO() {
+        require(msg.sender == DAO, "Caller must be DAO");
+        _;
+    }
+
+    /**
      * @notice Funds retirement bonds with a specified amount of tokens.
      * @param token The address of the token to fund the retirement bonds with.
      * @param amount The amount of tokens to fund the retirement bonds with.
      */
-    function fundBonds(address token, uint256 amount) external onlyOwner {
+    function fundBonds(address token, uint256 amount) external onlyDAO {
         // Limit the maximium amount of reserves that can be pulled from the treasury to the lower of the
         // excess reserves or tokens held by the treasury
 
@@ -53,7 +61,7 @@ contract RetirementBondAllocator is Ownable2Step {
         require(amount <= maxBondAmount, "Bond amount exceeds limit");
 
         IKlimaTreasury(TREASURY).manage(token, amount);
-        IKlima(token).transfer(bondContract, amount);
+        IKlima(token).safeTransfer(bondContract, amount);
         IKlimaRetirementBond(bondContract).openMarket(token);
     }
 
@@ -61,7 +69,7 @@ contract RetirementBondAllocator is Ownable2Step {
      * @dev Closes the retirement bonds market for a specified token, transferring any remaining tokens to the treasury.
      * @param token The address of the token for which to close the retirement bonds market.
      */
-    function closeBonds(address token) external onlyOwner {
+    function closeBonds(address token) external onlyDAO {
         IKlimaRetirementBond(bondContract).closeMarket(token);
 
         // Extra gas and transfers no tokens, but does trigger a reserve update within the treasury.
@@ -72,7 +80,7 @@ contract RetirementBondAllocator is Ownable2Step {
      * @notice Updates the retirement bond contract being used.
      * @param _bondContract The address of the new retirement bond contract.
      */
-    function updateBondContract(address _bondContract) external onlyOwner {
+    function updateBondContract(address _bondContract) external onlyDAO {
         bondContract = _bondContract;
     }
 
@@ -80,8 +88,7 @@ contract RetirementBondAllocator is Ownable2Step {
      * @dev Updates the maximum reserve percentage allowed.
      * @param _maxReservePercent The new maximum reserve percentage allowed. 500 = 5%.
      */
-    function updateMaxReservePercent(uint256 _maxReservePercent) external {
-        enforceOnlyDao();
+    function updateMaxReservePercent(uint256 _maxReservePercent) external onlyDAO {
 
         uint256 oldMax = maxReservePercent;
         maxReservePercent = _maxReservePercent;
@@ -89,10 +96,4 @@ contract RetirementBondAllocator is Ownable2Step {
         emit MaxPercentUpdated(oldMax, maxReservePercent);
     }
 
-    /**
-     * @notice Ensures that the caller is the DAO multi-sig.
-     */
-    function enforceOnlyDao() private view {
-        require(msg.sender == DAO, "Caller must be DAO");
-    }
 }
