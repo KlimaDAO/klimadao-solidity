@@ -47,7 +47,7 @@ contract RetirementBondAllocator is Ownable2Step {
      * @param token The address of the token to fund the retirement bonds with.
      * @param amount The amount of tokens to fund the retirement bonds with.
      */
-    function fundBonds(address token, uint256 amount) external onlyDAO {
+    function fundBonds(address token, uint256 amount) external onlyOwner {
         // Limit the maximium amount of reserves that can be pulled from the treasury to the lower of the
         // excess reserves or tokens held by the treasury
 
@@ -69,7 +69,7 @@ contract RetirementBondAllocator is Ownable2Step {
      * @dev Closes the retirement bonds market for a specified token, transferring any remaining tokens to the treasury.
      * @param token The address of the token for which to close the retirement bonds market.
      */
-    function closeBonds(address token) external onlyDAO {
+    function closeBonds(address token) external onlyOwner {
         IKlimaRetirementBond(bondContract).closeMarket(token);
 
         // Extra gas and transfers no tokens, but does trigger a reserve update within the treasury.
@@ -80,7 +80,7 @@ contract RetirementBondAllocator is Ownable2Step {
      * @notice Updates the retirement bond contract being used.
      * @param _bondContract The address of the new retirement bond contract.
      */
-    function updateBondContract(address _bondContract) external onlyDAO {
+    function updateBondContract(address _bondContract) external onlyOwner {
         bondContract = _bondContract;
     }
 

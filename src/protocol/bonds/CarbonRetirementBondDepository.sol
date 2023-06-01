@@ -55,14 +55,6 @@ contract CarbonRetirementBondDepository is Ownable2Step {
     event KlimaBonded(uint256 daoFee, uint256 klimaBurned);
 
     /**
-     * @notice Modifier to ensure that the caller is the DAO multi-sig.
-     */
-    modifier onlyDAO() {
-        require(msg.sender == DAO, "Caller must be DAO");
-        _;
-    }
-
-    /**
      * @notice Modifier to ensure that the calling function is being called by the allocator contract.
      */
     modifier onlyAllocator() {
@@ -82,7 +74,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
         uint256 klimaNeeded = getKlimaAmount(poolAmount, poolToken);
 
-        transferAndBurnKlima(klimaNeeded, poolToken);
+        _transferAndBurnKlima(klimaNeeded, poolToken);
         IKlima(poolToken).safeTransfer(INFINITY, poolAmount);
 
         emit CarbonBonded(poolToken, poolAmount);
@@ -122,7 +114,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
         uint256 klimaNeeded = getKlimaAmount(poolNeeded, poolToken);
 
         // Transfer and burn the KLIMA
-        transferAndBurnKlima(klimaNeeded, poolToken);
+        _transferAndBurnKlima(klimaNeeded, poolToken);
 
         IKlima(poolToken).safeIncreaseAllowance(INFINITY, poolNeeded);
 
@@ -179,7 +171,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
         uint256 klimaNeeded = getKlimaAmount(poolNeeded, poolToken);
 
         // Transfer and burn the KLIMA
-        transferAndBurnKlima(klimaNeeded, poolToken);
+        _transferAndBurnKlima(klimaNeeded, poolToken);
 
         IKlima(poolToken).safeIncreaseAllowance(INFINITY, poolNeeded);
 
@@ -238,7 +230,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param poolToken The address of the pool token to update the DAO fee for.
      * @param _daoFee The new DAO fee.
      */
-    function updateDaoFee(address poolToken, uint256 _daoFee) external onlyDAO {
+    function updateDaoFee(address poolToken, uint256 _daoFee) external onlyOwner {
         uint256 oldFee = daoFee[poolToken];
         daoFee[poolToken] = _daoFee;
 
@@ -266,7 +258,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @notice Sets the address of the allocator contract. Only the contract owner can call this function.
      * @param allocator The address of the allocator contract to set.
      */
-    function setAllocator(address allocator) external onlyDAO {
+    function setAllocator(address allocator) external onlyOwner {
         address oldAllocator = allocatorContract;
         allocatorContract = allocator;
 
@@ -304,7 +296,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @param totalKlima    The total amount of KLIMA tokens to transfer and burn.
      * @param poolToken     The address of the pool token to burn KLIMA tokens for.
      */
-    function transferAndBurnKlima(uint256 totalKlima, address poolToken) private {
+    function _transferAndBurnKlima(uint256 totalKlima, address poolToken) private {
         // Transfer and burn the KLIMA
         uint256 feeAmount = (totalKlima * daoFee[poolToken]) / FEE_DIVISOR;
 
