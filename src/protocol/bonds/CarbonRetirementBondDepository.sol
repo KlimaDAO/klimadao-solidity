@@ -19,14 +19,14 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
     /// @notice Address of the KLIMA token contract.
     address public constant KLIMA = 0x4e78011Ce80ee02d2c3e649Fb657E45898257815;
-    /// @notice Address of the DAO contract.
+    /// @notice Address of the DAO multi-sig.
     address public constant DAO = 0x65A5076C0BA74e5f3e069995dc3DAB9D197d995c;
     /// @notice Address of the Treasury contract.
     address public constant TREASURY = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
     /// @notice address of the Klima Infinity contract.
     address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
     /// @notice Divisor used for calculating percentages.
-    uint256 public constant FEE_DIVISOR = 10000;
+    uint256 public constant FEE_DIVISOR = 10_000;
     /// @notice Allocator contract used by policy to fund and close markets.
     address public allocatorContract;
 
@@ -320,5 +320,4 @@ contract CarbonRetirementBondDepository is Ownable2Step {
             ? (amountOut * (reserve0)) / reserve1
             : (amountOut * (reserve1)) / reserve0;
     }
-
 }
