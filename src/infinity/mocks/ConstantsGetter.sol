@@ -84,4 +84,8 @@ contract ConstantsGetter {
     function klimaCarbonRetirements() external pure returns (address) {
         return C.klimaCarbonRetirements();
     }
+
+    function klimaRetirementBond() external pure returns (address) {
+        return C.klimaRetirementBond();
+    }
 }

@@ -62,45 +62,46 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactSourceSpecific_BCT_BCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_BCT(uint retireAmount) public {
         retireExactSource(BCT, BCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_BCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_USDC(uint retireAmount) public {
         retireExactSource(USDC, BCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_BCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_KLIMA(uint retireAmount) public {
         retireExactSource(KLIMA, BCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_BCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_SKLIMA(uint retireAmount) public {
         retireExactSource(SKLIMA, BCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_BCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_WSKLIMA(uint retireAmount) public {
         retireExactSource(WSKLIMA, BCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NCT_NCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_NCT(uint retireAmount) public {
         retireExactSource(NCT, NCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_USDC(uint retireAmount) public {
         retireExactSource(USDC, NCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_KLIMA(uint retireAmount) public {
         retireExactSource(KLIMA, NCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_SKLIMA(uint retireAmount) public {
         retireExactSource(SKLIMA, NCT, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_WSKLIMA(uint retireAmount) public {
         retireExactSource(WSKLIMA, NCT, retireAmount);
     }
 

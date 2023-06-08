@@ -26,6 +26,7 @@ import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
+import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -319,6 +320,72 @@ abstract contract TestHelper is Test, HelperContract {
         _user = users.createUsers(2);
         user = _user[0];
         user2 = _user[1];
+    }
+
+    function fundRetirementBonds(address retirementBonds) internal {
+        // Assuming mainnet fork testing for the moment
+        address BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
+        address NCT = 0xD838290e877E0188a4A44700463419ED96c16107;
+        address MCO2 = 0xAa7DbD1598251f856C12f63557A4C4397c253Cea;
+        address UBO = 0x2B3eCb0991AF0498ECE9135bcD04013d7993110c;
+        address NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
+
+        address owner = IKlimaRetirementBond(retirementBonds).owner();
+        address allocator = IKlimaRetirementBond(retirementBonds).allocatorContract();
+
+        vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
+
+        IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
+
+        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
+
+        vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
+
+        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
+
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+
+        IKlimaRetirementBond(retirementBonds).setPoolReference(BCT, vm.envAddress("SUSHI_BCT_LP"));
+        IKlimaRetirementBond(retirementBonds).updateMaxSlippage(BCT, 200);
+        IKlimaRetirementBond(retirementBonds).updateDaoFee(BCT, 3000);
+
+        IKlimaRetirementBond(retirementBonds).setPoolReference(NCT, vm.envAddress("SUSHI_NCT_LP"));
+        IKlimaRetirementBond(retirementBonds).updateMaxSlippage(NCT, 200);
+        IKlimaRetirementBond(retirementBonds).updateDaoFee(NCT, 3000);
+
+        IKlimaRetirementBond(retirementBonds).setPoolReference(MCO2, vm.envAddress("MCO2_QUICKSWAP"));
+        IKlimaRetirementBond(retirementBonds).updateMaxSlippage(MCO2, 200);
+        IKlimaRetirementBond(retirementBonds).updateDaoFee(MCO2, 3000);
+
+        IKlimaRetirementBond(retirementBonds).setPoolReference(UBO, vm.envAddress("TRIDENT_UBO_LP"));
+        IKlimaRetirementBond(retirementBonds).updateMaxSlippage(UBO, 200);
+        IKlimaRetirementBond(retirementBonds).updateDaoFee(UBO, 3000);
+
+        IKlimaRetirementBond(retirementBonds).setPoolReference(NBO, vm.envAddress("TRIDENT_NBO_LP"));
+        IKlimaRetirementBond(retirementBonds).updateMaxSlippage(NBO, 200);
+        IKlimaRetirementBond(retirementBonds).updateDaoFee(NBO, 3000);
+
+        IRetirementBondAllocator(allocator).fundBonds(BCT, maxBondAmount(BCT, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(NCT, maxBondAmount(NCT, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(MCO2, maxBondAmount(MCO2, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(UBO, maxBondAmount(UBO, allocator));
+        IRetirementBondAllocator(allocator).fundBonds(NBO, maxBondAmount(NBO, allocator));
+
+        vm.stopPrank();
+    }
+
+    function maxBondAmount(address token, address allocator) internal returns (uint256 maxAmount) {
+        address treasury = vm.envAddress("KLIMA_TREASURY_ADDRESS");
+        uint256 maxReserve = IRetirementBondAllocator(allocator).maxReservePercent();
+        uint256 maxDivisor = IRetirementBondAllocator(allocator).PERCENT_DIVISOR();
+
+        uint256 currentExcessReserves = IKlimaTreasury(treasury).excessReserves() * 1e9;
+        uint256 maxExcessReserves = (currentExcessReserves * maxReserve) / maxDivisor;
+        uint256 maxTreasuryHoldings = (IERC20(token).balanceOf(treasury) * maxReserve) / maxDivisor;
+
+        maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
 
     //////////// EVM Helpers ////////////

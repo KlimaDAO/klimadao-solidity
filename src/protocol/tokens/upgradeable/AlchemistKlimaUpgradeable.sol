@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "ozu/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "ozu-4-5-1/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
 
 contract AlchemistKlimaUpgradeable is ERC20PresetMinterPauserUpgradeable {
     bool public allowMinting;

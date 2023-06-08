@@ -2,6 +2,7 @@
 
 #Hardhat files
 cache
+cache_hardhat
 artifacts
 
 .idea/

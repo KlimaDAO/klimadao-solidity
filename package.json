@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "forge t -vvv --ffi --fork-url http://localhost:8545",
-    "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL}"
+    "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 -m test_infinity",
+    "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 -m test_protocol",
+    "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
+    "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi"
   },
   "repository": {
     "type": "git",
@@ -22,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/KlimaDAO/klimadao-solidity/issues"
   },
-  "homepage": "https://github.com/KlimaDAO/klimadao-solidity#readme"
+  "homepage": "https://github.com/KlimaDAO/klimadao-solidity#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-foundry": "^1.0.1",
+    "hardhat": "^2.14.0"
+  }
 }

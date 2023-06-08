@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "ozu/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "ozu/token/ERC721/extensions/ERC721PausableUpgradeable.sol";
-import "ozu/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
-import "ozu/utils/ContextUpgradeable.sol";
-import "ozu/utils/CountersUpgradeable.sol";
-import "ozu/proxy/utils/Initializable.sol";
-import "ozu/access/AccessControlEnumerableUpgradeable.sol";
+import "ozu-4-5-1/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "ozu-4-5-1/token/ERC721/extensions/ERC721PausableUpgradeable.sol";
+import "ozu-4-5-1/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
+import "ozu-4-5-1/utils/ContextUpgradeable.sol";
+import "ozu-4-5-1/utils/CountersUpgradeable.sol";
+import "ozu-4-5-1/proxy/utils/Initializable.sol";
+import "ozu-4-5-1/access/AccessControlEnumerableUpgradeable.sol";
 
 contract KlimaIDONFT is
     Initializable,

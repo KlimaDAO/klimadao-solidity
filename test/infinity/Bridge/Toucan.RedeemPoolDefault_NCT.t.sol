@@ -53,23 +53,23 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_toucanRedeemPoolDefault_redeemNCT_usingNCT_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingNCT_fuzz(uint redeemAmount) public {
         redeemNCT(NCT, redeemAmount);
     }
 
-    function test_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint redeemAmount) public {
         redeemNCT(USDC, redeemAmount);
     }
 
-    function test_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint redeemAmount) public {
         redeemNCT(KLIMA, redeemAmount);
     }
 
-    function test_toucanRedeemPoolDefault_redeemNCT_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingSKLIMA_fuzz(uint redeemAmount) public {
         redeemNCT(SKLIMA, redeemAmount);
     }
 
-    function test_toucanRedeemPoolDefault_redeemNCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
         redeemNCT(WSKLIMA, redeemAmount);
     }
 

@@ -51,7 +51,7 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         DEFAULT_PROJECT = IToucanPool(BCT).getScoredTCO2s()[0];
     }
 
-    function test_toucanRetireExactTCO2() public {
+    function test_infinity_toucanRetireExactTCO2() public {
         address sourceToken = DEFAULT_PROJECT;
         address carbonToken = DEFAULT_PROJECT;
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, BCT, address(this));
@@ -97,7 +97,7 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
     }
 
-    function test_toucanRetireExactTCO2WithEntity() public {
+    function test_infinity_toucanRetireExactTCO2WithEntity() public {
         address sourceToken = DEFAULT_PROJECT;
         address carbonToken = DEFAULT_PROJECT;
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, BCT, address(this));

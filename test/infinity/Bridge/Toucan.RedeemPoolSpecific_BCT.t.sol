@@ -53,23 +53,23 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_toucanRedeemPoolSpecific_redeemBCT_usingBCT_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingBCT_fuzz(uint redeemAmount) public {
         redeemBCT(BCT, redeemAmount);
     }
 
-    function test_toucanRedeemPoolSpecific_redeemBCT_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingUSDC_fuzz(uint redeemAmount) public {
         redeemBCT(USDC, redeemAmount);
     }
 
-    function test_toucanRedeemPoolSpecific_redeemBCT_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingKLIMA_fuzz(uint redeemAmount) public {
         redeemBCT(KLIMA, redeemAmount);
     }
 
-    function test_toucanRedeemPoolSpecific_redeemBCT_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingSKLIMA_fuzz(uint redeemAmount) public {
         redeemBCT(SKLIMA, redeemAmount);
     }
 
-    function test_toucanRedeemPoolSpecific_redeemBCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
         redeemBCT(WSKLIMA, redeemAmount);
     }
 

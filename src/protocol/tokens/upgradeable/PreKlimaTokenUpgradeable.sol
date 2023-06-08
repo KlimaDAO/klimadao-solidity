@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.4;
 
-import "ozu/token/ERC20/presets/ERC20PresetFixedSupplyUpgradeable.sol";
-import "ozu/access/OwnableUpgradeable.sol";
-import "ozu/utils/math/SafeMathUpgradeable.sol";
+import "ozu-4-5-1/token/ERC20/presets/ERC20PresetFixedSupplyUpgradeable.sol";
+import "ozu-4-5-1/access/OwnableUpgradeable.sol";
+import "ozu-4-5-1/utils/math/SafeMathUpgradeable.sol";
 
 contract PreKlimaTokenUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableUpgradeable {
     using SafeMathUpgradeable for uint256;

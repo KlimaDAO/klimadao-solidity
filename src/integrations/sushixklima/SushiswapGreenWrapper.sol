@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.10;
 
-import "ozu/proxy/utils/Initializable.sol";
-import "ozu/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "ozu/utils/ContextUpgradeable.sol";
-import "ozu/access/OwnableUpgradeable.sol";
+import "ozu-4-5-1/proxy/utils/Initializable.sol";
+import "ozu-4-5-1/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "ozu-4-5-1/utils/ContextUpgradeable.sol";
+import "ozu-4-5-1/access/OwnableUpgradeable.sol";
 import "./interfaces/IUniswapV2Router02.sol";
 
 /**

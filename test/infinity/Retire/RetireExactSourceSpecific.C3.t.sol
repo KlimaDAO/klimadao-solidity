@@ -63,45 +63,46 @@ contract retireExactSourceSpecificC3 is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_retireExactSourceSpecific_UBO_UBO(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_UBO_UBO(uint retireAmount) public {
         retireExactSource(UBO, UBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_UBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_UBO_USDC(uint retireAmount) public {
         retireExactSource(USDC, UBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_UBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_UBO_KLIMA(uint retireAmount) public {
         retireExactSource(KLIMA, UBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_UBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_UBO_SKLIMA(uint retireAmount) public {
         retireExactSource(SKLIMA, UBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_UBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_UBO_WSKLIMA(uint retireAmount) public {
         retireExactSource(WSKLIMA, UBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NBO_NBO(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NBO_NBO(uint retireAmount) public {
         retireExactSource(NBO, NBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NBO_USDC(uint retireAmount) public {
         retireExactSource(USDC, NBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NBO_KLIMA(uint retireAmount) public {
         retireExactSource(KLIMA, NBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NBO_SKLIMA(uint retireAmount) public {
         retireExactSource(SKLIMA, NBO, retireAmount);
     }
 
-    function test_retireExactSourceSpecific_NBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NBO_WSKLIMA(uint retireAmount) public {
         retireExactSource(WSKLIMA, NBO, retireAmount);
     }
 
