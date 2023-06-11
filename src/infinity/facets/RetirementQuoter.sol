@@ -29,7 +29,12 @@ contract RetirementQuoter {
         uint retireAmount
     ) public view returns (uint amountIn) {
         uint totalCarbon = LibRetire.getTotalCarbon(retireAmount);
+
         if (sourceToken == carbonToken) return totalCarbon;
+
+        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+            return LibSwap.getSourceAmountFromRetirementBond(sourceToken, carbonToken, totalCarbon);
+
         return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
     }
 
@@ -39,7 +44,12 @@ contract RetirementQuoter {
         uint retireAmount
     ) public view returns (uint amountIn) {
         uint totalCarbon = LibRetire.getTotalCarbonSpecific(carbonToken, retireAmount);
+
         if (sourceToken == carbonToken) return totalCarbon;
+
+        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+            return LibSwap.getSourceAmountFromRetirementBond(sourceToken, carbonToken, totalCarbon);
+
         return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
     }
 
@@ -49,6 +59,7 @@ contract RetirementQuoter {
         uint redeemAmount
     ) public view returns (uint amountIn) {
         if (sourceToken == carbonToken) return redeemAmount;
+        
         return LibSwap.getSourceAmount(sourceToken, carbonToken, redeemAmount);
     }
 

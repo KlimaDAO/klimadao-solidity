@@ -329,6 +329,49 @@ library LibSwap {
         return sourcesNeeded;
     }
 
+    /**
+     * @notice                  Fetches the amount of KLIMA needed for a retirement bond, then calculates the source
+     *                          amount needed if a DEX swap is required.
+     * @param sourceToken       Source token provided to swap
+     * @param carbonToken       Pool token used
+     * @param amount            Amount of carbon tokens needed
+     * @return sourceNeeded     Total source tokens needed for output amount
+     */
+     function getSourceAmountFromRetirementBond(
+        address sourceToken,
+        address carbonToken,
+        uint256 amount
+    ) internal view returns (uint256 sourceNeeded) {
+        // Return the direct quote in KLIMA first
+        if (sourceToken == C.klima() || sourceToken == C.sKlima())
+            return LibTreasurySwap.getAmountIn(carbonToken,amount);
+
+        // Wrap the amount if using wsKLIMA
+        if (sourceToken == C.wsKlima())
+            return LibKlima.toWrappedAmount(LibTreasurySwap.getAmountIn(carbonToken,amount));
+
+        // Direct swap from USDC to KLIMA on Sushi
+        if (sourceToken == C.usdc()) {
+            uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken,amount);
+            
+            address[] memory path = new address[](2);
+            path[0] = C.usdc();
+            path[1] = C.klima();
+            
+            return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
+        }
+
+        // At this point we only have non USDC and not KLIMA tokens. Route through a source <> USDC pool on Sushi
+        uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken,amount);
+        
+        address[] memory path = new address[](3);
+        path[0] = sourceToken;
+        path[1] = C.usdc();
+        path[2] = C.klima();
+            
+        return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
+    }
+
     /* ========== Output Amount View Functions ========== */
 
     /**
