@@ -38,10 +38,6 @@ library LibSwap {
         // If providing a staked version of Klima, update sourceToken to use Klima default path.
         if (sourceToken == C.sKlima() || sourceToken == C.wsKlima()) sourceToken = C.klima();
 
-        // Check RB balance and use if possible
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= carbonAmount)
-            return swapWithRetirementBonds(sourceToken, carbonToken, sourceAmount, carbonAmount);
-
         // If source token is not defined in the default, swap to USDC on Sushiswap.
         // This is wrapped in its own statement to allow for the fewest number of swaps
         if (s.swap[carbonToken][sourceToken].swapDexes.length == 0) {

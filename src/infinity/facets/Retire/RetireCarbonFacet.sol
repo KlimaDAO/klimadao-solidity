@@ -59,8 +59,11 @@ contract RetireCarbonFacet is ReentrancyGuard {
                 maxAmountIn = LibKlima.unwrapKlima(maxAmountIn);
             }
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
-
-            uint carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            
+            uint256 carbonReceived;
+            if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+                carbonReceived = LibSwap.swapWithRetirementBonds(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            else carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
             require(carbonReceived >= totalCarbon, "Swap not enough");
             totalCarbon = carbonReceived;
@@ -131,7 +134,10 @@ contract RetireCarbonFacet is ReentrancyGuard {
             }
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
-            uint carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            uint256 carbonReceived;
+            if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+                carbonReceived = LibSwap.swapWithRetirementBonds(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            else carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
             // Check for any trade dust and send back
             LibSwap.returnTradeDust(sourceToken, poolToken);
