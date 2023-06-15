@@ -31,6 +31,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
     address WSKLIMA;
     address NCT;
     address[] projects;
+    address KLIMA_RETIREMENT_BOND;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -48,6 +49,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         NCT = constantsFacet.nct();
 
         projects = IToucanPool(NCT).getScoredTCO2s();
+        KLIMA_RETIREMENT_BOND = constantsFacet.klimaRetirementBond();
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
@@ -108,6 +110,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         amountRedeem[0] = redeemAmount;
 
         uint poolBalance = IERC20(specificProject).balanceOf(NCT);
+        uint bondBalance = IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount > poolBalance || redeemAmount == 0) {
             vm.expectRevert();
@@ -135,6 +138,9 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
             // No tokens left in contract
             assertZeroTokenBalance(specificProject, diamond);
             assertZeroTokenBalance(NCT, diamond);
+
+            // Retirement bonds were not used
+            assertEq(bondBalance, IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND));
 
             // Caller has default project tokens
             assertEq(redeemAmount, amounts[0]);

@@ -191,9 +191,12 @@ abstract contract TestHelper is Test, HelperContract {
         c3RedeemF = new RedeemC3PoolFacet();
         toucanRedeemF = new RedeemToucanPoolFacet();
         retirementQuoterF = new RetirementQuoter();
+        retireCarbonF = new RetireCarbonFacet();
+        retireSourceF = new RetireSourceFacet();
+
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](5);
 
         // Klima Infinity specific facets
 
@@ -217,6 +220,20 @@ abstract contract TestHelper is Test, HelperContract {
                 facetAddress: address(retirementQuoterF),
                 action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("RetirementQuoter")
+            })
+        );
+        cut[3] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireCarbonF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireCarbonFacet")
+            })
+        );
+        cut[4] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireSourceF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireSourceFacet")
             })
         );
 
