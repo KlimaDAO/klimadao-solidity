@@ -191,6 +191,12 @@ library LibSwap {
 
     /* ========== Smaller Specific Swap Functions ========== */
 
+    /**
+     * @notice                  Swaps a given amount of USDC for KLIMA using Sushiswap
+     * @param sourceAmount      Amount of USDC to swap
+     * @param klimaAmount       Amount of KLIMA to swap for
+     * @return klimaReceived    Amount of KLIMA received
+     */
     function swapToKlimaFromUsdc(uint256 sourceAmount, uint256 klimaAmount) internal returns (uint256 klimaReceived) {
         address[] memory path = new address[](2);
         path[0] = C.usdc();
@@ -199,11 +205,17 @@ library LibSwap {
         return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
     }
 
-    function swapToKlimaFromOther(
-        address sourceToken,
-        uint256 sourceAmount,
-        uint256 klimaAmount
-    ) internal returns (uint256 klimaReceived) {
+    /**
+     * @notice                  Swaps from arbitrary token routed through USDC for KLIMA
+     * @param sourceToken       Source token provided to swap
+     * @param sourceAmount      Amount of source token to swap
+     * @param klimaAmount       Amount of KLIMA to swap for
+     * @return klimaReceived    Amount of KLIMA received
+     */
+    function swapToKlimaFromOther(address sourceToken, uint256 sourceAmount, uint256 klimaAmount)
+        internal
+        returns (uint256 klimaReceived)
+    {
         address[] memory path = new address[](3);
         path[0] = sourceToken;
         path[1] = C.usdc();
@@ -211,6 +223,14 @@ library LibSwap {
         return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
     }
 
+    /**
+     * @notice                  Performs a swap with Retirement Bonds for carbon to retire.
+     * @param sourceToken       Source token provided to swap
+     * @param carbonToken       Carbon token to receive
+     * @param sourceAmount      Amount of source token to swap
+     * @param carbonAmount      Amount of carbon token needed
+     * @return carbonRecieved   Amount of carbon token received from the swap
+     */
     function swapWithRetirementBonds(
         address sourceToken,
         address carbonToken,
@@ -228,11 +248,8 @@ library LibSwap {
         if (sourceToken == C.usdc()) {
             sourceAmount = swapToKlimaFromUsdc(sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
         } else {
-            sourceAmount = swapToKlimaFromOther(
-                sourceToken,
-                sourceAmount,
-                LibTreasurySwap.getAmountIn(carbonToken, carbonAmount)
-            );
+            sourceAmount =
+                swapToKlimaFromOther(sourceToken, sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
         }
 
         LibTreasurySwap.swapToExact(carbonToken, sourceAmount, carbonAmount);
