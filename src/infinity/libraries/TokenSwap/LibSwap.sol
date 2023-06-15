@@ -217,7 +217,8 @@ library LibSwap {
         uint256 sourceAmount,
         uint256 carbonAmount
     ) internal returns (uint256 carbonRecieved) {
-        if (sourceToken == C.klima()) {
+        // Any form of KLIMA should be unwrapped/unstaked before this is called.
+        if (sourceToken == C.klima() || sourceToken == C.sKlima() || sourceToken == C.wsKlima()) {
             LibTreasurySwap.swapToExact(carbonToken, sourceAmount, carbonAmount);
             return carbonAmount;
         }
