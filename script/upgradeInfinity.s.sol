@@ -39,12 +39,11 @@ contract DeployInfinityScript is Script, HelperContract {
         RedeemToucanPoolFacet toucanRedeemF = new RedeemToucanPoolFacet();
         RetireToucanTCO2Facet toucanRetireF = new RetireToucanTCO2Facet();
         RetireCarbonFacet retireCarbonF = new RetireCarbonFacet();
-        RetireInfoFacet retireInfoF = new RetireInfoFacet();
         RetireSourceFacet retireSourceF = new RetireSourceFacet();
         RetirementQuoter retirementQuoterF = new RetirementQuoter();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](9);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](7);
 
         // Klima Infinity specific facets
 
@@ -90,43 +89,17 @@ contract DeployInfinityScript is Script, HelperContract {
 
         cut[5] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(retireInfoF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireInfoFacet")
-            })
-        );
-
-        cut[6] = (
-            IDiamondCut.FacetCut({
                 facetAddress: address(retireSourceF),
                 action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("RetireSourceFacet")
             })
         );
 
-        bytes4[] memory currentSelectors = new bytes4[](5);
-        currentSelectors[0] = bytes4(0xf8262473);
-        currentSelectors[1] = bytes4(0xf0ff264c);
-        currentSelectors[2] = bytes4(0x16950775);
-        currentSelectors[3] = bytes4(0x79f5e053);
-        currentSelectors[4] = bytes4(0x7eed24a2);
-        bytes4[] memory newSelectors = new bytes4[](2);
-        newSelectors[0] = bytes4(0x8298360e);
-        newSelectors[1] = bytes4(0x58bdb8e8);
-
-        cut[7] = (
+        cut[6] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(retirementQuoterF),
                 action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: currentSelectors
-            })
-        );
-
-        cut[8] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retirementQuoterF),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: newSelectors
+                functionSelectors: generateSelectors("RetirementQuoter")
             })
         );
 
