@@ -31,6 +31,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
     address WSKLIMA;
     address NBO;
     address[] projects;
+    address KLIMA_RETIREMENT_BOND;
 
     uint defaultCarbonRetireAmount = 100 * 1e18;
 
@@ -48,6 +49,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
         NBO = constantsFacet.nbo();
+        KLIMA_RETIREMENT_BOND = constantsFacet.klimaRetirementBond();
 
         projects = IC3Pool(NBO).getERC20Tokens();
 
@@ -107,6 +109,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
         uint poolBalance = IERC20(specificProject).balanceOf(constantsFacet.nbo());
+        uint bondBalance = IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
@@ -139,6 +142,9 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
             assertZeroTokenBalance(specificProject, diamond);
             assertZeroTokenBalance(NBO, diamond);
 
+            // Retirement bonds were not used
+            assertEq(bondBalance, IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND));
+            
             // Caller has default project tokens
             assertEq(redeemAmount, amounts[0]);
             assertEq(IERC20(specificProject).balanceOf(address(this)), amounts[0]);

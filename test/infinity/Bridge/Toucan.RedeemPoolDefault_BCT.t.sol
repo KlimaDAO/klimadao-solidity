@@ -31,6 +31,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
     address WSKLIMA;
     address BCT;
     address DEFAULT_PROJECT;
+    address KLIMA_RETIREMENT_BOND;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -48,6 +49,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         BCT = constantsFacet.bct();
 
         DEFAULT_PROJECT = IToucanPool(BCT).getScoredTCO2s()[0];
+        KLIMA_RETIREMENT_BOND = constantsFacet.klimaRetirementBond();
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
@@ -97,6 +99,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
         uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.bct());
+        uint bondBalance = IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount == 0) {
             vm.expectRevert();
@@ -123,6 +126,9 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
             // No tokens left in contract
             assertZeroTokenBalance(DEFAULT_PROJECT, diamond);
             assertZeroTokenBalance(BCT, diamond);
+
+            // Retirement bonds were not used
+            assertEq(bondBalance, IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND));
 
             // Caller has default project tokens
             assertEq(projectTokens[0], DEFAULT_PROJECT);
