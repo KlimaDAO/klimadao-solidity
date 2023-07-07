@@ -259,9 +259,10 @@ abstract contract TestHelper is Test, HelperContract {
         address owner = IKlimaRetirementBond(retirementBonds).owner();
         address allocator = IKlimaRetirementBond(retirementBonds).allocatorContract();
 
-        vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
+        if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
+            vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
 
-        IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
+            IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
 
         if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
             IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
@@ -271,8 +272,8 @@ abstract contract TestHelper is Test, HelperContract {
             IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
         }
 
-        vm.stopPrank();
-
+            vm.stopPrank();
+        }
         vm.startPrank(owner);
 
         IKlimaRetirementBond(retirementBonds).setPoolReference(BCT, vm.envAddress("SUSHI_BCT_LP"));
