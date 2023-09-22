@@ -141,6 +141,51 @@ library LibRetire {
         }
     }
 
+    /* ========== Credit Token Direct Retirements ========== */
+
+    /**
+     * @notice                     Retire received carbon based on the bridge of the provided pool tokens using default redemption
+     * @param creditToken          Pool token used to retire
+     * @param amount               The amount of carbon to retire
+     * @param retiringEntityString String description of the retiring entity
+     * @param beneficiaryAddress   0x address for the beneficiary
+     * @param beneficiaryString    String description of the beneficiary
+     * @param retirementMessage    String message for this specific retirement
+     */
+    function retireReceivedCreditToken(
+        address creditToken,
+        uint256 amount,
+        address retiringAddress,
+        string memory retiringEntityString,
+        address beneficiaryAddress,
+        string memory beneficiaryString,
+        string memory retirementMessage
+    ) internal {
+        if (LibToucanCarbon.isValid(creditToken)) {
+            LibToucanCarbon.retireTCO2(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                amount,
+                retiringAddress,
+                retiringEntityString,
+                beneficiaryAddress,
+                beneficiaryString,
+                retirementMessage
+            );
+        } else if (LibC3Carbon.isValid(creditToken)) {
+            LibC3Carbon.retireC3T(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                amount,
+                retiringAddress,
+                retiringEntityString,
+                beneficiaryAddress,
+                beneficiaryString,
+                retirementMessage
+            );
+        }
+    }
+
     /**
      * @notice                     Additional function to handle the differences in wanting to fully retire x pool tokens specifically
      * @param poolToken            Pool token used to retire

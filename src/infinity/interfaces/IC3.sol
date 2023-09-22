@@ -15,5 +15,9 @@ interface IC3Pool {
 }
 
 interface IC3ProjectToken {
-    function offsetFor(uint amount, address beneficiary, string memory transferee, string memory reason) external;
+    function offsetFor(uint256 amount, address beneficiary, string memory transferee, string memory reason) external;
+}
+
+interface IC3ProjectFactory {
+    function isTokenExists(address _address) external returns (bool);
 }
