@@ -20,6 +20,7 @@ import {RetireC3C3TFacet} from "src/infinity/facets/Bridges/C3/RetireC3C3TFacet.
 import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
 import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
+import {RetireCarbonmarkFacet} from "src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
 import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
@@ -30,7 +31,7 @@ import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "sr
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
-    using Strings for uint;
+    using Strings for uint256;
 
     // Users
     Users users;
@@ -51,6 +52,7 @@ abstract contract TestHelper is Test, HelperContract {
     RetireInfoFacet retireInfoF;
     RetireSourceFacet retireSourceF;
     RetirementQuoter retirementQuoterF;
+    RetireCarbonmarkFacet retireCarbonmark;
 
     function setupInfinity() internal returns (address) {
         //deploy facets and init contract
@@ -193,47 +195,18 @@ abstract contract TestHelper is Test, HelperContract {
         retirementQuoterF = new RetirementQuoter();
         retireCarbonF = new RetireCarbonFacet();
         retireSourceF = new RetireSourceFacet();
-
+        retireCarbonmark = new RetireCarbonmarkFacet();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](5);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
 
         // Klima Infinity specific facets
 
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(c3RedeemF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemC3PoolFacet")
-            })
-        );
-
-        cut[1] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(toucanRedeemF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemToucanPoolFacet")
-            })
-        );
-        cut[2] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retirementQuoterF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetirementQuoter")
-            })
-        );
-        cut[3] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireCarbonFacet")
-            })
-        );
-        cut[4] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireSourceF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireSourceFacet")
+                facetAddress: address(retireCarbonmark),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
             })
         );
 
@@ -290,11 +263,13 @@ abstract contract TestHelper is Test, HelperContract {
 
         IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
 
-        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
+        if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
+            IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
 
-        vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
+            vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
 
-        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
+            IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
+        }
 
         vm.stopPrank();
 
@@ -343,7 +318,7 @@ abstract contract TestHelper is Test, HelperContract {
 
     //////////// EVM Helpers ////////////
 
-    function increaseTime(uint _seconds) internal {
+    function increaseTime(uint256 _seconds) internal {
         vm.warp(block.timestamp + _seconds);
     }
 
@@ -355,8 +330,8 @@ abstract contract TestHelper is Test, HelperContract {
 
     //////////// Other Helpers ////////////
 
-    function randomish(uint maxValue) internal view returns (uint) {
-        uint seed = uint(keccak256(abi.encodePacked(block.timestamp)));
+    function randomish(uint256 maxValue) internal view returns (uint256) {
+        uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp)));
         return (seed % (maxValue));
     }
 }
