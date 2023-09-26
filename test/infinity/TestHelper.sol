@@ -347,4 +347,9 @@ abstract contract TestHelper is Test, HelperContract {
         uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp)));
         return (seed % (maxValue));
     }
+
+    function randomish(uint256 maxValue, uint256 salt) internal view returns (uint256) {
+        uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp + salt)));
+        return (seed % (maxValue));
+    }
 }

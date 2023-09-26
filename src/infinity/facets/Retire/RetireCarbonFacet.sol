@@ -179,9 +179,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         return LibRetire.getTotalRetirements(beneficiaryAddress);
     }
 
-    /**
-     * Batch retirements
-     */
+    /* ========== Batch Retirements ========== */
 
     /**
      * @notice                     Retires an exact amount of carbon using default redemption
@@ -192,7 +190,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
      * @param fromMode             From Mode for transfering tokens
      */
     function retireExactCarbonDefaultBatch(
-        RetirementDetails[] memory retirements,
+        RetirementDetails[] calldata retirements,
         address sourceToken,
         address poolToken,
         uint256 maxAmountIn,
@@ -299,14 +297,16 @@ contract RetireCarbonFacet is ReentrancyGuard {
             LibSwap.returnTradeDust(sourceToken, poolToken);
         }
 
+        uint256 redeemedAmount;
+
         for (uint256 i = 0; i < retirements.length; ++i) {
-            retireBatchItem(retirements[i], true);
+            redeemedAmount += retireBatchItem(retirements[i], true);
         }
 
         // Send any aggregator fees to treasury
         if (totalCarbon - totalRetirementAmount > 0) {
             LibTransfer.sendToken(
-                IERC20(poolToken), totalCarbon - totalRetirementAmount, C.treasury(), LibTransfer.To.EXTERNAL
+                IERC20(poolToken), totalCarbon - redeemedAmount, C.treasury(), LibTransfer.To.EXTERNAL
             );
         }
     }
@@ -316,7 +316,10 @@ contract RetireCarbonFacet is ReentrancyGuard {
      * @param retirement           RetirementDetails struct containing the individual retirement details
      * @param specific             Flag for if this is a specific or default redemption
      */
-    function retireBatchItem(RetirementDetails memory retirement, bool specific) private {
+    function retireBatchItem(RetirementDetails memory retirement, bool specific)
+        private
+        returns (uint256 redeemedAmount)
+    {
         require(retirement.retireAmount > 0, "Cannot retire zero tonnes");
         if (!specific) {
             LibRetire.retireReceivedCarbon(
@@ -329,7 +332,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
                 retirement.retirementMessage
             );
         } else {
-            LibRetire.retireReceivedExactCarbonSpecific(
+            return LibRetire.retireReceivedExactCarbonSpecific(
                 retirement.poolToken,
                 retirement.projectToken,
                 retirement.retireAmount,
