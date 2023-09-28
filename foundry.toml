@@ -25,3 +25,6 @@ override_spacing = false
 quote_style = "double"
 tab_width = 4
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
+
+[doc]
+book = "book.toml"
