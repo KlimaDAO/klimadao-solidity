@@ -13,15 +13,15 @@ interface IKlima is IERC20 {
 }
 
 interface IKlimaTreasury {
-    function excessReserves() external returns (uint);
+    function excessReserves() external returns (uint256);
 
-    function manage(address _token, uint _amount) external;
+    function manage(address _token, uint256 _amount) external;
 
     function queue(uint8 _managing, address _address) external returns (bool);
 
     function toggle(uint8 _managing, address _address, address _calculator) external returns (bool);
 
-    function ReserveManagerQueue(address _address) external returns (uint);
+    function ReserveManagerQueue(address _address) external returns (uint256);
 }
 
 interface IKlimaRetirementBond {
@@ -56,4 +56,8 @@ interface IRetirementBondAllocator {
     function maxReservePercent() external view returns (uint256);
 
     function PERCENT_DIVISOR() external view returns (uint256);
+}
+
+interface IStaking {
+    function unstake(uint256 _amount, bool _trigger) external;
 }
