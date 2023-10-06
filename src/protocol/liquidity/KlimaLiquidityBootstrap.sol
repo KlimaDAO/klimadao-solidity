@@ -38,6 +38,8 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
     uint256 public currentDebt;
     uint256 public heldLiquidity;
 
+    bool public liquidityDeployed;
+
     constructor(address _depositor, address _pairToken, uint256 _pairTokenDecimals, uint256 _bootstrapPrice) {
         depositor = _depositor;
         pairToken = _pairToken;
@@ -64,6 +66,7 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
     }
 
     function deployLiquidity() external onlyOwner {
+        require(!liquidityDeployed);
         // Get the amount of KLIMA based on pair token balance
         uint256 pairBalance = IERC20(pairToken).balanceOf(address(this));
 
@@ -80,6 +83,7 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
         );
 
         currentDebt = klimaAmount;
+        liquidityDeployed = true;
     }
 
     function repayDebt(address token, uint256 amount) external {
