@@ -28,3 +28,5 @@ node_modules
 .cache
 .local
 .DS_Store
+
+docs/
