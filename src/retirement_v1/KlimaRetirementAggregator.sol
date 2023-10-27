@@ -32,7 +32,9 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         __Context_init();
     }
 
-    /** === State Variables and Mappings === */
+    /**
+     * === State Variables and Mappings ===
+     */
     address public KLIMA;
     address public sKLIMA;
     address public wsKLIMA;
@@ -48,13 +50,17 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
 
     address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
 
-    /** === Event Setup === */
+    /**
+     * === Event Setup ===
+     */
     event AddressUpdated(uint256 addressIndex, address indexed oldAddress, address indexed newAddress);
     event PoolAdded(address poolToken, uint256 bridge);
     event PoolRemoved(address poolToken);
     event BridgeHelperUpdated(uint256 bridgeID, address helper);
 
-    /** === Non Specific Auto Retirements */
+    /**
+     * === Non Specific Auto Retirements
+     */
 
     /**
      * @notice This function will retire a carbon pool token that is held
@@ -84,11 +90,8 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
 
         if (_amountInCarbon) {
-            uint256 sourceAmount = IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(
-                _sourceToken,
-                _poolToken,
-                _amount
-            );
+            uint256 sourceAmount =
+                IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(_sourceToken, _poolToken, _amount);
 
             // Transfer and approve the source tokens for Infinity
             IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
@@ -135,21 +138,41 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
     ) public {
         require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
 
-        (uint256 sourceAmount, ) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
+        if (_amountInCarbon) {
+            uint256 sourceAmount =
+                IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(_sourceToken, _poolToken, _amount);
 
-        IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, sourceAmount);
 
-        _retireCarbon(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            _retireEntityString,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _msgSender()
-        );
+            IKlimaInfinity(INFINITY).retireExactCarbonDefault(
+                _sourceToken,
+                _poolToken,
+                sourceAmount,
+                _amount,
+                _retireEntityString,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        } else {
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), _amount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, _amount);
+
+            IKlimaInfinity(INFINITY).retireExactSourceDefault(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                _retireEntityString,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        }
     }
 
     /**
@@ -183,16 +206,41 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
     ) public {
         require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
 
-        _retireCarbon(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _initiator
-        );
+        if (_amountInCarbon) {
+            uint256 sourceAmount =
+                IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(_sourceToken, _poolToken, _amount);
+
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_initiator, address(this), sourceAmount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, sourceAmount);
+
+            IKlimaInfinity(INFINITY).retireExactCarbonDefault(
+                _sourceToken,
+                _poolToken,
+                sourceAmount,
+                _amount,
+                "KlimaDAO Retirement Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        } else {
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_initiator, address(this), _amount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, _amount);
+
+            IKlimaInfinity(INFINITY).retireExactSourceDefault(
+                _sourceToken,
+                _poolToken,
+                _amount,
+                "KlimaDAO Retirement Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        }
     }
 
     /**
@@ -220,11 +268,10 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         string memory _retirementMessage,
         address _retiree
     ) internal {
-        (uint256 sourceAmount, ) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
+        (uint256 sourceAmount,) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
 
         require(
-            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount,
-            "Source tokens not transferred."
+            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount, "Source tokens not transferred."
         );
 
         IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(bridgeHelper[poolBridge[_poolToken]], sourceAmount);
@@ -277,11 +324,10 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         string memory _retirementMessage,
         address _retiree
     ) internal {
-        (uint256 sourceAmount, ) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
+        (uint256 sourceAmount,) = getSourceAmount(_sourceToken, _poolToken, _amount, _amountInCarbon);
 
         require(
-            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount,
-            "Source tokens not transferred."
+            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount, "Source tokens not transferred."
         );
 
         IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(bridgeHelper[poolBridge[_poolToken]], sourceAmount);
@@ -323,7 +369,9 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         }
     }
 
-    /** === Specific offset selection retirements === */
+    /**
+     * === Specific offset selection retirements ===
+     */
 
     /**
      * @notice This function will retire a carbon pool token that is held
@@ -351,23 +399,46 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         string memory _retirementMessage,
         address[] memory _carbonList
     ) public {
-        //require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        require(_carbonList.length == 1, "Can only specify one project.");
 
-        (uint256 sourceAmount, ) = getSourceAmountSpecific(_sourceToken, _poolToken, _amount, _amountInCarbon);
+        if (_amountInCarbon) {
+            uint256 sourceAmount =
+                IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(_sourceToken, _poolToken, _amount);
 
-        IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, sourceAmount);
 
-        _retireCarbonSpecific(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _msgSender(),
-            _carbonList
-        );
+            IKlimaInfinity(INFINITY).retireExactCarbonSpecific(
+                _sourceToken,
+                _poolToken,
+                _carbonList[0],
+                sourceAmount,
+                _amount,
+                "KlimaDAO Retirement Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        } else {
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), _amount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, _amount);
+
+            IKlimaInfinity(INFINITY).retireExactSourceSpecific(
+                _sourceToken,
+                _poolToken,
+                _carbonList[0],
+                _amount,
+                "KlimaDAO Retirement Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        }
     }
 
     function retireCarbonSpecific(
@@ -381,24 +452,46 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         string memory _retirementMessage,
         address[] memory _carbonList
     ) public {
-        //require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        require(_carbonList.length == 1, "Can only specify one project.");
 
-        (uint256 sourceAmount, ) = getSourceAmountSpecific(_sourceToken, _poolToken, _amount, _amountInCarbon);
+        if (_amountInCarbon) {
+            uint256 sourceAmount =
+                IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(_sourceToken, _poolToken, _amount);
 
-        IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), sourceAmount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, sourceAmount);
 
-        _retireCarbonSpecific(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            _retireEntityString,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _msgSender(),
-            _carbonList
-        );
+            IKlimaInfinity(INFINITY).retireExactCarbonSpecific(
+                _sourceToken,
+                _poolToken,
+                _carbonList[0],
+                sourceAmount,
+                _amount,
+                _retireEntityString,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        } else {
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_msgSender(), address(this), _amount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, _amount);
+
+            IKlimaInfinity(INFINITY).retireExactSourceSpecific(
+                _sourceToken,
+                _poolToken,
+                _carbonList[0],
+                _amount,
+                _retireEntityString,
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        }
     }
 
     function retireCarbonSpecificFrom(
@@ -412,19 +505,46 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         string memory _retirementMessage,
         address[] memory _carbonList
     ) public {
-        address retiree = _initiator;
+        require(isPoolToken[_poolToken], "Pool Token Not Accepted.");
+        require(_carbonList.length == 1, "Can only specify one project.");
 
-        _retireCarbonSpecific(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            retiree,
-            _carbonList
-        );
+        if (_amountInCarbon) {
+            uint256 sourceAmount =
+                IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(_sourceToken, _poolToken, _amount);
+
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_initiator, address(this), sourceAmount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, sourceAmount);
+
+            IKlimaInfinity(INFINITY).retireExactCarbonSpecific(
+                _sourceToken,
+                _poolToken,
+                _carbonList[0],
+                sourceAmount,
+                _amount,
+                "KlimaDAO Retirement Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        } else {
+            // Transfer and approve the source tokens for Infinity
+            IERC20Upgradeable(_sourceToken).safeTransferFrom(_initiator, address(this), _amount);
+            IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(INFINITY, _amount);
+
+            IKlimaInfinity(INFINITY).retireExactSourceSpecific(
+                _sourceToken,
+                _poolToken,
+                _carbonList[0],
+                _amount,
+                "KlimaDAO Retirement Aggregator",
+                _beneficiaryAddress,
+                _beneficiaryString,
+                _retirementMessage,
+                0
+            );
+        }
     }
 
     /**
@@ -537,23 +657,21 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
         }
     }
 
-    function _prepareRetireSpecific(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon
-    ) internal {
-        (uint256 sourceAmount, ) = getSourceAmountSpecific(_sourceToken, _poolToken, _amount, _amountInCarbon);
+    function _prepareRetireSpecific(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
+        internal
+    {
+        (uint256 sourceAmount,) = getSourceAmountSpecific(_sourceToken, _poolToken, _amount, _amountInCarbon);
 
         require(
-            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount,
-            "Source tokens not transferred."
+            IERC20Upgradeable(_sourceToken).balanceOf(address(this)) == sourceAmount, "Source tokens not transferred."
         );
 
         IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(bridgeHelper[poolBridge[_poolToken]], sourceAmount);
     }
 
-    /** === External views and helpful functions === */
+    /**
+     * === External views and helpful functions ===
+     */
 
     /**
      * @notice This function calls the appropriate helper for a pool token and
@@ -567,41 +685,16 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
      * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
      * @return Returns both the source amount and carbon amount as a result of swaps.
      */
-    function getSourceAmount(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon
-    ) public view returns (uint256, uint256) {
-        uint256 sourceAmount;
-        uint256 carbonAmount = _amount;
-
+    function getSourceAmount(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
+        public
+        view
+        returns (uint256, uint256)
+    {
         if (_amountInCarbon) {
-            (sourceAmount, ) = IRetireBridgeCommon(bridgeHelper[poolBridge[_poolToken]]).getNeededBuyAmount(
-                _sourceToken,
-                _poolToken,
-                _amount,
-                false
-            );
-            if (_sourceToken == wsKLIMA) {
-                sourceAmount = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(sourceAmount);
-            }
-        } else {
-            sourceAmount = _amount;
-
-            address poolRouter = IRetireBridgeCommon(bridgeHelper[poolBridge[_poolToken]]).poolRouter(_poolToken);
-
-            address[] memory path = IRetireBridgeCommon(bridgeHelper[poolBridge[_poolToken]]).getSwapPath(
-                _sourceToken,
-                _poolToken
-            );
-
-            uint256[] memory amountsOut = IUniswapV2Router02(poolRouter).getAmountsOut(_amount, path);
-
-            carbonAmount = amountsOut[path.length - 1];
+            return
+                (IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(_sourceToken, _poolToken, _amount), _amount);
         }
-
-        return (sourceAmount, carbonAmount);
+        return (_amount, IKlimaInfinity(INFINITY).getRetireAmountSourceDefault(_sourceToken, _poolToken, _amount));
     }
 
     /**
@@ -615,41 +708,16 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
      * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
      * @return Returns both the source amount and carbon amount as a result of swaps.
      */
-    function getSourceAmountSpecific(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon
-    ) public view returns (uint256, uint256) {
-        uint256 sourceAmount;
-        uint256 carbonAmount = _amount;
-
+    function getSourceAmountSpecific(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
+        public
+        view
+        returns (uint256, uint256)
+    {
         if (_amountInCarbon) {
-            (sourceAmount, ) = IRetireBridgeCommon(bridgeHelper[poolBridge[_poolToken]]).getNeededBuyAmount(
-                _sourceToken,
-                _poolToken,
-                _amount,
-                true
-            );
-            if (_sourceToken == wsKLIMA) {
-                sourceAmount = IwsKLIMA(wsKLIMA).sKLIMATowKLIMA(sourceAmount);
-            }
-        } else {
-            sourceAmount = _amount;
-
-            address poolRouter = IRetireBridgeCommon(bridgeHelper[poolBridge[_poolToken]]).poolRouter(_poolToken);
-
-            address[] memory path = IRetireBridgeCommon(bridgeHelper[poolBridge[_poolToken]]).getSwapPath(
-                _sourceToken,
-                _poolToken
-            );
-
-            uint256[] memory amountsOut = IUniswapV2Router02(poolRouter).getAmountsOut(_amount, path);
-
-            carbonAmount = amountsOut[path.length - 1];
+            return
+                (IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(_sourceToken, _poolToken, _amount), _amount);
         }
-
-        return (sourceAmount, carbonAmount);
+        return (_amount, IKlimaInfinity(INFINITY).getRetireAmountSourceSpecific(_sourceToken, _poolToken, _amount));
     }
 
     /**
@@ -712,9 +780,9 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
     }
 
     /**
-        @notice Remove a carbon pool to retire.
-        @param _poolToken Pool being removed.
-        @return bool
+     * @notice Remove a carbon pool to retire.
+     *     @param _poolToken Pool being removed.
+     *     @return bool
      */
     function removePool(address _poolToken) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -726,10 +794,10 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
     }
 
     /**
-        @notice Set the helper contract to be used with a carbon bridge.
-        @param _bridgeID Int ID of the bridge.
-        @param _helper Helper contract to use with this bridge.
-        @return bool
+     * @notice Set the helper contract to be used with a carbon bridge.
+     *     @param _bridgeID Int ID of the bridge.
+     *     @param _helper Helper contract to use with this bridge.
+     *     @return bool
      */
     function setBridgeHelper(uint256 _bridgeID, address _helper) external onlyOwner returns (bool) {
         require(_helper != address(0), "Helper cannot be zero address");
@@ -741,8 +809,8 @@ contract KlimaRetirementAggregator is Initializable, ContextUpgradeable, Ownable
     }
 
     /**
-        @notice Allow withdrawal of any tokens sent in error
-        @param _token Address of token to transfer
+     * @notice Allow withdrawal of any tokens sent in error
+     *     @param _token Address of token to transfer
      */
     function feeWithdraw(address _token, address _recipient) external onlyOwner returns (bool) {
         IERC20Upgradeable(_token).safeTransfer(_recipient, IERC20Upgradeable(_token).balanceOf(address(this)));
