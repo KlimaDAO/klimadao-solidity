@@ -914,6 +914,87 @@
     {
         "inputs": [
             {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "id",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "remainingAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "unitPrice",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct ICarbonmark.CreditListing",
+                "name": "listing",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxAmountIn",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "retireAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "retiringEntityString",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "beneficiaryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "beneficiaryString",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "retirementMessage",
+                "type": "string"
+            },
+            {
+                "internalType": "enum LibTransfer.From",
+                "name": "fromMode",
+                "type": "uint8"
+            }
+        ],
+        "name": "retireCarbonmarkListing",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "retirementIndex",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
                 "name": "account",
                 "type": "address"
