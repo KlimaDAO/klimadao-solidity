@@ -304,6 +304,29 @@ abstract contract TestHelper is Test, HelperContract {
         vm.stopPrank();
     }
 
+    function closeRetirementBonds(address retirementBonds) internal {
+        // Assuming mainnet fork testing for the moment
+        address BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
+        address NCT = 0xD838290e877E0188a4A44700463419ED96c16107;
+        address MCO2 = 0xAa7DbD1598251f856C12f63557A4C4397c253Cea;
+        address UBO = 0x2B3eCb0991AF0498ECE9135bcD04013d7993110c;
+        address NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
+
+        address allocator = IKlimaRetirementBond(retirementBonds).allocatorContract();
+
+        address owner = IRetirementBondAllocator(allocator).owner();
+
+        vm.startPrank(owner);
+
+        IRetirementBondAllocator(allocator).closeBonds(BCT);
+        IRetirementBondAllocator(allocator).closeBonds(NCT);
+        IRetirementBondAllocator(allocator).closeBonds(MCO2);
+        IRetirementBondAllocator(allocator).closeBonds(UBO);
+        IRetirementBondAllocator(allocator).closeBonds(NBO);
+
+        vm.stopPrank();
+    }
+
     function maxBondAmount(address token, address allocator) internal returns (uint256 maxAmount) {
         address treasury = vm.envAddress("KLIMA_TREASURY_ADDRESS");
         uint256 maxReserve = IRetirementBondAllocator(allocator).maxReservePercent();

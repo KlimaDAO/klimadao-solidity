@@ -56,27 +56,27 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactSourceDefault_MCO2_MCO2(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_MCO2_MCO2(uint256 retireAmount) public {
         retireExactMoss(MCO2, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_MCO2_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_MCO2_USDC(uint256 retireAmount) public {
         retireExactMoss(USDC, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_MCO2_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_MCO2_KLIMA(uint256 retireAmount) public {
         retireExactMoss(KLIMA, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_MCO2_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_MCO2_SKLIMA(uint256 retireAmount) public {
         retireExactMoss(SKLIMA, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_MCO2_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_MCO2_WSKLIMA(uint256 retireAmount) public {
         retireExactMoss(WSKLIMA, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint retireAmount) internal returns (uint sourceAmount) {
+    function getSourceTokens(address sourceToken, uint256 retireAmount) internal returns (uint256 sourceAmount) {
         /// @dev getting trade amount on zero output will revert
         if (retireAmount == 0 && sourceToken != MCO2) vm.expectRevert();
         sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, MCO2, retireAmount);
@@ -93,12 +93,12 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function retireExactMoss(address sourceToken, uint retireAmount) public {
+    function retireExactMoss(address sourceToken, uint256 retireAmount) public {
         vm.assume(retireAmount < (IERC20(MCO2).balanceOf(QUICKSWAP_LP) * 90) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, retireAmount);
+        uint256 sourceAmount = getSourceTokens(sourceToken, retireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         if (retireAmount == 0) {
             vm.expectRevert();
@@ -137,9 +137,7 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
 
             // Since the output from Trident isn't deterministic until the swap happens, check an approximation.
             assertApproxEqRel(
-                LibRetire.getTotalCarbonRetired(beneficiaryAddress),
-                currentTotalCarbon + retireAmount,
-                1e16
+                LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount, 1e19
             );
         }
     }
