@@ -65,75 +65,77 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_BCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_BCT(uint256 retireAmount) public {
         retireExactSource(BCT, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_BCT_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_NCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_NCT(uint256 retireAmount) public {
         retireExactSource(NCT, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NCT_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, NCT, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint sourceAmount) internal {
+    function getSourceTokens(address sourceToken, uint256 sourceAmount) internal {
         address sourceTarget;
 
         /// @dev Setting minimum amount assumptions due to issues with Trident performing swaps with zero output tokens.
         vm.assume(sourceAmount > 1e4);
 
-        if (sourceToken == BCT || sourceToken == NCT || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) {
+        if (sourceToken == BCT || sourceToken == NCT || sourceToken == USDC) {
+            sourceTarget = KLIMA_TREASURY;
+        } else if (sourceToken == KLIMA || sourceToken == SKLIMA) {
+            sourceTarget = STAKING;
+        } else if (sourceToken == WSKLIMA) {
             vm.assume(sourceAmount > LibKlima.toWrappedAmount(1e6));
             sourceTarget = WSKLIMA_HOLDER;
         }
-
+        if (sourceToken == SKLIMA) vm.assume(sourceAmount <= IERC20(KLIMA).balanceOf(STAKING));
         vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
 
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function retireExactSource(address sourceToken, address poolToken, uint sourceAmount) public {
+    function retireExactSource(address sourceToken, address poolToken, uint256 sourceAmount) public {
         getSourceTokens(sourceToken, sourceAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         address projectToken = poolToken == BCT ? DEFAULT_PROJECT_BCT : DEFAULT_PROJECT_NCT;
 
-        uint retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
-        uint poolAmount = poolToken == BCT
+        uint256 retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
+        uint256 poolAmount = poolToken == BCT
             ? IERC20(DEFAULT_PROJECT_BCT).balanceOf(poolToken)
             : IERC20(DEFAULT_PROJECT_NCT).balanceOf(poolToken);
         vm.assume(retireAmount <= poolAmount);
@@ -175,9 +177,7 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
 
             // Since the output from Trident isn't deterministic until the swap happens, check an approximation.
             assertApproxEqRel(
-                LibRetire.getTotalCarbonRetired(beneficiaryAddress),
-                currentTotalCarbon + retireAmount,
-                1e16
+                LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount, 1e16
             );
         }
     }
