@@ -47,6 +47,8 @@ interface IKlimaRetirementBond {
 }
 
 interface IRetirementBondAllocator {
+    function owner() external returns (address);
+
     function fundBonds(address token, uint amount) external;
 
     function closeBonds(address token) external;

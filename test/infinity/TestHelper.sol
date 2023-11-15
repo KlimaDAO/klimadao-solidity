@@ -190,28 +190,28 @@ abstract contract TestHelper is Test, HelperContract {
         vm.startPrank(ownerF.owner());
 
         //deploy facets and init contract
-        c3RedeemF = new RedeemC3PoolFacet();
-        toucanRedeemF = new RedeemToucanPoolFacet();
-        retirementQuoterF = new RetirementQuoter();
-        retireCarbonF = new RetireCarbonFacet();
-        retireSourceF = new RetireSourceFacet();
-        retireCarbonmark = new RetireCarbonmarkFacet();
+        // c3RedeemF = new RedeemC3PoolFacet();
+        // toucanRedeemF = new RedeemToucanPoolFacet();
+        // retirementQuoterF = new RetirementQuoter();
+        // retireCarbonF = new RetireCarbonFacet();
+        // retireSourceF = new RetireSourceFacet();
+        // retireCarbonmark = new RetireCarbonmarkFacet();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+        // IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
 
-        // Klima Infinity specific facets
+        // // Klima Infinity specific facets
 
-        cut[0] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonmark),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
-            })
-        );
+        // cut[0] = (
+        //     IDiamondCut.FacetCut({
+        //         facetAddress: address(retireCarbonmark),
+        //         action: IDiamondCut.FacetCutAction.Add,
+        //         functionSelectors: generateSelectors("RetireCarbonmarkFacet")
+        //     })
+        // );
 
         // deploy diamond and perform diamondCut
-        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        // IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
 
         vm.stopPrank();
     }
@@ -264,13 +264,13 @@ abstract contract TestHelper is Test, HelperContract {
 
             IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
 
-        if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
-            IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
+            if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
+                IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
 
-            vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
+                vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
 
-            IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
-        }
+                IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
+            }
 
             vm.stopPrank();
         }
