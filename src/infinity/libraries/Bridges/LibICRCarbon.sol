@@ -25,33 +25,35 @@ library LibICRCarbon {
         uint256 retiredAmount
     );
 
-    function retireICR(
+    function retireICC(
         address poolToken,
         address projectToken,
         uint256 tokenId,
         uint256 amount,
-        address retiringAddress,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage
+        LibRetire.RetireDetails memory details
     ) internal returns (uint256 retiredAmount) {
         bytes memory data;
+
         IProject(projectToken).retire(
-            tokenId, amount, beneficiaryAddress, beneficiaryString, "", retirementMessage, data
+            tokenId, amount, details.beneficiaryAddress, details.beneficiaryString, "", details.retirementMessage, data
         );
 
         LibRetire.saveRetirementDetails(
-            poolToken, projectToken, amount, beneficiaryAddress, beneficiaryString, retirementMessage
+            poolToken,
+            projectToken,
+            amount,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage
         );
 
         emit CarbonRetired(
             LibRetire.CarbonBridge.ICR,
-            retiringAddress,
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage,
+            details.retiringAddress,
+            details.retiringEntityString,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage,
             poolToken,
             projectToken,
             tokenId,

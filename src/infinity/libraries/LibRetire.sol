@@ -12,6 +12,7 @@ import {LibMeta} from "./LibMeta.sol";
 import "./Bridges/LibToucanCarbon.sol";
 import "./Bridges/LibMossCarbon.sol";
 import "./Bridges/LibC3Carbon.sol";
+import "./Bridges/LibICRCarbon.sol";
 import "./Token/LibTransfer.sol";
 import "./TokenSwap/LibSwap.sol";
 import "../interfaces/IKlimaInfinity.sol";
@@ -27,6 +28,14 @@ library LibRetire {
         MOSS,
         C3,
         ICR
+    }
+
+    struct RetireDetails {
+        address retiringAddress;
+        string retiringEntityString;
+        address beneficiaryAddress;
+        string beneficiaryString;
+        string retirementMessage;
     }
 
     /* ========== Default Redemption Retirements ========== */
@@ -155,6 +164,7 @@ library LibRetire {
      */
     function retireReceivedCreditToken(
         address creditToken,
+        uint256 tokenId,
         uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
@@ -183,6 +193,23 @@ library LibRetire {
                 beneficiaryAddress,
                 beneficiaryString,
                 retirementMessage
+            );
+        } else if (LibICRCarbon.isValid(creditToken)) {
+            RetireDetails memory details;
+
+            details.retiringAddress = retiringAddress;
+            details.retiringEntityString = retiringEntityString;
+            details.beneficiaryAddress = beneficiaryAddress;
+            details.beneficiaryString = beneficiaryString;
+            details.retirementMessage = retirementMessage;
+
+            // Retire the carbon
+            LibICRCarbon.retireICC(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                tokenId,
+                amount,
+                details
             );
         }
     }
