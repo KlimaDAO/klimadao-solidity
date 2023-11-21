@@ -20,7 +20,7 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
 
     /* ===== KLIMA PROTOCOL CONSTANTS ===== */
     address public constant KLIMA = 0x4e78011Ce80ee02d2c3e649Fb657E45898257815;
-    address public constant SKLIMA = 0x25d28a24Ceb6F81015bB0b2007D795ACAc411b4d;
+    address public constant SKLIMA = 0xb0C22d8D350C67420f06F48936654f567C73E8C8;
     address public constant DAO = 0x65A5076C0BA74e5f3e069995dc3DAB9D197d995c;
     address public constant STAKING = 0x25d28a24Ceb6F81015bB0b2007D795ACAc411b4d;
 
@@ -40,6 +40,12 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
 
     bool public liquidityDeployed;
 
+    event Deposit(address depositor, address token, uint256 amount);
+    event Withdraw(address depositor, address token, uint256 amount);
+    event Bootstrap(address token0, address token1, uint256 token0Amount, uint256 token1Amount);
+    event IncreaseDebt(uint256 amount);
+    event RepayDebt(uint256 amount);
+
     constructor(address _depositor, address _pairToken, uint256 _pairTokenDecimals, uint256 _bootstrapPrice) {
         depositor = _depositor;
         pairToken = _pairToken;
@@ -48,9 +54,9 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
     }
 
     function deposit(address token, uint256 amount) external {
-        require(msg.sender == depositor, "Depositor not whitelisted");
+        require(msg.sender == depositor || msg.sender == DAO, "Depositor not whitelisted");
 
-        require(token == pairToken || token == KLIMA, "Token not whitelisted");
+        require(token == pairToken || token == SKLIMA, "Token not whitelisted");
 
         if (token == pairToken) {
             // Only allow cleanly divisible amounts for pair token deposits
@@ -62,11 +68,14 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
-        depositedAmount[token] = amount;
+        depositedAmount[token] += amount;
+        emit Deposit(msg.sender, token, amount);
     }
 
     function deployLiquidity() external onlyOwner {
         require(!liquidityDeployed);
+        liquidityDeployed = true;
+
         // Get the amount of KLIMA based on pair token balance
         uint256 pairBalance = IERC20(pairToken).balanceOf(address(this));
 
@@ -78,12 +87,20 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
         // Transfer in the KLIMA to pair with
         IERC20(KLIMA).safeTransferFrom(DAO, address(this), klimaAmount);
 
-        (,, heldLiquidity) = IUniswapV2Router01(SUSHI_V2_ROUTER).addLiquidity(
-            KLIMA, pairToken, klimaAmount, pairBalance, klimaAmount, pairBalance, DAO, block.timestamp
+        IERC20(KLIMA).safeIncreaseAllowance(SUSHI_V2_ROUTER, klimaAmount);
+        IERC20(pairToken).safeIncreaseAllowance(SUSHI_V2_ROUTER, pairBalance);
+
+        (uint256 deployedToken0Amount, uint256 deployedToken1Amount, uint256 deployedLiquidity) = IUniswapV2Router01(
+            SUSHI_V2_ROUTER
+        ).addLiquidity(
+            KLIMA, pairToken, klimaAmount, pairBalance, klimaAmount, pairBalance, address(this), block.timestamp
         );
 
+        heldLiquidity = deployedLiquidity;
         currentDebt = klimaAmount;
-        liquidityDeployed = true;
+
+        emit IncreaseDebt(currentDebt);
+        emit Bootstrap(KLIMA, pairToken, deployedToken0Amount, deployedToken1Amount);
     }
 
     function repayDebt(address token, uint256 amount) external {
@@ -98,6 +115,7 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
             if (currentStaked >= currentDebt) {
                 repayAmount = currentStaked - currentDebt;
 
+                IERC20(SKLIMA).safeIncreaseAllowance(STAKING, repayAmount);
                 IStaking(STAKING).unstake(repayAmount, false);
                 IERC20(KLIMA).safeTransfer(DAO, repayAmount);
             }
@@ -106,14 +124,32 @@ contract KlimaLiquidityBootstrap is Ownable2Step {
         }
 
         uint256 unlockedLiquidity = heldLiquidity * repayAmount / currentDebt;
+        currentDebt -= repayAmount;
+        heldLiquidity -= unlockedLiquidity;
 
         IERC20(deployedLiquidityToken).safeTransfer(depositor, unlockedLiquidity);
 
-        currentDebt -= repayAmount;
-        heldLiquidity -= unlockedLiquidity;
+        emit RepayDebt(repayAmount);
     }
 
-    function emergencyWithdraw(address token) external onlyOwner {
-        IERC20(token).safeTransfer(msg.sender, IERC20(token).balanceOf(address(this)));
+    function updateDeployedLiquidityToken(address token) external onlyOwner {
+        deployedLiquidityToken = token;
+    }
+
+    function withdraw(address token, uint256 amount) external {
+        require(msg.sender == depositor);
+        if (token == SKLIMA) {
+            uint256 tokenBalance = IERC20(SKLIMA).balanceOf(address(this));
+            if (currentDebt < tokenBalance) {
+                amount = tokenBalance - currentDebt;
+            }
+        }
+
+        IERC20(token).safeTransfer(msg.sender, amount);
+        emit Withdraw(depositor, token, amount);
+    }
+
+    function emergencyWithdraw(address token, uint256 amount) external onlyOwner {
+        IERC20(token).safeTransfer(msg.sender, amount);
     }
 }
