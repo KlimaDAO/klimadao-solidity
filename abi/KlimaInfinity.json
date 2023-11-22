@@ -255,6 +255,60 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "projectToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "retiringEntityString",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "beneficiaryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "beneficiaryString",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "retirementMessage",
+                "type": "string"
+            },
+            {
+                "internalType": "enum LibTransfer.From",
+                "name": "fromMode",
+                "type": "uint8"
+            }
+        ],
+        "name": "icrRetireExactCarbon",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "retirementIndex",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "sourceToken",
                 "type": "address"
             },
@@ -630,6 +684,84 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "ids",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "values",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "onERC1155BatchReceived",
+        "outputs": [
+            {
+                "internalType": "bytes4",
+                "name": "",
+                "type": "bytes4"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "onERC1155Received",
+        "outputs": [
+            {
+                "internalType": "bytes4",
+                "name": "",
+                "type": "bytes4"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "",
                 "type": "address"
             },
@@ -929,6 +1061,11 @@
                         "internalType": "address",
                         "name": "token",
                         "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "tokenId",
+                        "type": "uint256"
                     },
                     {
                         "internalType": "uint256",
@@ -1257,209 +1394,6 @@
             }
         ],
         "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getRetireAmountSourceDefault",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountOut",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getRetireAmountSourceSpecific",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountOut",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "redeemAmount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getSourceAmountDefaultRedeem",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "retireAmount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getSourceAmountDefaultRetirement",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256[]",
-                "name": "redeemAmounts",
-                "type": "uint256[]"
-            }
-        ],
-        "name": "getSourceAmountSpecificRedeem",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "retireAmount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getSourceAmountSpecificRetirement",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sourceToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "carbonToken",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountOut",
-                "type": "uint256"
-            }
-        ],
-        "name": "getSourceAmountSwapOnly",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
