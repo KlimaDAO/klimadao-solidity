@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-/******************************************************************************\
-* Authors: Cujo <rawr@cujowolf.dev>
-* EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
-
-* Script to upgrade Infinity diamond with new and revised facets
-/******************************************************************************/
+/**
+ * \
+ * Authors: Cujo <rawr@cujowolf.dev>
+ * EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
+ * 
+ * Script to upgrade Infinity diamond with new and revised facets
+ * /*****************************************************************************
+ */
 
 import "forge-std/Script.sol";
 import "../src/infinity/interfaces/IDiamondCut.sol";
@@ -22,6 +24,8 @@ import {RetireCarbonFacet} from "../src/infinity/facets/Retire/RetireCarbonFacet
 import {RetireInfoFacet} from "../src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "../src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "../src/infinity/facets/RetirementQuoter.sol";
+import {ERC1155ReceiverFacet} from "src/infinity/facets/ERC1155ReceiverFacet.sol";
+import {RetireICRFacet} from "src/infinity/facets/Bridges/ICR/RetireICRFacet.sol";
 import {DiamondInit} from "../src/infinity/init/DiamondInit.sol";
 import "../test/infinity/HelperContract.sol";
 
@@ -41,65 +45,27 @@ contract DeployInfinityScript is Script, HelperContract {
         RetireCarbonFacet retireCarbonF = new RetireCarbonFacet();
         RetireSourceFacet retireSourceF = new RetireSourceFacet();
         RetirementQuoter retirementQuoterF = new RetirementQuoter();
+        RetireICRFacet retireICRF = new RetireICRFacet();
+        ERC1155ReceiverFacet erc1155ReceiverF = new ERC1155ReceiverFacet();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](7);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
 
         // Klima Infinity specific facets
 
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(c3RedeemF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemC3PoolFacet")
+                facetAddress: address(retireICRF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("RetireICRFacet")
             })
         );
 
         cut[1] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(c3RetireF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireC3C3TFacet")
-            })
-        );
-
-        cut[2] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(toucanRedeemF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemToucanPoolFacet")
-            })
-        );
-
-        cut[3] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(toucanRetireF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireToucanTCO2Facet")
-            })
-        );
-
-        cut[4] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireCarbonFacet")
-            })
-        );
-
-        cut[5] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireSourceF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireSourceFacet")
-            })
-        );
-
-        cut[6] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retirementQuoterF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetirementQuoter")
+                facetAddress: address(erc1155ReceiverF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("ERC1155ReceiverFacet")
             })
         );
 
