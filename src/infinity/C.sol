@@ -32,24 +32,24 @@ library C {
 
     /* Carbon Pools */
     // Toucan
-    address private constant BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
-    address private constant NCT = 0xD838290e877E0188a4A44700463419ED96c16107;
+    address private constant BCT = address(0);
+    address private constant NCT = address(0);
 
     // Moss
-    address private constant MCO2 = 0xAa7DbD1598251f856C12f63557A4C4397c253Cea;
+    address private constant MCO2 = address(0);
 
     // C3
-    address private constant UBO = 0x2B3eCb0991AF0498ECE9135bcD04013d7993110c;
-    address private constant NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
+    address private constant UBO = address(0);
+    address private constant NBO = address(0);
 
     // Other important addresses
-    address private constant TOUCAN_RETIRE_CERT = 0x5e377f16E4ec6001652befD737341a28889Af002;
-    address private constant MOSS_CARBON_CHAIN = 0xeDAEFCf60e12Bd331c092341D5b3d8901C1c05A8;
-    address private constant KLIMA_CARBON_RETIREMENTS = 0xac298CD34559B9AcfaedeA8344a977eceff1C0Fd;
-    address private constant KLIMA_RETIREMENT_BOND = 0xa595f0d598DaF144e5a7ca91E6D9A5bAA09dDeD0;
-    address constant TOUCAN_REGISTRY = 0x263fA1c180889b3a3f46330F32a4a23287E99FC9;
-    address constant C3_PROJECT_FACTORY = 0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B;
-    address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d8A;
+    address private constant TOUCAN_RETIRE_CERT = address(0);
+    address private constant MOSS_CARBON_CHAIN = address(0);
+    address private constant KLIMA_CARBON_RETIREMENTS = 0xe4069467D406281249AC02699f2e87dfd5819535;
+    address private constant KLIMA_RETIREMENT_BOND = address(0);
+    address constant TOUCAN_REGISTRY = address(0);
+    address constant C3_PROJECT_FACTORY = address(0);
+    address constant ICR_PROJECT_REGISTRY = 0x0B0fCaCD2336A5f000661fF5E69aA70c28fD526D;
 
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;

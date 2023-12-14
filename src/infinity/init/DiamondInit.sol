@@ -27,7 +27,7 @@ import "../C.sol";
 contract DiamondInit {
     AppStorage internal s;
 
-    uint private constant MAX_INT = 2 ** 256 - 1;
+    uint256 private constant MAX_INT = 2 ** 256 - 1;
 
     // You can add parameters to this function in order to pass in
     // data to set your own state variables
@@ -119,17 +119,17 @@ contract DiamondInit {
 
         s.tridentPool[C.klima()][C.nbo()] = 0x251cA6A70cbd93Ccd7039B6b708D4cb9683c266C;
 
-        // Staking and wrapping batch token approvals
-        LibApprove.approveToken(IERC20(C.wsKlima()), C.wsKlima(), MAX_INT);
-        LibApprove.approveToken(IERC20(C.sKlima()), C.wsKlima(), MAX_INT);
-        LibApprove.approveToken(IERC20(C.sKlima()), C.staking(), MAX_INT);
-        LibApprove.approveToken(IERC20(C.klima()), C.staking(), MAX_INT);
-        LibApprove.approveToken(IERC20(C.klima()), C.stakingHelper(), MAX_INT);
+        // // Staking and wrapping batch token approvals
+        // LibApprove.approveToken(IERC20(C.wsKlima()), C.wsKlima(), MAX_INT);
+        // LibApprove.approveToken(IERC20(C.sKlima()), C.wsKlima(), MAX_INT);
+        // LibApprove.approveToken(IERC20(C.sKlima()), C.staking(), MAX_INT);
+        // LibApprove.approveToken(IERC20(C.klima()), C.staking(), MAX_INT);
+        // LibApprove.approveToken(IERC20(C.klima()), C.stakingHelper(), MAX_INT);
 
-        // AMM DEX Bulk approvals
-        LibApprove.approveToken((IERC20(C.klima())), C.sushiBento(), MAX_INT);
+        // // AMM DEX Bulk approvals
+        // LibApprove.approveToken((IERC20(C.klima())), C.sushiBento(), MAX_INT);
 
-        // Approve BentoBox
-        IBentoBoxMinimal(C.sushiBento()).setMasterContractApproval(address(this), C.sushiTridentRouter(), true, 0, 0, 0);
+        // // Approve BentoBox
+        // IBentoBoxMinimal(C.sushiBento()).setMasterContractApproval(address(this), C.sushiTridentRouter(), true, 0, 0, 0);
     }
 }
