@@ -28,7 +28,7 @@ library C {
     address private constant SUSHI_TRIDENT_POLYGON = 0xc5017BE80b4446988e8686168396289a9A62668E;
 
     // Marketplace contracts
-    address private constant CARBONMARK = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821;
+    address private constant CARBONMARK = 0x6D9D36D4C4572Bd4C5F5472Ab264cD2a3f4dB85c;
 
     /* Carbon Pools */
     // Toucan
