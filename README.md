@@ -49,6 +49,29 @@ These examples use a localhost fork running on the `anvil` command
   forge script script/deployInfinity.s.sol:DeployInfinityScript --fork-url http://localhost:8545 --broadcast --ffi
   ```
 
+## Axelar Cross-Chain Contracts
+
+For the contracts under `src/axelar`, which are designed to be deployed across
+multiple chains, we use `woke` for testing, so you need to install it via Python:
+
+```
+pip install woke -U
+```
+
+To run tests:
+
+1. `woke init pytypes`
+1. `woke test`
+
+To view tests coverage:
+
+1. Install VS Code
+1. Install the Tools for Solidity extension into VS Code
+1. woke test --coverage
+1. Use the Tools for Solidity: Show Coverage command in VS Code
+1. Select woke-coverage.cov
+
+
 ## Deprecated Contracts
 
 Note that the `AlphaKlimaRedeemUpgradeable` will fail to get built by default, and therefore has been marked deprecated.

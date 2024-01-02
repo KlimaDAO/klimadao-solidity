@@ -13,6 +13,15 @@ mnemonic.txt
 cache/
 out/
 
+# Python + Woke testing files
+pytypes
+__pycache__/
+*.py[cod]
+.hypothesis/
+.woke-build
+.woke-logs
+woke-coverage.cov
+
 # Ignores development broadcast logs
 !/broadcast
 /broadcast/*/31337/
