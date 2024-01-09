@@ -17,6 +17,7 @@ import "src/infinity/facets/DiamondLoupeFacet.sol";
 import {OwnershipFacet} from "src/infinity/facets/OwnershipFacet.sol";
 import {RedeemC3PoolFacet} from "src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
 import {RetireC3C3TFacet} from "src/infinity/facets/Bridges/C3/RetireC3C3TFacet.sol";
+import {RetireICRFacet} from "src/infinity/facets/Bridges/ICR/RetireICRFacet.sol";
 import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
 import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
@@ -24,10 +25,12 @@ import {RetireCarbonmarkFacet} from "src/infinity/facets/Retire/RetireCarbonmark
 import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
+import {ERC1155ReceiverFacet} from "src/infinity/facets/ERC1155ReceiverFacet.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
 import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
+import {ICRProject} from "./interfaces/ICR.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -52,7 +55,9 @@ abstract contract TestHelper is Test, HelperContract {
     RetireInfoFacet retireInfoF;
     RetireSourceFacet retireSourceF;
     RetirementQuoter retirementQuoterF;
-    RetireCarbonmarkFacet retireCarbonmark;
+    RetireCarbonmarkFacet retireCarbonmarkF;
+    RetireICRFacet retireICRF;
+    ERC1155ReceiverFacet erc1155ReceiverF;
 
     function setupInfinity() internal returns (address) {
         //deploy facets and init contract
@@ -195,23 +200,33 @@ abstract contract TestHelper is Test, HelperContract {
         // retirementQuoterF = new RetirementQuoter();
         // retireCarbonF = new RetireCarbonFacet();
         // retireSourceF = new RetireSourceFacet();
-        // retireCarbonmark = new RetireCarbonmarkFacet();
+        // retireCarbonmarkF = new RetireCarbonmarkFacet();
+        retireICRF = new RetireICRFacet();
+        erc1155ReceiverF = new ERC1155ReceiverFacet();
 
         // FacetCut array which contains the three standard facets to be added
-        // IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
 
         // // Klima Infinity specific facets
 
-        // cut[0] = (
-        //     IDiamondCut.FacetCut({
-        //         facetAddress: address(retireCarbonmark),
-        //         action: IDiamondCut.FacetCutAction.Add,
-        //         functionSelectors: generateSelectors("RetireCarbonmarkFacet")
-        //     })
-        // );
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireICRF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("RetireICRFacet")
+            })
+        );
+
+        cut[1] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(erc1155ReceiverF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("ERC1155ReceiverFacet")
+            })
+        );
 
         // deploy diamond and perform diamondCut
-        // IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
 
         vm.stopPrank();
     }
@@ -357,5 +372,14 @@ abstract contract TestHelper is Test, HelperContract {
     function randomish(uint256 maxValue) internal view returns (uint256) {
         uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp)));
         return (seed % (maxValue));
+    }
+
+    function mintERC1155Tokens(address token, uint256 tokenId, uint256 amount, address recipient) internal {
+        ICRProject project = ICRProject(token);
+
+        // address minter = project.owner();
+
+        vm.prank(0x333D9A49b6418e5dC188989614f07c89d8389CC8);
+        project.verifyAndMintExPost(recipient, tokenId, amount, 0, 3_124_224_000, 3_124_224_000, "testing");
     }
 }

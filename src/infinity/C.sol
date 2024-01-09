@@ -49,6 +49,7 @@ library C {
     address private constant KLIMA_RETIREMENT_BOND = 0xa595f0d598DaF144e5a7ca91E6D9A5bAA09dDeD0;
     address constant TOUCAN_REGISTRY = 0x263fA1c180889b3a3f46330F32a4a23287E99FC9;
     address constant C3_PROJECT_FACTORY = 0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B;
+    address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d8A;
 
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;
@@ -140,5 +141,9 @@ library C {
 
     function carbonmark() internal pure returns (address) {
         return CARBONMARK;
+    }
+
+    function icrProjectRegistry() internal pure returns (address) {
+        return ICR_PROJECT_REGISTRY;
     }
 }

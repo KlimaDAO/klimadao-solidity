@@ -16,6 +16,7 @@ interface ICarbonmark {
         bytes32 id;
         address account;
         address token;
+        uint256 tokenId;
         uint256 remainingAmount;
         uint256 unitPrice;
     }

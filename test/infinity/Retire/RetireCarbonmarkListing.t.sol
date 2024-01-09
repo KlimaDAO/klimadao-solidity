@@ -76,7 +76,7 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
             ICarbonmark(CARBONMARK).createListing(TCO2, listingAmount, 5_000_000, 1e17, block.timestamp + 3600);
 
         ICarbonmark.CreditListing memory listing =
-            ICarbonmark.CreditListing(listingId, address(this), TCO2, listingAmount, 5_000_000);
+            ICarbonmark.CreditListing(listingId, address(this), TCO2, 0, listingAmount, 5_000_000);
 
         retireExactBCT(listing, 5e17);
     }

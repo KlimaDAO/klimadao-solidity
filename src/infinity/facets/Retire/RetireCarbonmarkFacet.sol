@@ -53,6 +53,7 @@ contract RetireCarbonmarkFacet is ReentrancyGuard {
 
         LibRetire.retireReceivedCreditToken(
             listing.token,
+            listing.tokenId,
             retireAmount,
             msg.sender,
             retiringEntityString,
