@@ -17,20 +17,24 @@ import "src/infinity/facets/DiamondLoupeFacet.sol";
 import {OwnershipFacet} from "src/infinity/facets/OwnershipFacet.sol";
 import {RedeemC3PoolFacet} from "src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
 import {RetireC3C3TFacet} from "src/infinity/facets/Bridges/C3/RetireC3C3TFacet.sol";
+import {RetireICRFacet} from "src/infinity/facets/Bridges/ICR/RetireICRFacet.sol";
 import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
 import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
+import {RetireCarbonmarkFacet} from "src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
 import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
+import {ERC1155ReceiverFacet} from "src/infinity/facets/ERC1155ReceiverFacet.sol";
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
 import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
+import {ICRProject} from "./interfaces/ICR.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
-    using Strings for uint;
+    using Strings for uint256;
 
     // Users
     Users users;
@@ -51,6 +55,9 @@ abstract contract TestHelper is Test, HelperContract {
     RetireInfoFacet retireInfoF;
     RetireSourceFacet retireSourceF;
     RetirementQuoter retirementQuoterF;
+    RetireCarbonmarkFacet retireCarbonmarkF;
+    RetireICRFacet retireICRF;
+    ERC1155ReceiverFacet erc1155ReceiverF;
 
     function setupInfinity() internal returns (address) {
         //deploy facets and init contract
@@ -188,52 +195,33 @@ abstract contract TestHelper is Test, HelperContract {
         vm.startPrank(ownerF.owner());
 
         //deploy facets and init contract
-        c3RedeemF = new RedeemC3PoolFacet();
-        toucanRedeemF = new RedeemToucanPoolFacet();
-        retirementQuoterF = new RetirementQuoter();
-        retireCarbonF = new RetireCarbonFacet();
-        retireSourceF = new RetireSourceFacet();
-
+        // c3RedeemF = new RedeemC3PoolFacet();
+        // toucanRedeemF = new RedeemToucanPoolFacet();
+        // retirementQuoterF = new RetirementQuoter();
+        // retireCarbonF = new RetireCarbonFacet();
+        // retireSourceF = new RetireSourceFacet();
+        // retireCarbonmarkF = new RetireCarbonmarkFacet();
+        retireICRF = new RetireICRFacet();
+        erc1155ReceiverF = new ERC1155ReceiverFacet();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](5);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
 
-        // Klima Infinity specific facets
+        // // Klima Infinity specific facets
 
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(c3RedeemF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemC3PoolFacet")
+                facetAddress: address(retireICRF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("RetireICRFacet")
             })
         );
 
         cut[1] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(toucanRedeemF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemToucanPoolFacet")
-            })
-        );
-        cut[2] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retirementQuoterF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetirementQuoter")
-            })
-        );
-        cut[3] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireCarbonFacet")
-            })
-        );
-        cut[4] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireSourceF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireSourceFacet")
+                facetAddress: address(erc1155ReceiverF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("ERC1155ReceiverFacet")
             })
         );
 
@@ -286,18 +274,21 @@ abstract contract TestHelper is Test, HelperContract {
         address owner = IKlimaRetirementBond(retirementBonds).owner();
         address allocator = IKlimaRetirementBond(retirementBonds).allocatorContract();
 
-        vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
+        if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
+            vm.startPrank(IKlimaRetirementBond(retirementBonds).DAO());
 
-        IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
+            IRetirementBondAllocator(allocator).updateMaxReservePercent(500);
 
-        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
+            if (!IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).isReserveManager(allocator)) {
+                IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).queue(3, allocator);
 
-        vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
+                vm.roll(IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).ReserveManagerQueue(allocator));
 
-        IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
+                IKlimaTreasury(IKlimaRetirementBond(retirementBonds).TREASURY()).toggle(3, allocator, address(0));
+            }
 
-        vm.stopPrank();
-
+            vm.stopPrank();
+        }
         vm.startPrank(owner);
 
         IKlimaRetirementBond(retirementBonds).setPoolReference(BCT, vm.envAddress("SUSHI_BCT_LP"));
@@ -329,6 +320,29 @@ abstract contract TestHelper is Test, HelperContract {
         vm.stopPrank();
     }
 
+    function closeRetirementBonds(address retirementBonds) internal {
+        // Assuming mainnet fork testing for the moment
+        address BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
+        address NCT = 0xD838290e877E0188a4A44700463419ED96c16107;
+        address MCO2 = 0xAa7DbD1598251f856C12f63557A4C4397c253Cea;
+        address UBO = 0x2B3eCb0991AF0498ECE9135bcD04013d7993110c;
+        address NBO = 0x6BCa3B77C1909Ce1a4Ba1A20d1103bDe8d222E48;
+
+        address allocator = IKlimaRetirementBond(retirementBonds).allocatorContract();
+
+        address owner = IRetirementBondAllocator(allocator).owner();
+
+        vm.startPrank(owner);
+
+        IRetirementBondAllocator(allocator).closeBonds(BCT);
+        IRetirementBondAllocator(allocator).closeBonds(NCT);
+        IRetirementBondAllocator(allocator).closeBonds(MCO2);
+        IRetirementBondAllocator(allocator).closeBonds(UBO);
+        IRetirementBondAllocator(allocator).closeBonds(NBO);
+
+        vm.stopPrank();
+    }
+
     function maxBondAmount(address token, address allocator) internal returns (uint256 maxAmount) {
         address treasury = vm.envAddress("KLIMA_TREASURY_ADDRESS");
         uint256 maxReserve = IRetirementBondAllocator(allocator).maxReservePercent();
@@ -343,7 +357,7 @@ abstract contract TestHelper is Test, HelperContract {
 
     //////////// EVM Helpers ////////////
 
-    function increaseTime(uint _seconds) internal {
+    function increaseTime(uint256 _seconds) internal {
         vm.warp(block.timestamp + _seconds);
     }
 
@@ -355,8 +369,17 @@ abstract contract TestHelper is Test, HelperContract {
 
     //////////// Other Helpers ////////////
 
-    function randomish(uint maxValue) internal view returns (uint) {
-        uint seed = uint(keccak256(abi.encodePacked(block.timestamp)));
+    function randomish(uint256 maxValue) internal view returns (uint256) {
+        uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp)));
         return (seed % (maxValue));
+    }
+
+    function mintERC1155Tokens(address token, uint256 tokenId, uint256 amount, address recipient) internal {
+        ICRProject project = ICRProject(token);
+
+        // address minter = project.owner();
+
+        vm.prank(0x333D9A49b6418e5dC188989614f07c89d8389CC8);
+        project.verifyAndMintExPost(recipient, tokenId, amount, 0, 3_124_224_000, 3_124_224_000, "testing");
     }
 }

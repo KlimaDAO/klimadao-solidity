@@ -4,6 +4,7 @@ pragma solidity ^0.8.16;
 import "../LibRetire.sol";
 import "../Token/LibTransfer.sol";
 import "../../interfaces/IC3.sol";
+import "../../C.sol";
 
 import "lib/forge-std/src/console.sol";
 
@@ -257,5 +258,9 @@ library LibC3Carbon {
             LibTransfer.sendToken(IERC20(projectTokens[i]), redeemedAmounts[i], msg.sender, toMode);
         }
         return redeemedAmounts;
+    }
+
+    function isValid(address token) internal returns (bool) {
+        return IC3ProjectFactory(C.c3ProjectFactory()).isTokenExists(token);
     }
 }

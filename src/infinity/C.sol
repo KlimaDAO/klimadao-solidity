@@ -8,7 +8,7 @@ pragma solidity ^0.8.0;
 
 library C {
     // Chain
-    uint private constant CHAIN_ID = 137; // Polygon
+    uint256 private constant CHAIN_ID = 137; // Polygon
 
     // Klima Protocol Contracts
     address private constant KLIMA = 0x4e78011Ce80ee02d2c3e649Fb657E45898257815;
@@ -27,6 +27,9 @@ library C {
     address private constant SUSHI_BENTO = 0x0319000133d3AdA02600f0875d2cf03D442C3367;
     address private constant SUSHI_TRIDENT_POLYGON = 0xc5017BE80b4446988e8686168396289a9A62668E;
 
+    // Marketplace contracts
+    address private constant CARBONMARK = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821;
+
     /* Carbon Pools */
     // Toucan
     address private constant BCT = 0x2F800Db0fdb5223b3C3f354886d907A671414A7F;
@@ -44,6 +47,9 @@ library C {
     address private constant MOSS_CARBON_CHAIN = 0xeDAEFCf60e12Bd331c092341D5b3d8901C1c05A8;
     address private constant KLIMA_CARBON_RETIREMENTS = 0xac298CD34559B9AcfaedeA8344a977eceff1C0Fd;
     address private constant KLIMA_RETIREMENT_BOND = 0xa595f0d598DaF144e5a7ca91E6D9A5bAA09dDeD0;
+    address constant TOUCAN_REGISTRY = 0x263fA1c180889b3a3f46330F32a4a23287E99FC9;
+    address constant C3_PROJECT_FACTORY = 0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B;
+    address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d8A;
 
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;
@@ -123,5 +129,21 @@ library C {
 
     function klimaRetirementBond() internal pure returns (address) {
         return KLIMA_RETIREMENT_BOND;
+    }
+
+    function toucanRegistry() internal pure returns (address) {
+        return TOUCAN_REGISTRY;
+    }
+
+    function c3ProjectFactory() internal pure returns (address) {
+        return C3_PROJECT_FACTORY;
+    }
+
+    function carbonmark() internal pure returns (address) {
+        return CARBONMARK;
+    }
+
+    function icrProjectRegistry() internal pure returns (address) {
+        return ICR_PROJECT_REGISTRY;
     }
 }

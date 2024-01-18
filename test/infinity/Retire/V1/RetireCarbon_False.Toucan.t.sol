@@ -1,31 +1,34 @@
 pragma solidity ^0.8.16;
 
-import {RetireSourceFacet} from "../../../src/infinity/facets/Retire/RetireSourceFacet.sol";
-import {RetirementQuoter} from "../../../src/infinity/facets/RetirementQuoter.sol";
-import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
-import {LibKlima} from "../../../src/infinity/libraries/LibKlima.sol";
-import {LibToucanCarbon} from "../../../src/infinity/libraries/Bridges/LibToucanCarbon.sol";
-import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
-import {IToucanPool} from "../../../src/infinity/interfaces/IToucan.sol";
+import {RetireSourceFacet} from "../../../../src/infinity/facets/Retire/RetireSourceFacet.sol";
+import {RetirementQuoter} from "../../../../src/infinity/facets/RetirementQuoter.sol";
+import {LibRetire} from "../../../../src/infinity/libraries/LibRetire.sol";
+import {LibKlima} from "../../../../src/infinity/libraries/LibKlima.sol";
+import {LibToucanCarbon} from "../../../../src/infinity/libraries/Bridges/LibToucanCarbon.sol";
+import {LibTransfer} from "../../../../src/infinity/libraries/Token/LibTransfer.sol";
+import {IToucanPool} from "../../../../src/infinity/interfaces/IToucan.sol";
+import {KlimaRetirementAggregator} from "../../../../src/retirement_v1/KlimaRetirementAggregator.sol";
 
-import "../TestHelper.sol";
-import "../../helpers/AssertionHelper.sol";
+import "../../TestHelper.sol";
+import "../../../helpers/AssertionHelper.sol";
 
-import {console2} from "../../../lib/forge-std/src/console2.sol";
+import {console2} from "../../../../lib/forge-std/src/console2.sol";
 
-contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
+contract retireCarbonFalseToucan is TestHelper, AssertionHelper {
     RetireSourceFacet retireSourceFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
+    KlimaRetirementAggregator aggregatorV1;
 
     // Retirement details
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
-    string entity = "Test Entity";
+    string entity = "KlimaDAO Retirement Aggregator";
 
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
+    address aggregatorV1Address = vm.envAddress("RETIREMENT_V1_ADDRESS");
     address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
     address SUSHI_BENTO = vm.envAddress("SUSHI_BENTO");
 
@@ -46,6 +49,7 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         retireSourceFacet = RetireSourceFacet(diamond);
         quoterFacet = RetirementQuoter(diamond);
         constantsFacet = ConstantsGetter(diamond);
+        aggregatorV1 = KlimaRetirementAggregator(aggregatorV1Address);
 
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
@@ -65,43 +69,43 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_BCT(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_BCT_BCT(uint256 retireAmount) public {
         retireExactSource(BCT, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_USDC(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_BCT_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_KLIMA(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_BCT_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_SKLIMA(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_BCT_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_BCT_WSKLIMA(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_BCT_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_NCT(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_NCT_NCT(uint256 retireAmount) public {
         retireExactSource(NCT, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_USDC(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_NCT_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_KLIMA(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_NCT_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_SKLIMA(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_NCT_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NCT_WSKLIMA(uint256 retireAmount) public {
+    function test_infinity_v1_retireCarbon_False_NCT_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, NCT, retireAmount);
     }
 
@@ -115,15 +119,16 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
             sourceTarget = KLIMA_TREASURY;
         } else if (sourceToken == KLIMA || sourceToken == SKLIMA) {
             sourceTarget = STAKING;
+            vm.assume(sourceAmount < IERC20(KLIMA).balanceOf(STAKING));
         } else if (sourceToken == WSKLIMA) {
             vm.assume(sourceAmount > LibKlima.toWrappedAmount(1e6));
             sourceTarget = WSKLIMA_HOLDER;
         }
-        if (sourceToken == SKLIMA) vm.assume(sourceAmount <= IERC20(KLIMA).balanceOf(STAKING));
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
+
+        vm.assume(sourceAmount < IERC20(sourceToken).balanceOf(sourceTarget));
 
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
+        IERC20(sourceToken).approve(aggregatorV1Address, sourceAmount);
     }
 
     function retireExactSource(address sourceToken, address poolToken, uint256 sourceAmount) public {
@@ -142,35 +147,21 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
 
         if (sourceAmount == 0) {
             vm.expectRevert();
-            retireSourceFacet.retireExactSourceDefault(
-                sourceToken,
-                poolToken,
-                sourceAmount,
-                entity,
-                beneficiaryAddress,
-                beneficiary,
-                message,
-                LibTransfer.From.EXTERNAL
+            aggregatorV1.retireCarbon(
+                sourceToken, poolToken, sourceAmount, false, beneficiaryAddress, beneficiary, message
             );
         } else {
-            uint256 retirementIndex = retireSourceFacet.retireExactSourceDefault(
-                sourceToken,
-                poolToken,
-                sourceAmount,
-                entity,
-                beneficiaryAddress,
-                beneficiary,
-                message,
-                LibTransfer.From.EXTERNAL
+            aggregatorV1.retireCarbon(
+                sourceToken, poolToken, sourceAmount, false, beneficiaryAddress, beneficiary, message
             );
 
             // No tokens left in contract
             assertZeroTokenBalance(sourceToken, diamond);
+            assertZeroTokenBalance(sourceToken, aggregatorV1Address);
             assertZeroTokenBalance(poolToken, diamond);
+            assertZeroTokenBalance(poolToken, aggregatorV1Address);
             assertZeroTokenBalance(projectToken, diamond);
-
-            // Return value matches
-            assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), retirementIndex);
+            assertZeroTokenBalance(projectToken, aggregatorV1Address);
 
             // Account state values updated
             assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + 1);
