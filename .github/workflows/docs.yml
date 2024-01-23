@@ -1,0 +1,47 @@
+name: Build and Deploy Forge Docs
+
+on:
+  # Runs on pushes targeting the 'forge-docs' branch
+  push:
+    branches: ["forge-docs"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Foundry project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      - name: Run Forge doc
+        run: |
+          forge doc
+        id: doc
+
+      - name: Deploy GitHub Pages site
+        uses: actions/deploy-pages@v4.0.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: ./docs/book

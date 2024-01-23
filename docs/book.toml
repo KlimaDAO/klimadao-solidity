@@ -8,16 +8,14 @@ title = "KlimaDAO solidity reference documentation"
 [output.html]
 additional-css = ["book.css"]
 additional-js = ["solidity.min.js"]
-#theme = "coal"
 default-theme = "coal"
-preferred-dark-theme = "coal"
 git-repository-url = "https://github.com/KlimaDAO/klimadao-solidity"
 no-section-label = true
+preferred-dark-theme = "coal"
 
 [output.html.fold]
 enable = true
 level = 1
-
 
 [preprocessor.custom]
 command = "python3 ./docs/preprocess_summary.py"
