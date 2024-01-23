@@ -22,7 +22,6 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
     address diamond = vm.envAddress("INFINITY_ADDRESS");
     address SUSHI_LP = vm.envAddress("SUSHI_BCT_LP");
 
-
     // Addresses pulled from current diamond constants
     address USDC;
     address KLIMA;
@@ -30,7 +29,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
 
     // Other static values for fee calcs
     uint256 feeDivider = 10_000;
-    uint256 bctRedeemFee = 2_500;
+    uint256 bctRedeemFee = 2500;
     uint256 infinityFee = 100;
 
     function setUp() public {
@@ -44,10 +43,11 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
+        closeRetirementBonds(constantsFacet.klimaRetirementBond());
         // fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retirementQuoter_defaultRetire_noBonds_USDC(uint amount) public {
+    function test_infinity_retirementQuoter_defaultRetire_noBonds_USDC(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
         // Account for fees
@@ -59,7 +59,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assertEq(swapResult, retireResult);
     }
 
-    function test_infinity_retirementQuoter_defaultRetire_noBonds_KLIMA(uint amount) public {
+    function test_infinity_retirementQuoter_defaultRetire_noBonds_KLIMA(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
         // Account for fees
@@ -71,7 +71,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assertEq(swapResult, retireResult);
     }
 
-    function test_infinity_retirementQuoter_defaultRetire_withBonds_USDC(uint amount) public {
+    function test_infinity_retirementQuoter_defaultRetire_withBonds_USDC(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
 
@@ -84,7 +84,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assert(swapResult >= retireResult);
     }
 
-    function test_infinity_retirementQuoter_defaultRetire_withBonds_KLIMA(uint amount) public {
+    function test_infinity_retirementQuoter_defaultRetire_withBonds_KLIMA(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
 
@@ -97,11 +97,12 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assert(swapResult >= retireResult);
     }
 
-    function test_infinity_retirementQuoter_specificRetire_noBonds_USDC(uint amount) public {
+    function test_infinity_retirementQuoter_specificRetire_noBonds_USDC(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
         // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider) + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
+            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(USDC, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(USDC, BCT, amount);
@@ -109,11 +110,12 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assertEq(swapResult, retireResult);
     }
 
-    function test_infinity_retirementQuoter_specificRetire_noBonds_KLIMA(uint amount) public {
+    function test_infinity_retirementQuoter_specificRetire_noBonds_KLIMA(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
         // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider) + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
+            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(KLIMA, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(KLIMA, BCT, amount);
@@ -121,12 +123,13 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assertEq(swapResult, retireResult);
     }
 
-    function test_infinity_retirementQuoter_specificRetire_withBonds_USDC(uint amount) public {
+    function test_infinity_retirementQuoter_specificRetire_withBonds_USDC(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
 
         // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider) + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
+            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(USDC, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(USDC, BCT, amount);
@@ -134,12 +137,13 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         assert(swapResult >= retireResult);
     }
 
-    function test_infinity_retirementQuoter_specificRetire_withBonds_KLIMA(uint amount) public {
+    function test_infinity_retirementQuoter_specificRetire_withBonds_KLIMA(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
-        
+
         // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider) + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
+            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(KLIMA, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(KLIMA, BCT, amount);

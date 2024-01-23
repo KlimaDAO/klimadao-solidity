@@ -12,6 +12,7 @@ import {LibMeta} from "./LibMeta.sol";
 import "./Bridges/LibToucanCarbon.sol";
 import "./Bridges/LibMossCarbon.sol";
 import "./Bridges/LibC3Carbon.sol";
+import "./Bridges/LibICRCarbon.sol";
 import "./Token/LibTransfer.sol";
 import "./TokenSwap/LibSwap.sol";
 import "../interfaces/IKlimaInfinity.sol";
@@ -25,7 +26,16 @@ library LibRetire {
     enum CarbonBridge {
         TOUCAN,
         MOSS,
-        C3
+        C3,
+        ICR
+    }
+
+    struct RetireDetails {
+        address retiringAddress;
+        string retiringEntityString;
+        address beneficiaryAddress;
+        string beneficiaryString;
+        string retirementMessage;
     }
 
     /* ========== Default Redemption Retirements ========== */
@@ -41,7 +51,7 @@ library LibRetire {
      */
     function retireReceivedCarbon(
         address poolToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
@@ -98,13 +108,13 @@ library LibRetire {
     function retireReceivedExactCarbonSpecific(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage
-    ) internal returns (uint redeemedAmount) {
+    ) internal returns (uint256 redeemedAmount) {
         AppStorage storage s = LibAppStorage.diamondStorage();
         require(
             s.poolBridge[poolToken] == CarbonBridge.TOUCAN || s.poolBridge[poolToken] == CarbonBridge.C3,
@@ -141,6 +151,69 @@ library LibRetire {
         }
     }
 
+    /* ========== Credit Token Direct Retirements ========== */
+
+    /**
+     * @notice                     Retire received carbon based on the bridge of the provided pool tokens using default redemption
+     * @param creditToken          Pool token used to retire
+     * @param amount               The amount of carbon to retire
+     * @param retiringEntityString String description of the retiring entity
+     * @param beneficiaryAddress   0x address for the beneficiary
+     * @param beneficiaryString    String description of the beneficiary
+     * @param retirementMessage    String message for this specific retirement
+     */
+    function retireReceivedCreditToken(
+        address creditToken,
+        uint256 tokenId,
+        uint256 amount,
+        address retiringAddress,
+        string memory retiringEntityString,
+        address beneficiaryAddress,
+        string memory beneficiaryString,
+        string memory retirementMessage
+    ) internal {
+        if (LibToucanCarbon.isValid(creditToken)) {
+            LibToucanCarbon.retireTCO2(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                amount,
+                retiringAddress,
+                retiringEntityString,
+                beneficiaryAddress,
+                beneficiaryString,
+                retirementMessage
+            );
+        } else if (LibC3Carbon.isValid(creditToken)) {
+            LibC3Carbon.retireC3T(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                amount,
+                retiringAddress,
+                retiringEntityString,
+                beneficiaryAddress,
+                beneficiaryString,
+                retirementMessage
+            );
+        } else if (LibICRCarbon.isValid(creditToken)) {
+            RetireDetails memory details;
+
+            details.retiringAddress = retiringAddress;
+            details.retiringEntityString = retiringEntityString;
+            details.beneficiaryAddress = beneficiaryAddress;
+            details.beneficiaryString = beneficiaryString;
+            details.retirementMessage = retirementMessage;
+
+            // Retire the carbon
+            LibICRCarbon.retireICC(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                tokenId,
+                amount,
+                details
+            );
+        }
+    }
+
     /**
      * @notice                     Additional function to handle the differences in wanting to fully retire x pool tokens specifically
      * @param poolToken            Pool token used to retire
@@ -155,13 +228,13 @@ library LibRetire {
     function retireReceivedCarbonSpecificFromSource(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage
-    ) internal returns (uint redeemedAmount) {
+    ) internal returns (uint256 redeemedAmount) {
         AppStorage storage s = LibAppStorage.diamondStorage();
         require(
             s.poolBridge[poolToken] == CarbonBridge.TOUCAN || s.poolBridge[poolToken] == CarbonBridge.C3,
@@ -205,7 +278,7 @@ library LibRetire {
      * @param retireAmount      Pool token used to retire
      * @return totalCarbon      Total pool token needed
      */
-    function getTotalCarbon(uint retireAmount) internal view returns (uint totalCarbon) {
+    function getTotalCarbon(uint256 retireAmount) internal view returns (uint256 totalCarbon) {
         return retireAmount + getFee(retireAmount);
     }
 
@@ -215,7 +288,11 @@ library LibRetire {
      * @param retireAmount      Amount of carbon wanting to retire
      * @return totalCarbon      Total pool token needed
      */
-    function getTotalCarbonSpecific(address poolToken, uint retireAmount) internal view returns (uint totalCarbon) {
+    function getTotalCarbonSpecific(address poolToken, uint256 retireAmount)
+        internal
+        view
+        returns (uint256 totalCarbon)
+    {
         // This is for exact carbon retirements
         AppStorage storage s = LibAppStorage.diamondStorage();
 
@@ -233,7 +310,7 @@ library LibRetire {
      * @param carbonAmount      Amount being retired
      * @return fee              Total fee charged
      */
-    function getFee(uint carbonAmount) internal view returns (uint fee) {
+    function getFee(uint256 carbonAmount) internal view returns (uint256 fee) {
         AppStorage storage s = LibAppStorage.diamondStorage();
         fee = (carbonAmount * s.fee) / 100_000;
     }
@@ -250,14 +327,14 @@ library LibRetire {
     function saveRetirementDetails(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage
     ) internal {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
-        (uint currentRetirementIndex,,) =
+        (uint256 currentRetirementIndex,,) =
             IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(beneficiaryAddress);
 
         // Save the base details of the retirement
@@ -272,28 +349,28 @@ library LibRetire {
 
     /* ========== Account Getters ========== */
 
-    function getTotalRetirements(address account) internal view returns (uint totalRetirements) {
+    function getTotalRetirements(address account) internal view returns (uint256 totalRetirements) {
         (totalRetirements,,) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
     }
 
-    function getTotalCarbonRetired(address account) internal view returns (uint totalCarbonRetired) {
+    function getTotalCarbonRetired(address account) internal view returns (uint256 totalCarbonRetired) {
         (, totalCarbonRetired,) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
     }
 
-    function getTotalPoolRetired(address account, address poolToken) internal view returns (uint totalPoolRetired) {
+    function getTotalPoolRetired(address account, address poolToken) internal view returns (uint256 totalPoolRetired) {
         return IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementPoolInfo(account, poolToken);
     }
 
-    function getTotalProjectRetired(address account, address projectToken) internal view returns (uint) {
+    function getTotalProjectRetired(address account, address projectToken) internal view returns (uint256) {
         AppStorage storage s = LibAppStorage.diamondStorage();
         return s.a[account].totalProjectRetired[projectToken];
     }
 
-    function getTotalRewardsClaimed(address account) internal view returns (uint totalClaimed) {
+    function getTotalRewardsClaimed(address account) internal view returns (uint256 totalClaimed) {
         (,, totalClaimed) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
     }
 
-    function getRetirementDetails(address account, uint retirementIndex)
+    function getRetirementDetails(address account, uint256 retirementIndex)
         internal
         view
         returns (
@@ -302,7 +379,7 @@ library LibRetire {
             address beneficiaryAddress,
             string memory beneficiary,
             string memory retirementMessage,
-            uint amount
+            uint256 amount
         )
     {
         (poolTokenAddress, amount, beneficiary, retirementMessage) =

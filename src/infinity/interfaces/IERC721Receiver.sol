@@ -18,7 +18,7 @@ interface IERC721Receiver {
      *
      * The selector can be obtained in Solidity with `IERC721Receiver.onERC721Received.selector`.
      */
-    function onERC721Received(address operator, address from, uint tokenId, bytes calldata data)
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data)
         external
         returns (bytes4);
 }

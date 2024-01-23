@@ -255,6 +255,60 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "projectToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "retiringEntityString",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "beneficiaryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "beneficiaryString",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "retirementMessage",
+                "type": "string"
+            },
+            {
+                "internalType": "enum LibTransfer.From",
+                "name": "fromMode",
+                "type": "uint8"
+            }
+        ],
+        "name": "icrRetireExactCarbon",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "retirementIndex",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "sourceToken",
                 "type": "address"
             },
@@ -630,6 +684,84 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "ids",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "values",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "onERC1155BatchReceived",
+        "outputs": [
+            {
+                "internalType": "bytes4",
+                "name": "",
+                "type": "bytes4"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "onERC1155Received",
+        "outputs": [
+            {
+                "internalType": "bytes4",
+                "name": "",
+                "type": "bytes4"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "",
                 "type": "address"
             },
@@ -901,6 +1033,92 @@
             }
         ],
         "name": "retireExactCarbonSpecific",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "retirementIndex",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "id",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "tokenId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "remainingAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "unitPrice",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct ICarbonmark.CreditListing",
+                "name": "listing",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxAmountIn",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "retireAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "retiringEntityString",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "beneficiaryAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "beneficiaryString",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "retirementMessage",
+                "type": "string"
+            },
+            {
+                "internalType": "enum LibTransfer.From",
+                "name": "fromMode",
+                "type": "uint8"
+            }
+        ],
+        "name": "retireCarbonmarkListing",
         "outputs": [
             {
                 "internalType": "uint256",

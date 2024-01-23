@@ -271,4 +271,8 @@ library LibToucanCarbon {
         }
         return redeemedAmounts;
     }
+
+    function isValid(address token) internal returns (bool) {
+        return IToucanContractRegistry(C.toucanRegistry()).isValidERC20(token);
+    }
 }

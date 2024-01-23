@@ -35,3 +35,7 @@ interface IToucanCarbonOffsets {
         uint amount
     ) external;
 }
+
+interface IToucanContractRegistry {
+    function isValidERC20(address erc20) external returns (bool);
+}
