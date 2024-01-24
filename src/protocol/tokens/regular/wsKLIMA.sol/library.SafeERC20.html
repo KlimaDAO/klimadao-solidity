@@ -178,7 +178,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="safeerc20"><a class="header" href="#safeerc20">SafeERC20</a></h1>
-<p><a href="https://github.com/KlimaDAO/klimadao-solidity/blob/d4e134157b4d504544c62a707adfa480baf68558/src/protocol/tokens/regular/wsKLIMA.sol">Git Source</a></p>
+<p><a href="https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/protocol/tokens/regular/wsKLIMA.sol">Git Source</a></p>
 <p><em>Wrappers around ERC20 operations that throw on failure (when the token
 contract returns false). Tokens that return no value (and instead revert or
 throw on failure) are also supported, non-reverting calls are assumed to be
@@ -194,7 +194,7 @@ which allows you to call the safe operations as <code>token.safeTransfer(...)</c
 </code></pre>
 <h3 id="safeapprove"><a class="header" href="#safeapprove">safeApprove</a></h3>
 <p><em>Deprecated. This function has issues similar to the ones found in
-<a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#approve">IERC20-approve</a>, and its usage is discouraged.
+<a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#approve">IERC20-approve</a>, and its usage is discouraged.
 Whenever possible, use {safeIncreaseAllowance} and
 {safeDecreaseAllowance} instead.</em></p>
 <pre><code class="language-solidity">function safeApprove(IERC20 token, address spender, uint256 value) internal;

@@ -178,7 +178,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="erc20"><a class="header" href="#erc20">ERC20</a></h1>
-<p><a href="https://github.com/KlimaDAO/klimadao-solidity/blob/d4e134157b4d504544c62a707adfa480baf68558/src/protocol/tokens/regular/wsKLIMA.sol">Git Source</a></p>
+<p><a href="https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/protocol/tokens/regular/wsKLIMA.sol">Git Source</a></p>
 <p><strong>Inherits:</strong>
 <a href="/src/protocol/tokens/regular/sKlimaToken.sol/interface.IERC20.html">IERC20</a></p>
 <p><em>Implementation of the {IERC20} interface.
@@ -248,15 +248,15 @@ no way affects any of the arithmetic of the contract, including
 <pre><code class="language-solidity">function decimals() public view returns (uint8);
 </code></pre>
 <h3 id="totalsupply"><a class="header" href="#totalsupply">totalSupply</a></h3>
-<p><em>See <a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#totalsupply">IERC20-totalSupply</a>.</em></p>
+<p><em>See <a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#totalsupply">IERC20-totalSupply</a>.</em></p>
 <pre><code class="language-solidity">function totalSupply() public view override returns (uint256);
 </code></pre>
 <h3 id="balanceof"><a class="header" href="#balanceof">balanceOf</a></h3>
-<p><em>See <a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#balanceof">IERC20-balanceOf</a>.</em></p>
+<p><em>See <a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#balanceof">IERC20-balanceOf</a>.</em></p>
 <pre><code class="language-solidity">function balanceOf(address account) public view override returns (uint256);
 </code></pre>
 <h3 id="transfer"><a class="header" href="#transfer">transfer</a></h3>
-<p>*See <a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#transfer">IERC20-transfer</a>.
+<p>*See <a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#transfer">IERC20-transfer</a>.
 Requirements:</p>
 <ul>
 <li><code>recipient</code> cannot be the zero address.</li>
@@ -265,11 +265,11 @@ Requirements:</p>
 <pre><code class="language-solidity">function transfer(address recipient, uint256 amount) public virtual override returns (bool);
 </code></pre>
 <h3 id="allowance"><a class="header" href="#allowance">allowance</a></h3>
-<p><em>See <a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#allowance">IERC20-allowance</a>.</em></p>
+<p><em>See <a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#allowance">IERC20-allowance</a>.</em></p>
 <pre><code class="language-solidity">function allowance(address owner, address spender) public view virtual override returns (uint256);
 </code></pre>
 <h3 id="approve"><a class="header" href="#approve">approve</a></h3>
-<p>*See <a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#approve">IERC20-approve</a>.
+<p>*See <a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#approve">IERC20-approve</a>.
 Requirements:</p>
 <ul>
 <li><code>spender</code> cannot be the zero address.*</li>
@@ -277,7 +277,7 @@ Requirements:</p>
 <pre><code class="language-solidity">function approve(address spender, uint256 amount) public virtual override returns (bool);
 </code></pre>
 <h3 id="transferfrom"><a class="header" href="#transferfrom">transferFrom</a></h3>
-<p>*See <a href="/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC20.html#transferfrom">IERC20-transferFrom</a>.
+<p>*See <a href="/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC20.html#transferfrom">IERC20-transferFrom</a>.
 Emits an {Approval} event indicating the updated allowance. This is not
 required by the EIP. See the note at the beginning of {ERC20};
 Requirements:</p>
