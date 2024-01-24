@@ -1,5 +1,5 @@
 # PreKlimaTokenUpgradeable
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/upgradeable/PreKlimaTokenUpgradeable.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/upgradeable/PreKlimaTokenUpgradeable.sol)
 
 **Inherits:**
 ERC20PresetFixedSupplyUpgradeable, OwnableUpgradeable
@@ -109,13 +109,13 @@ function removeApprovedSellers(address[] calldata disapprovedSellers_) external 
 
 
 ```solidity
-function _beforeTokenTransfer(address from_, address to_, uint amount_) internal override;
+function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal override;
 ```
 
 ### mint
 
 
 ```solidity
-function mint(address recipient_, uint amount_) public virtual onlyOwner;
+function mint(address recipient_, uint256 amount_) public virtual onlyOwner;
 ```
 

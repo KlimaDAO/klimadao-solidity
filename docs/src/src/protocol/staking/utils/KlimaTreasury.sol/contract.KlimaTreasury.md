@@ -1,5 +1,5 @@
 # KlimaTreasury
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/utils/KlimaTreasury.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/utils/KlimaTreasury.sol)
 
 **Inherits:**
 [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
@@ -16,7 +16,7 @@ address public KLIMA;
 ### blocksNeededForQueue
 
 ```solidity
-uint public blocksNeededForQueue;
+uint256 public blocksNeededForQueue;
 ```
 
 
@@ -37,7 +37,7 @@ mapping(address => bool) public isReserveToken;
 ### reserveTokenQueue
 
 ```solidity
-mapping(address => uint) public reserveTokenQueue;
+mapping(address => uint256) public reserveTokenQueue;
 ```
 
 
@@ -58,7 +58,7 @@ mapping(address => bool) public isReserveDepositor;
 ### reserveDepositorQueue
 
 ```solidity
-mapping(address => uint) public reserveDepositorQueue;
+mapping(address => uint256) public reserveDepositorQueue;
 ```
 
 
@@ -79,7 +79,7 @@ mapping(address => bool) public isReserveSpender;
 ### reserveSpenderQueue
 
 ```solidity
-mapping(address => uint) public reserveSpenderQueue;
+mapping(address => uint256) public reserveSpenderQueue;
 ```
 
 
@@ -100,7 +100,7 @@ mapping(address => bool) public isLiquidityToken;
 ### LiquidityTokenQueue
 
 ```solidity
-mapping(address => uint) public LiquidityTokenQueue;
+mapping(address => uint256) public LiquidityTokenQueue;
 ```
 
 
@@ -121,7 +121,7 @@ mapping(address => bool) public isLiquidityDepositor;
 ### LiquidityDepositorQueue
 
 ```solidity
-mapping(address => uint) public LiquidityDepositorQueue;
+mapping(address => uint256) public LiquidityDepositorQueue;
 ```
 
 
@@ -149,7 +149,7 @@ mapping(address => bool) public isReserveManager;
 ### ReserveManagerQueue
 
 ```solidity
-mapping(address => uint) public ReserveManagerQueue;
+mapping(address => uint256) public ReserveManagerQueue;
 ```
 
 
@@ -170,7 +170,7 @@ mapping(address => bool) public isLiquidityManager;
 ### LiquidityManagerQueue
 
 ```solidity
-mapping(address => uint) public LiquidityManagerQueue;
+mapping(address => uint256) public LiquidityManagerQueue;
 ```
 
 
@@ -191,14 +191,14 @@ mapping(address => bool) public isDebtor;
 ### debtorQueue
 
 ```solidity
-mapping(address => uint) public debtorQueue;
+mapping(address => uint256) public debtorQueue;
 ```
 
 
 ### debtorBalance
 
 ```solidity
-mapping(address => uint) public debtorBalance;
+mapping(address => uint256) public debtorBalance;
 ```
 
 
@@ -219,7 +219,7 @@ mapping(address => bool) public isRewardManager;
 ### rewardManagerQueue
 
 ```solidity
-mapping(address => uint) public rewardManagerQueue;
+mapping(address => uint256) public rewardManagerQueue;
 ```
 
 
@@ -233,21 +233,21 @@ address public sKLIMA;
 ### sKLIMAQueue
 
 ```solidity
-uint public sKLIMAQueue;
+uint256 public sKLIMAQueue;
 ```
 
 
 ### totalReserves
 
 ```solidity
-uint public totalReserves;
+uint256 public totalReserves;
 ```
 
 
 ### totalDebt
 
 ```solidity
-uint public totalDebt;
+uint256 public totalDebt;
 ```
 
 
@@ -256,7 +256,7 @@ uint public totalDebt;
 
 
 ```solidity
-constructor(address _KLIMA, address _BCT, uint _blocksNeededForQueue);
+constructor(address _KLIMA, address _BCT, uint256 _blocksNeededForQueue);
 ```
 
 ### deposit
@@ -265,7 +265,7 @@ allow approved address to deposit an asset for KLIMA
 
 
 ```solidity
-function deposit(uint _amount, address _token, uint _profit) external returns (uint send_);
+function deposit(uint256 _amount, address _token, uint256 _profit) external returns (uint256 send_);
 ```
 **Parameters**
 
@@ -288,7 +288,7 @@ allow approved address to burn KLIMA for reserves
 
 
 ```solidity
-function withdraw(uint _amount, address _token) external;
+function withdraw(uint256 _amount, address _token) external;
 ```
 **Parameters**
 
@@ -304,7 +304,7 @@ allow approved address to borrow reserves
 
 
 ```solidity
-function incurDebt(uint _amount, address _token) external;
+function incurDebt(uint256 _amount, address _token) external;
 ```
 **Parameters**
 
@@ -320,7 +320,7 @@ allow approved address to repay borrowed reserves with reserves
 
 
 ```solidity
-function repayDebtWithReserve(uint _amount, address _token) external;
+function repayDebtWithReserve(uint256 _amount, address _token) external;
 ```
 **Parameters**
 
@@ -336,7 +336,7 @@ allow approved address to repay borrowed reserves with KLIMA
 
 
 ```solidity
-function repayDebtWithKLIMA(uint _amount) external;
+function repayDebtWithKLIMA(uint256 _amount) external;
 ```
 **Parameters**
 
@@ -351,7 +351,7 @@ allow approved address to withdraw assets
 
 
 ```solidity
-function manage(address _token, uint _amount) external;
+function manage(address _token, uint256 _amount) external;
 ```
 **Parameters**
 
@@ -367,7 +367,7 @@ send epoch reward to staking contract
 
 
 ```solidity
-function mintRewards(address _recipient, uint _amount) external;
+function mintRewards(address _recipient, uint256 _amount) external;
 ```
 
 ### excessReserves
@@ -376,7 +376,7 @@ returns excess reserves not backing tokens
 
 
 ```solidity
-function excessReserves() public view returns (uint);
+function excessReserves() public view returns (uint256);
 ```
 **Returns**
 
@@ -402,7 +402,7 @@ returns KLIMA valuation of asset
 
 
 ```solidity
-function valueOf(address _token, uint _amount) public view returns (uint value_);
+function valueOf(address _token, uint256 _amount) public view returns (uint256 value_);
 ```
 **Parameters**
 
@@ -470,7 +470,7 @@ checks requirements and returns altered structs
 
 ```solidity
 function requirements(
-    mapping(address => uint) storage queue_,
+    mapping(address => uint256) storage queue_,
     mapping(address => bool) storage status_,
     address _address
 ) internal view returns (bool);
@@ -516,49 +516,49 @@ function listContains(address[] storage _list, address _token) internal view ret
 ### Deposit
 
 ```solidity
-event Deposit(address indexed token, uint amount, uint value);
+event Deposit(address indexed token, uint256 amount, uint256 value);
 ```
 
 ### Withdrawal
 
 ```solidity
-event Withdrawal(address indexed token, uint amount, uint value);
+event Withdrawal(address indexed token, uint256 amount, uint256 value);
 ```
 
 ### CreateDebt
 
 ```solidity
-event CreateDebt(address indexed debtor, address indexed token, uint amount, uint value);
+event CreateDebt(address indexed debtor, address indexed token, uint256 amount, uint256 value);
 ```
 
 ### RepayDebt
 
 ```solidity
-event RepayDebt(address indexed debtor, address indexed token, uint amount, uint value);
+event RepayDebt(address indexed debtor, address indexed token, uint256 amount, uint256 value);
 ```
 
 ### ReservesManaged
 
 ```solidity
-event ReservesManaged(address indexed token, uint amount);
+event ReservesManaged(address indexed token, uint256 amount);
 ```
 
 ### ReservesUpdated
 
 ```solidity
-event ReservesUpdated(uint indexed totalReserves);
+event ReservesUpdated(uint256 indexed totalReserves);
 ```
 
 ### ReservesAudited
 
 ```solidity
-event ReservesAudited(uint indexed totalReserves);
+event ReservesAudited(uint256 indexed totalReserves);
 ```
 
 ### RewardsMinted
 
 ```solidity
-event RewardsMinted(address indexed caller, address indexed recipient, uint amount);
+event RewardsMinted(address indexed caller, address indexed recipient, uint256 amount);
 ```
 
 ### ChangeQueued

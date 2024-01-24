@@ -1,5 +1,5 @@
 # RetirementBondAllocator
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/allocators/RetirementBondAllocator.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/allocators/RetirementBondAllocator.sol)
 
 **Inherits:**
 Ownable2Step
@@ -34,7 +34,7 @@ Maximum value of reserves or Treasury balance to allocate. Set by the DAO. 500 =
 
 
 ```solidity
-uint public maxReservePercent;
+uint256 public maxReservePercent;
 ```
 
 
@@ -43,7 +43,7 @@ Divisor used when calculating percentages.
 
 
 ```solidity
-uint public constant PERCENT_DIVISOR = 10_000;
+uint256 public constant PERCENT_DIVISOR = 10_000;
 ```
 
 
@@ -79,7 +79,7 @@ Funds retirement bonds with a specified amount of tokens.
 
 
 ```solidity
-function fundBonds(address token, uint amount) external onlyOwner;
+function fundBonds(address token, uint256 amount) external onlyOwner;
 ```
 **Parameters**
 
@@ -125,7 +125,7 @@ function updateBondContract(address _bondContract) external onlyOwner;
 
 
 ```solidity
-function updateMaxReservePercent(uint _maxReservePercent) external onlyDAO;
+function updateMaxReservePercent(uint256 _maxReservePercent) external onlyDAO;
 ```
 **Parameters**
 
@@ -138,6 +138,6 @@ function updateMaxReservePercent(uint _maxReservePercent) external onlyDAO;
 ### MaxPercentUpdated
 
 ```solidity
-event MaxPercentUpdated(uint oldMax, uint newMax);
+event MaxPercentUpdated(uint256 oldMax, uint256 newMax);
 ```
 

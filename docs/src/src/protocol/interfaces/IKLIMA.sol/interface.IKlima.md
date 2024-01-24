@@ -1,5 +1,5 @@
 # IKlima
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/interfaces/IKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/interfaces/IKLIMA.sol)
 
 **Inherits:**
 [IERC20](/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol/interface.IERC20.md)
@@ -10,20 +10,20 @@
 
 
 ```solidity
-function mint(address account_, uint amount_) external;
+function mint(address account_, uint256 amount_) external;
 ```
 
 ### burn
 
 
 ```solidity
-function burn(uint amount) external;
+function burn(uint256 amount) external;
 ```
 
 ### burnFrom
 
 
 ```solidity
-function burnFrom(address account_, uint amount_) external;
+function burnFrom(address account_, uint256 amount_) external;
 ```
 

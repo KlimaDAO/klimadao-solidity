@@ -1,5 +1,5 @@
 # sKLIMAv2
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 **Inherits:**
 [ERC20Permit](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20Permit.md), [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
@@ -30,56 +30,56 @@ Rebase[] public rebases;
 ### INDEX
 
 ```solidity
-uint public INDEX;
+uint256 public INDEX;
 ```
 
 
 ### MAX_UINT256
 
 ```solidity
-uint private constant MAX_UINT256 = ~uint(0);
+uint256 private constant MAX_UINT256 = ~uint256(0);
 ```
 
 
 ### INITIAL_FRAGMENTS_SUPPLY
 
 ```solidity
-uint private constant INITIAL_FRAGMENTS_SUPPLY = 5_000_000 * 10 ** 9;
+uint256 private constant INITIAL_FRAGMENTS_SUPPLY = 5_000_000 * 10 ** 9;
 ```
 
 
 ### TOTAL_GONS
 
 ```solidity
-uint private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_FRAGMENTS_SUPPLY);
+uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_FRAGMENTS_SUPPLY);
 ```
 
 
 ### MAX_SUPPLY
 
 ```solidity
-uint private constant MAX_SUPPLY = ~uint128(0);
+uint256 private constant MAX_SUPPLY = ~uint128(0);
 ```
 
 
 ### _gonsPerFragment
 
 ```solidity
-uint private _gonsPerFragment;
+uint256 private _gonsPerFragment;
 ```
 
 
 ### _gonBalances
 
 ```solidity
-mapping(address => uint) private _gonBalances;
+mapping(address => uint256) private _gonBalances;
 ```
 
 
 ### _allowedValue
 
 ```solidity
-mapping(address => mapping(address => uint)) private _allowedValue;
+mapping(address => mapping(address => uint256)) private _allowedValue;
 ```
 
 
@@ -109,7 +109,7 @@ function initialize(address stakingContract_) external returns (bool);
 
 
 ```solidity
-function setIndex(uint _INDEX) external onlyManager returns (bool);
+function setIndex(uint256 _INDEX) external onlyManager returns (bool);
 ```
 
 ### rebase
@@ -118,7 +118,7 @@ increases sKLIMA supply to increase staking balances relative to profit_
 
 
 ```solidity
-function rebase(uint profit_, uint epoch_) public onlyStakingContract returns (uint);
+function rebase(uint256 profit_, uint256 epoch_) public onlyStakingContract returns (uint256);
 ```
 **Parameters**
 
@@ -140,7 +140,7 @@ emits event with data about rebase
 
 
 ```solidity
-function _storeRebase(uint previousCirculating_, uint profit_, uint epoch_) internal returns (bool);
+function _storeRebase(uint256 previousCirculating_, uint256 profit_, uint256 epoch_) internal returns (bool);
 ```
 **Parameters**
 
@@ -161,97 +161,97 @@ function _storeRebase(uint previousCirculating_, uint profit_, uint epoch_) inte
 
 
 ```solidity
-function balanceOf(address who) public view override returns (uint);
+function balanceOf(address who) public view override returns (uint256);
 ```
 
 ### gonsForBalance
 
 
 ```solidity
-function gonsForBalance(uint amount) public view returns (uint);
+function gonsForBalance(uint256 amount) public view returns (uint256);
 ```
 
 ### balanceForGons
 
 
 ```solidity
-function balanceForGons(uint gons) public view returns (uint);
+function balanceForGons(uint256 gons) public view returns (uint256);
 ```
 
 ### circulatingSupply
 
 
 ```solidity
-function circulatingSupply() public view returns (uint);
+function circulatingSupply() public view returns (uint256);
 ```
 
 ### index
 
 
 ```solidity
-function index() public view returns (uint);
+function index() public view returns (uint256);
 ```
 
 ### transfer
 
 
 ```solidity
-function transfer(address to, uint value) public override returns (bool);
+function transfer(address to, uint256 value) public override returns (bool);
 ```
 
 ### allowance
 
 
 ```solidity
-function allowance(address owner_, address spender) public view override returns (uint);
+function allowance(address owner_, address spender) public view override returns (uint256);
 ```
 
 ### transferFrom
 
 
 ```solidity
-function transferFrom(address from, address to, uint value) public override returns (bool);
+function transferFrom(address from, address to, uint256 value) public override returns (bool);
 ```
 
 ### approve
 
 
 ```solidity
-function approve(address spender, uint value) public override returns (bool);
+function approve(address spender, uint256 value) public override returns (bool);
 ```
 
 ### _approve
 
 
 ```solidity
-function _approve(address owner, address spender, uint value) internal virtual override;
+function _approve(address owner, address spender, uint256 value) internal virtual override;
 ```
 
 ### increaseAllowance
 
 
 ```solidity
-function increaseAllowance(address spender, uint addedValue) public override returns (bool);
+function increaseAllowance(address spender, uint256 addedValue) public override returns (bool);
 ```
 
 ### decreaseAllowance
 
 
 ```solidity
-function decreaseAllowance(address spender, uint subtractedValue) public override returns (bool);
+function decreaseAllowance(address spender, uint256 subtractedValue) public override returns (bool);
 ```
 
 ## Events
 ### LogSupply
 
 ```solidity
-event LogSupply(uint indexed epoch, uint timestamp, uint totalSupply);
+event LogSupply(uint256 indexed epoch, uint256 timestamp, uint256 totalSupply);
 ```
 
 ### LogRebase
 
 ```solidity
-event LogRebase(uint indexed epoch, uint rebase, uint index);
+event LogRebase(uint256 indexed epoch, uint256 rebase, uint256 index);
 ```
 
 ### LogStakingContractUpdated
@@ -265,13 +265,13 @@ event LogStakingContractUpdated(address stakingContract);
 
 ```solidity
 struct Rebase {
-    uint epoch;
-    uint rebase;
-    uint totalStakedBefore;
-    uint totalStakedAfter;
-    uint amountRebased;
-    uint index;
-    uint blockNumberOccured;
+    uint256 epoch;
+    uint256 rebase;
+    uint256 totalStakedBefore;
+    uint256 totalStakedAfter;
+    uint256 amountRebased;
+    uint256 index;
+    uint256 blockNumberOccured;
 }
 ```
 

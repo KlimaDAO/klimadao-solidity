@@ -6,6 +6,7 @@
 - [IC3ProjectToken](IC3ProjectToken.sol/interface.IC3ProjectToken.md)
 - [ICarbonChain](ICarbonChain.sol/interface.ICarbonChain.md)
 - [IKlimaCarbonRetirements](IKlimaCarbonRetirements.sol/interface.IKlimaCarbonRetirements.md)
+- [IKlimaInfinity](IKlimaInfinity.sol/interface.IKlimaInfinity.md)
 - [IKlimaRetirementAggregator](IKlimaRetirementAggregator.sol/interface.IKlimaRetirementAggregator.md)
 - [IRetireBridgeCommon](IRetireBridgeCommon.sol/interface.IRetireBridgeCommon.md)
 - [IRetireC3Carbon](IRetireC3Carbon.sol/interface.IRetireC3Carbon.md)

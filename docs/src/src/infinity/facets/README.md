@@ -6,6 +6,7 @@
 - [DiamondCutFacet](DiamondCutFacet.sol/contract.DiamondCutFacet.md)
 - [DiamondLoupeFacet](DiamondLoupeFacet.sol/contract.DiamondLoupeFacet.md)
 - [DustFacet](DustFacet.sol/contract.DustFacet.md)
+- [ERC1155ReceiverFacet](ERC1155ReceiverFacet.sol/contract.ERC1155ReceiverFacet.md)
 - [ERC721ReceiverFacet](ERC721ReceiverFacet.sol/contract.ERC721ReceiverFacet.md)
 - [MetaTransactionsFacet](MetaTransactionsFacet.sol/contract.MetaTransactionsFacet.md)
 - [OwnershipFacet](OwnershipFacet.sol/contract.OwnershipFacet.md)

@@ -1,5 +1,5 @@
 # RetireC3Carbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/retirement_v1/RetireC3Carbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/retirement_v1/RetireC3Carbon.sol)
 
 **Inherits:**
 Initializable, ContextUpgradeable, OwnableUpgradeable
@@ -13,7 +13,7 @@ feeAmount represents the fee to be bonded for KLIMA. 0.1% increments. 10 = 1%
 
 
 ```solidity
-uint public feeAmount;
+uint256 public feeAmount;
 ```
 
 
@@ -80,7 +80,7 @@ token amount is expected to be held by the caller to use.
 function retireC3(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -111,7 +111,7 @@ retirement details and amounts.
 
 ```solidity
 function _retireCarbon(
-    uint _totalAmount,
+    uint256 _totalAmount,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
     string memory _retirementMessage,
@@ -142,7 +142,7 @@ token amount is expected to be held by the caller to use.
 function retireC3Specific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -176,10 +176,10 @@ initial transfer and swap to the pool token for a specific retirement.
 function _prepareRetireSpecific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _retiree
-) internal returns (uint, uint);
+) internal returns (uint256, uint256);
 ```
 **Parameters**
 
@@ -208,7 +208,7 @@ retirement details and amounts.
 
 ```solidity
 function _retireCarbonSpecific(
-    uint _totalAmount,
+    uint256 _totalAmount,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
     string memory _retirementMessage,
@@ -240,10 +240,10 @@ swaps and then retire the tokens.
 function _transferSourceTokens(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     bool _specificRetire
-) internal returns (uint, uint, uint);
+) internal returns (uint256, uint256, uint256);
 ```
 **Parameters**
 
@@ -262,7 +262,7 @@ Unwraps/unstakes any KLIMA needed to regular KLIMA.
 
 
 ```solidity
-function _stakedToUnstaked(address _klimaType, uint _amountIn) internal returns (uint);
+function _stakedToUnstaked(address _klimaType, uint256 _amountIn) internal returns (uint256);
 ```
 **Parameters**
 
@@ -290,8 +290,8 @@ returns any dust to the initiator.
 function _swapForExactCarbon(
     address _sourceToken,
     address _poolToken,
-    uint _carbonAmount,
-    uint _amountIn,
+    uint256 _carbonAmount,
+    uint256 _amountIn,
     address _retiree
 ) internal;
 ```
@@ -314,7 +314,9 @@ Swaps an exact number of source tokens for carbon tokens.
 
 
 ```solidity
-function _swapExactForCarbon(address _sourceToken, address _poolToken, uint _amountIn) internal returns (uint, uint);
+function _swapExactForCarbon(address _sourceToken, address _poolToken, uint256 _amountIn)
+    internal
+    returns (uint256, uint256);
 ```
 **Parameters**
 
@@ -340,7 +342,8 @@ before transferring back.
 
 
 ```solidity
-function _returnTradeDust(uint[] memory _amounts, address _sourceToken, uint _amountIn, address _retiree) internal;
+function _returnTradeDust(uint256[] memory _amounts, address _sourceToken, uint256 _amountIn, address _retiree)
+    internal;
 ```
 **Parameters**
 
@@ -358,10 +361,10 @@ Gets the fee amount for a carbon pool and returns the value.
 
 
 ```solidity
-function _getSpecificCarbonFee(address _poolToken, uint _poolAmount, bool _amountInCarbon)
+function _getSpecificCarbonFee(address _poolToken, uint256 _poolAmount, bool _amountInCarbon)
     internal
     view
-    returns (uint);
+    returns (uint256);
 ```
 **Parameters**
 
@@ -387,10 +390,10 @@ Also calculates and returns any fee needed in the pool token total.
 
 
 ```solidity
-function getNeededBuyAmount(address _sourceToken, address _poolToken, uint _poolAmount, bool _specificRetire)
+function getNeededBuyAmount(address _sourceToken, address _poolToken, uint256 _poolAmount, bool _specificRetire)
     public
     view
-    returns (uint, uint);
+    returns (uint256, uint256);
 ```
 **Parameters**
 
@@ -444,7 +447,7 @@ Set the fee for the helper
 
 
 ```solidity
-function setFeeAmount(uint _amount) external onlyOwner returns (bool);
+function setFeeAmount(uint256 _amount) external onlyOwner returns (bool);
 ```
 **Parameters**
 
@@ -591,7 +594,7 @@ event C3Retired(
     string retirementMessage,
     address indexed carbonPool,
     address carbonToken,
-    uint retiredAmount
+    uint256 retiredAmount
 );
 ```
 
@@ -624,7 +627,7 @@ event TridentChanged(
 ### FeeUpdated
 
 ```solidity
-event FeeUpdated(uint oldFee, uint newFee);
+event FeeUpdated(uint256 oldFee, uint256 newFee);
 ```
 
 ### MasterAggregatorUpdated

@@ -1,5 +1,5 @@
 # KlimaCirculatingSupplyContract
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/utils/KlimaCirculatingSupplyContract.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/utils/KlimaCirculatingSupplyContract.sol)
 
 
 ## State Variables
@@ -50,14 +50,14 @@ function initialize(address _klima) external returns (bool);
 
 
 ```solidity
-function KLIMACirculatingSupply() external view returns (uint);
+function KLIMACirculatingSupply() external view returns (uint256);
 ```
 
 ### getNonCirculatingKLIMA
 
 
 ```solidity
-function getNonCirculatingKLIMA() public view returns (uint);
+function getNonCirculatingKLIMA() public view returns (uint256);
 ```
 
 ### setNonCirculatingKLIMAAddresses

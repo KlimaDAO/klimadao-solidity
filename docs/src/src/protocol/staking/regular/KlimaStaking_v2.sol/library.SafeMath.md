@@ -1,5 +1,5 @@
 # SafeMath
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/regular/KlimaStaking_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/regular/KlimaStaking_v2.sol)
 
 Submitted for verification at Etherscan.io on 2021-06-12
 
@@ -15,7 +15,7 @@ Requirements:
 
 
 ```solidity
-function add(uint a, uint b) internal pure returns (uint);
+function add(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### sub
@@ -28,7 +28,7 @@ Requirements:
 
 
 ```solidity
-function sub(uint a, uint b) internal pure returns (uint);
+function sub(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### sub
@@ -41,7 +41,7 @@ Requirements:
 
 
 ```solidity
-function sub(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### mul
@@ -54,7 +54,7 @@ Requirements:
 
 
 ```solidity
-function mul(uint a, uint b) internal pure returns (uint);
+function mul(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### div
@@ -69,7 +69,7 @@ Requirements:
 
 
 ```solidity
-function div(uint a, uint b) internal pure returns (uint);
+function div(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### div
@@ -84,6 +84,6 @@ Requirements:
 
 
 ```solidity
-function div(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 

@@ -1,5 +1,5 @@
 # EnumerableSet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/KlimaToken.sol)
 
 
 ## Functions
@@ -40,7 +40,7 @@ function _contains(Set storage set, bytes32 value) private view returns (bool);
 
 
 ```solidity
-function _length(Set storage set) private view returns (uint);
+function _length(Set storage set) private view returns (uint256);
 ```
 
 ### _at
@@ -53,7 +53,7 @@ Requirements:
 
 
 ```solidity
-function _at(Set storage set, uint index) private view returns (bytes32);
+function _at(Set storage set, uint256 index) private view returns (bytes32);
 ```
 
 ### _getValues
@@ -69,7 +69,7 @@ Inserts new value by moving existing value at provided index to end of array and
 
 
 ```solidity
-function _insert(Set storage set_, uint index_, bytes32 valueToInsert_) private returns (bool);
+function _insert(Set storage set_, uint256 index_, bytes32 valueToInsert_) private returns (bool);
 ```
 
 ### add
@@ -109,7 +109,7 @@ function contains(Bytes4Set storage set, bytes4 value) internal view returns (bo
 
 
 ```solidity
-function length(Bytes4Set storage set) internal view returns (uint);
+function length(Bytes4Set storage set) internal view returns (uint256);
 ```
 
 ### at
@@ -122,7 +122,7 @@ Requirements:
 
 
 ```solidity
-function at(Bytes4Set storage set, uint index) internal view returns (bytes4);
+function at(Bytes4Set storage set, uint256 index) internal view returns (bytes4);
 ```
 
 ### getValues
@@ -136,7 +136,7 @@ function getValues(Bytes4Set storage set_) internal view returns (bytes4[] memor
 
 
 ```solidity
-function insert(Bytes4Set storage set_, uint index_, bytes4 valueToInsert_) internal returns (bool);
+function insert(Bytes4Set storage set_, uint256 index_, bytes4 valueToInsert_) internal returns (bool);
 ```
 
 ### add
@@ -176,7 +176,7 @@ function contains(Bytes32Set storage set, bytes32 value) internal view returns (
 
 
 ```solidity
-function length(Bytes32Set storage set) internal view returns (uint);
+function length(Bytes32Set storage set) internal view returns (uint256);
 ```
 
 ### at
@@ -189,7 +189,7 @@ Requirements:
 
 
 ```solidity
-function at(Bytes32Set storage set, uint index) internal view returns (bytes32);
+function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32);
 ```
 
 ### getValues
@@ -203,7 +203,7 @@ function getValues(Bytes32Set storage set_) internal view returns (bytes4[] memo
 
 
 ```solidity
-function insert(Bytes32Set storage set_, uint index_, bytes32 valueToInsert_) internal returns (bool);
+function insert(Bytes32Set storage set_, uint256 index_, bytes32 valueToInsert_) internal returns (bool);
 ```
 
 ### add
@@ -243,7 +243,7 @@ function contains(AddressSet storage set, address value) internal view returns (
 
 
 ```solidity
-function length(AddressSet storage set) internal view returns (uint);
+function length(AddressSet storage set) internal view returns (uint256);
 ```
 
 ### at
@@ -256,7 +256,7 @@ Requirements:
 
 
 ```solidity
-function at(AddressSet storage set, uint index) internal view returns (address);
+function at(AddressSet storage set, uint256 index) internal view returns (address);
 ```
 
 ### getValues
@@ -273,7 +273,7 @@ function getValues(AddressSet storage set_) internal view returns (address[] mem
 
 
 ```solidity
-function insert(AddressSet storage set_, uint index_, address valueToInsert_) internal returns (bool);
+function insert(AddressSet storage set_, uint256 index_, address valueToInsert_) internal returns (bool);
 ```
 
 ### add
@@ -284,7 +284,7 @@ already present.*
 
 
 ```solidity
-function add(UintSet storage set, uint value) internal returns (bool);
+function add(UintSet storage set, uint256 value) internal returns (bool);
 ```
 
 ### remove
@@ -295,7 +295,7 @@ present.*
 
 
 ```solidity
-function remove(UintSet storage set, uint value) internal returns (bool);
+function remove(UintSet storage set, uint256 value) internal returns (bool);
 ```
 
 ### contains
@@ -304,7 +304,7 @@ function remove(UintSet storage set, uint value) internal returns (bool);
 
 
 ```solidity
-function contains(UintSet storage set, uint value) internal view returns (bool);
+function contains(UintSet storage set, uint256 value) internal view returns (bool);
 ```
 
 ### length
@@ -313,7 +313,7 @@ function contains(UintSet storage set, uint value) internal view returns (bool);
 
 
 ```solidity
-function length(UintSet storage set) internal view returns (uint);
+function length(UintSet storage set) internal view returns (uint256);
 ```
 
 ### at
@@ -326,7 +326,7 @@ Requirements:
 
 
 ```solidity
-function at(UintSet storage set, uint index) internal view returns (uint);
+function at(UintSet storage set, uint256 index) internal view returns (uint256);
 ```
 
 ### add
@@ -337,7 +337,7 @@ already present.*
 
 
 ```solidity
-function add(UInt256Set storage set, uint value) internal returns (bool);
+function add(UInt256Set storage set, uint256 value) internal returns (bool);
 ```
 
 ### remove
@@ -348,7 +348,7 @@ present.*
 
 
 ```solidity
-function remove(UInt256Set storage set, uint value) internal returns (bool);
+function remove(UInt256Set storage set, uint256 value) internal returns (bool);
 ```
 
 ### contains
@@ -357,7 +357,7 @@ function remove(UInt256Set storage set, uint value) internal returns (bool);
 
 
 ```solidity
-function contains(UInt256Set storage set, uint value) internal view returns (bool);
+function contains(UInt256Set storage set, uint256 value) internal view returns (bool);
 ```
 
 ### length
@@ -366,7 +366,7 @@ function contains(UInt256Set storage set, uint value) internal view returns (boo
 
 
 ```solidity
-function length(UInt256Set storage set) internal view returns (uint);
+function length(UInt256Set storage set) internal view returns (uint256);
 ```
 
 ### at
@@ -379,7 +379,7 @@ Requirements:
 
 
 ```solidity
-function at(UInt256Set storage set, uint index) internal view returns (uint);
+function at(UInt256Set storage set, uint256 index) internal view returns (uint256);
 ```
 
 ## Structs
@@ -388,7 +388,7 @@ function at(UInt256Set storage set, uint index) internal view returns (uint);
 ```solidity
 struct Set {
     bytes32[] _values;
-    mapping(bytes32 => uint) _indexes;
+    mapping(bytes32 => uint256) _indexes;
 }
 ```
 

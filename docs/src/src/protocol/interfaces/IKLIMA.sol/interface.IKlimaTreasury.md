@@ -1,5 +1,5 @@
 # IKlimaTreasury
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/interfaces/IKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/interfaces/IKLIMA.sol)
 
 
 ## Functions
@@ -7,14 +7,14 @@
 
 
 ```solidity
-function excessReserves() external returns (uint);
+function excessReserves() external returns (uint256);
 ```
 
 ### manage
 
 
 ```solidity
-function manage(address _token, uint _amount) external;
+function manage(address _token, uint256 _amount) external;
 ```
 
 ### queue
@@ -35,6 +35,13 @@ function toggle(uint8 _managing, address _address, address _calculator) external
 
 
 ```solidity
-function ReserveManagerQueue(address _address) external returns (uint);
+function ReserveManagerQueue(address _address) external returns (uint256);
+```
+
+### isReserveManager
+
+
+```solidity
+function isReserveManager(address _address) external returns (bool);
 ```
 

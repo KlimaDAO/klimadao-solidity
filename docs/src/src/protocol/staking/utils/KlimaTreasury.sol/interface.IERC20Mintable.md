@@ -1,5 +1,5 @@
 # IERC20Mintable
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/utils/KlimaTreasury.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/utils/KlimaTreasury.sol)
 
 
 ## Functions
@@ -7,13 +7,13 @@
 
 
 ```solidity
-function mint(uint amount_) external;
+function mint(uint256 amount_) external;
 ```
 
 ### mint
 
 
 ```solidity
-function mint(address account_, uint ammount_) external;
+function mint(address account_, uint256 ammount_) external;
 ```
 

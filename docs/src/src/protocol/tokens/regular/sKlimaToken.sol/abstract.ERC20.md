@@ -1,5 +1,5 @@
 # ERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/sKlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/sKlimaToken.sol)
 
 **Inherits:**
 [IERC20](/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol/interface.IERC20.md)
@@ -16,21 +16,21 @@ bytes32 private constant ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256("ERC20Token
 ### _balances
 
 ```solidity
-mapping(address => uint) internal _balances;
+mapping(address => uint256) internal _balances;
 ```
 
 
 ### _allowances
 
 ```solidity
-mapping(address => mapping(address => uint)) internal _allowances;
+mapping(address => mapping(address => uint256)) internal _allowances;
 ```
 
 
 ### _totalSupply
 
 ```solidity
-uint internal _totalSupply;
+uint256 internal _totalSupply;
 ```
 
 
@@ -111,7 +111,7 @@ function decimals() public view returns (uint8);
 
 
 ```solidity
-function totalSupply() public view override returns (uint);
+function totalSupply() public view override returns (uint256);
 ```
 
 ### balanceOf
@@ -120,7 +120,7 @@ function totalSupply() public view override returns (uint);
 
 
 ```solidity
-function balanceOf(address account) public view virtual override returns (uint);
+function balanceOf(address account) public view virtual override returns (uint256);
 ```
 
 ### transfer
@@ -132,7 +132,7 @@ Requirements:
 
 
 ```solidity
-function transfer(address recipient, uint amount) public virtual override returns (bool);
+function transfer(address recipient, uint256 amount) public virtual override returns (bool);
 ```
 
 ### allowance
@@ -141,7 +141,7 @@ function transfer(address recipient, uint amount) public virtual override return
 
 
 ```solidity
-function allowance(address owner, address spender) public view virtual override returns (uint);
+function allowance(address owner, address spender) public view virtual override returns (uint256);
 ```
 
 ### approve
@@ -152,7 +152,7 @@ Requirements:
 
 
 ```solidity
-function approve(address spender, uint amount) public virtual override returns (bool);
+function approve(address spender, uint256 amount) public virtual override returns (bool);
 ```
 
 ### transferFrom
@@ -168,7 +168,7 @@ Requirements:
 
 
 ```solidity
-function transferFrom(address sender, address recipient, uint amount) public virtual override returns (bool);
+function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool);
 ```
 
 ### increaseAllowance
@@ -182,7 +182,7 @@ Requirements:
 
 
 ```solidity
-function increaseAllowance(address spender, uint addedValue) public virtual returns (bool);
+function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool);
 ```
 
 ### decreaseAllowance
@@ -198,7 +198,7 @@ Requirements:
 
 
 ```solidity
-function decreaseAllowance(address spender, uint subtractedValue) public virtual returns (bool);
+function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool);
 ```
 
 ### _transfer
@@ -214,7 +214,7 @@ Requirements:
 
 
 ```solidity
-function _transfer(address sender, address recipient, uint amount) internal virtual;
+function _transfer(address sender, address recipient, uint256 amount) internal virtual;
 ```
 
 ### _mint
@@ -227,7 +227,7 @@ Requirements:
 
 
 ```solidity
-function _mint(address account_, uint ammount_) internal virtual;
+function _mint(address account_, uint256 ammount_) internal virtual;
 ```
 
 ### _burn
@@ -241,7 +241,7 @@ Requirements:
 
 
 ```solidity
-function _burn(address account, uint amount) internal virtual;
+function _burn(address account, uint256 amount) internal virtual;
 ```
 
 ### _approve
@@ -256,7 +256,7 @@ Requirements:
 
 
 ```solidity
-function _approve(address owner, address spender, uint amount) internal virtual;
+function _approve(address owner, address spender, uint256 amount) internal virtual;
 ```
 
 ### _beforeTokenTransfer
@@ -278,6 +278,6 @@ To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hook
 
 
 ```solidity
-function _beforeTokenTransfer(address from_, address to_, uint amount_) internal virtual;
+function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal virtual;
 ```
 

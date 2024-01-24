@@ -1,5 +1,5 @@
 # Address
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/sKlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/sKlimaToken.sol)
 
 
 ## Functions
@@ -39,7 +39,7 @@ https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-
 
 
 ```solidity
-function sendValue(address payable recipient, uint amount) internal;
+function sendValue(address payable recipient, uint256 amount) internal;
 ```
 
 ### functionCall
@@ -83,7 +83,7 @@ _Available since v3.1._*
 
 
 ```solidity
-function functionCallWithValue(address target, bytes memory data, uint value) internal returns (bytes memory);
+function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory);
 ```
 
 ### functionCallWithValue
@@ -94,7 +94,7 @@ _Available since v3.1._*
 
 
 ```solidity
-function functionCallWithValue(address target, bytes memory data, uint value, string memory errorMessage)
+function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage)
     internal
     returns (bytes memory);
 ```
@@ -103,7 +103,7 @@ function functionCallWithValue(address target, bytes memory data, uint value, st
 
 
 ```solidity
-function _functionCallWithValue(address target, bytes memory data, uint weiValue, string memory errorMessage)
+function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage)
     private
     returns (bytes memory);
 ```

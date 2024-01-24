@@ -1,5 +1,5 @@
 # LibBalance
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/Token/LibBalance.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/Token/LibBalance.sol)
 
 **Author:**
 LeoFib, Publius
@@ -10,7 +10,7 @@ LeoFib, Publius
 
 
 ```solidity
-function getBalance(address account, IERC20 token) internal view returns (uint combined_balance);
+function getBalance(address account, IERC20 token) internal view returns (uint256 combined_balance);
 ```
 
 ### increaseInternalBalance
@@ -19,7 +19,7 @@ function getBalance(address account, IERC20 token) internal view returns (uint c
 
 
 ```solidity
-function increaseInternalBalance(address account, IERC20 token, uint amount) internal;
+function increaseInternalBalance(address account, IERC20 token, uint256 amount) internal;
 ```
 
 ### decreaseInternalBalance
@@ -30,9 +30,9 @@ instead.*
 
 
 ```solidity
-function decreaseInternalBalance(address account, IERC20 token, uint amount, bool allowPartial)
+function decreaseInternalBalance(address account, IERC20 token, uint256 amount, bool allowPartial)
     internal
-    returns (uint deducted);
+    returns (uint256 deducted);
 ```
 
 ### setInternalBalance
@@ -44,7 +44,7 @@ this function relies on the caller providing it directly.*
 
 
 ```solidity
-function setInternalBalance(address account, IERC20 token, uint newBalance, int delta) private;
+function setInternalBalance(address account, IERC20 token, uint256 newBalance, int256 delta) private;
 ```
 
 ### getInternalBalance
@@ -53,7 +53,7 @@ function setInternalBalance(address account, IERC20 token, uint newBalance, int 
 
 
 ```solidity
-function getInternalBalance(address account, IERC20 token) internal view returns (uint);
+function getInternalBalance(address account, IERC20 token) internal view returns (uint256);
 ```
 
 ## Events
@@ -62,6 +62,6 @@ function getInternalBalance(address account, IERC20 token) internal view returns
 
 
 ```solidity
-event InternalBalanceChanged(address indexed account, IERC20 indexed token, int delta);
+event InternalBalanceChanged(address indexed account, IERC20 indexed token, int256 delta);
 ```
 

@@ -1,5 +1,5 @@
 # IC3Pool
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/retirement_v1/interfaces/IC3Pool.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/retirement_v1/interfaces/IC3Pool.sol)
 
 
 ## Functions
@@ -7,14 +7,14 @@
 
 
 ```solidity
-function freeRedeem(uint amount) external;
+function freeRedeem(uint256 amount) external;
 ```
 
 ### taxedRedeem
 
 
 ```solidity
-function taxedRedeem(address[] memory erc20Addresses, uint[] memory amount) external;
+function taxedRedeem(address[] memory erc20Addresses, uint256[] memory amount) external;
 ```
 
 ### getFreeRedeemAddresses
@@ -28,6 +28,6 @@ function getFreeRedeemAddresses() external view returns (address[] memory);
 
 
 ```solidity
-function feeRedeem() external view returns (uint);
+function feeRedeem() external view returns (uint256);
 ```
 

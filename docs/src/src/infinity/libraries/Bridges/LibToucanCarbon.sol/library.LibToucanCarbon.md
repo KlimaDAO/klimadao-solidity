@@ -1,5 +1,5 @@
 # LibToucanCarbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/Bridges/LibToucanCarbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/Bridges/LibToucanCarbon.sol)
 
 **Author:**
 Cujo
@@ -14,7 +14,7 @@ Redeems Toucan pool tokens using default redemtion and retires the TCO2
 ```solidity
 function redeemAutoAndRetire(
     address poolToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -44,13 +44,13 @@ Redeems Toucan pool tokens using specific redemtion and retires the TCO2
 function redeemSpecificAndRetire(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage
-) internal returns (uint retiredAmount);
+) internal returns (uint256 retiredAmount);
 ```
 **Parameters**
 
@@ -81,7 +81,7 @@ Redeems Toucan TCO2s
 function retireTCO2(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -124,7 +124,7 @@ Calculates the additional pool tokens needed to specifically redeem x TCO2s
 
 
 ```solidity
-function getSpecificRedeemFee(address poolToken, uint amount) internal view returns (uint poolFeeAmount);
+function getSpecificRedeemFee(address poolToken, uint256 amount) internal view returns (uint256 poolFeeAmount);
 ```
 **Parameters**
 
@@ -146,7 +146,7 @@ Returns the number of TCO2s retired when selectively redeeming x pool tokens
 
 
 ```solidity
-function getSpecificRetireAmount(address poolToken, uint amount) internal view returns (uint retireAmount);
+function getSpecificRetireAmount(address poolToken, uint256 amount) internal view returns (uint256 retireAmount);
 ```
 **Parameters**
 
@@ -168,9 +168,9 @@ Simple wrapper to use redeem Toucan pools using the default list
 
 
 ```solidity
-function redeemPoolAuto(address poolToken, uint amount, LibTransfer.To toMode)
+function redeemPoolAuto(address poolToken, uint256 amount, LibTransfer.To toMode)
     internal
-    returns (address[] memory projectTokens, uint[] memory amounts);
+    returns (address[] memory projectTokens, uint256[] memory amounts);
 ```
 **Parameters**
 
@@ -197,9 +197,9 @@ Simple wrapper to use redeem Toucan pools using the specific list
 function redeemPoolSpecific(
     address poolToken,
     address[] memory projectTokens,
-    uint[] memory amounts,
+    uint256[] memory amounts,
     LibTransfer.To toMode
-) internal returns (uint[] memory);
+) internal returns (uint256[] memory);
 ```
 **Parameters**
 
@@ -217,6 +217,13 @@ function redeemPoolSpecific(
 |`<none>`|`uint256[]`|redeemedAmounts      TCO2 token amounts redeemed|
 
 
+### isValid
+
+
+```solidity
+function isValid(address token) internal returns (bool);
+```
+
 ## Events
 ### CarbonRetired
 
@@ -230,7 +237,7 @@ event CarbonRetired(
     string retirementMessage,
     address indexed carbonPool,
     address carbonToken,
-    uint retiredAmount
+    uint256 retiredAmount
 );
 ```
 

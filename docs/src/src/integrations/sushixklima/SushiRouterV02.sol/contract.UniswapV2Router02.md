@@ -1,5 +1,5 @@
 # UniswapV2Router02
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SushiRouterV02.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SushiRouterV02.sol)
 
 **Inherits:**
 [IUniswapV2Router02](/src/retirement_v1/interfaces/IUniswapV2Router02.sol/interface.IUniswapV2Router02.md)
@@ -25,7 +25,7 @@ address public immutable override WETH;
 
 
 ```solidity
-modifier ensure(uint deadline);
+modifier ensure(uint256 deadline);
 ```
 
 ### constructor
@@ -49,11 +49,11 @@ receive() external payable;
 function _addLiquidity(
     address tokenA,
     address tokenB,
-    uint amountADesired,
-    uint amountBDesired,
-    uint amountAMin,
-    uint amountBMin
-) internal virtual returns (uint amountA, uint amountB);
+    uint256 amountADesired,
+    uint256 amountBDesired,
+    uint256 amountAMin,
+    uint256 amountBMin
+) internal virtual returns (uint256 amountA, uint256 amountB);
 ```
 
 ### addLiquidity
@@ -63,13 +63,13 @@ function _addLiquidity(
 function addLiquidity(
     address tokenA,
     address tokenB,
-    uint amountADesired,
-    uint amountBDesired,
-    uint amountAMin,
-    uint amountBMin,
+    uint256 amountADesired,
+    uint256 amountBDesired,
+    uint256 amountAMin,
+    uint256 amountBMin,
     address to,
-    uint deadline
-) external virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity);
+    uint256 deadline
+) external virtual override ensure(deadline) returns (uint256 amountA, uint256 amountB, uint256 liquidity);
 ```
 
 ### addLiquidityETH
@@ -78,12 +78,18 @@ function addLiquidity(
 ```solidity
 function addLiquidityETH(
     address token,
-    uint amountTokenDesired,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 amountTokenDesired,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline
-) external payable virtual override ensure(deadline) returns (uint amountToken, uint amountETH, uint liquidity);
+    uint256 deadline
+)
+    external
+    payable
+    virtual
+    override
+    ensure(deadline)
+    returns (uint256 amountToken, uint256 amountETH, uint256 liquidity);
 ```
 
 ### removeLiquidity
@@ -93,12 +99,12 @@ function addLiquidityETH(
 function removeLiquidity(
     address tokenA,
     address tokenB,
-    uint liquidity,
-    uint amountAMin,
-    uint amountBMin,
+    uint256 liquidity,
+    uint256 amountAMin,
+    uint256 amountBMin,
     address to,
-    uint deadline
-) public virtual override ensure(deadline) returns (uint amountA, uint amountB);
+    uint256 deadline
+) public virtual override ensure(deadline) returns (uint256 amountA, uint256 amountB);
 ```
 
 ### removeLiquidityETH
@@ -107,12 +113,12 @@ function removeLiquidity(
 ```solidity
 function removeLiquidityETH(
     address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 liquidity,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline
-) public virtual override ensure(deadline) returns (uint amountToken, uint amountETH);
+    uint256 deadline
+) public virtual override ensure(deadline) returns (uint256 amountToken, uint256 amountETH);
 ```
 
 ### removeLiquidityWithPermit
@@ -122,16 +128,16 @@ function removeLiquidityETH(
 function removeLiquidityWithPermit(
     address tokenA,
     address tokenB,
-    uint liquidity,
-    uint amountAMin,
-    uint amountBMin,
+    uint256 liquidity,
+    uint256 amountAMin,
+    uint256 amountBMin,
     address to,
-    uint deadline,
+    uint256 deadline,
     bool approveMax,
     uint8 v,
     bytes32 r,
     bytes32 s
-) external virtual override returns (uint amountA, uint amountB);
+) external virtual override returns (uint256 amountA, uint256 amountB);
 ```
 
 ### removeLiquidityETHWithPermit
@@ -140,16 +146,16 @@ function removeLiquidityWithPermit(
 ```solidity
 function removeLiquidityETHWithPermit(
     address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 liquidity,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline,
+    uint256 deadline,
     bool approveMax,
     uint8 v,
     bytes32 r,
     bytes32 s
-) external virtual override returns (uint amountToken, uint amountETH);
+) external virtual override returns (uint256 amountToken, uint256 amountETH);
 ```
 
 ### removeLiquidityETHSupportingFeeOnTransferTokens
@@ -158,12 +164,12 @@ function removeLiquidityETHWithPermit(
 ```solidity
 function removeLiquidityETHSupportingFeeOnTransferTokens(
     address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 liquidity,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline
-) public virtual override ensure(deadline) returns (uint amountETH);
+    uint256 deadline
+) public virtual override ensure(deadline) returns (uint256 amountETH);
 ```
 
 ### removeLiquidityETHWithPermitSupportingFeeOnTransferTokens
@@ -172,97 +178,101 @@ function removeLiquidityETHSupportingFeeOnTransferTokens(
 ```solidity
 function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
     address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 liquidity,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline,
+    uint256 deadline,
     bool approveMax,
     uint8 v,
     bytes32 r,
     bytes32 s
-) external virtual override returns (uint amountETH);
+) external virtual override returns (uint256 amountETH);
 ```
 
 ### _swap
 
 
 ```solidity
-function _swap(uint[] memory amounts, address[] memory path, address _to) internal virtual;
+function _swap(uint256[] memory amounts, address[] memory path, address _to) internal virtual;
 ```
 
 ### swapExactTokensForTokens
 
 
 ```solidity
-function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external
-    virtual
-    override
-    ensure(deadline)
-    returns (uint[] memory amounts);
+function swapExactTokensForTokens(
+    uint256 amountIn,
+    uint256 amountOutMin,
+    address[] calldata path,
+    address to,
+    uint256 deadline
+) external virtual override ensure(deadline) returns (uint256[] memory amounts);
 ```
 
 ### swapTokensForExactTokens
 
 
 ```solidity
-function swapTokensForExactTokens(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
-    external
-    virtual
-    override
-    ensure(deadline)
-    returns (uint[] memory amounts);
+function swapTokensForExactTokens(
+    uint256 amountOut,
+    uint256 amountInMax,
+    address[] calldata path,
+    address to,
+    uint256 deadline
+) external virtual override ensure(deadline) returns (uint256[] memory amounts);
 ```
 
 ### swapExactETHForTokens
 
 
 ```solidity
-function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
+function swapExactETHForTokens(uint256 amountOutMin, address[] calldata path, address to, uint256 deadline)
     external
     payable
     virtual
     override
     ensure(deadline)
-    returns (uint[] memory amounts);
+    returns (uint256[] memory amounts);
 ```
 
 ### swapTokensForExactETH
 
 
 ```solidity
-function swapTokensForExactETH(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
-    external
-    virtual
-    override
-    ensure(deadline)
-    returns (uint[] memory amounts);
+function swapTokensForExactETH(
+    uint256 amountOut,
+    uint256 amountInMax,
+    address[] calldata path,
+    address to,
+    uint256 deadline
+) external virtual override ensure(deadline) returns (uint256[] memory amounts);
 ```
 
 ### swapExactTokensForETH
 
 
 ```solidity
-function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external
-    virtual
-    override
-    ensure(deadline)
-    returns (uint[] memory amounts);
+function swapExactTokensForETH(
+    uint256 amountIn,
+    uint256 amountOutMin,
+    address[] calldata path,
+    address to,
+    uint256 deadline
+) external virtual override ensure(deadline) returns (uint256[] memory amounts);
 ```
 
 ### swapETHForExactTokens
 
 
 ```solidity
-function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
+function swapETHForExactTokens(uint256 amountOut, address[] calldata path, address to, uint256 deadline)
     external
     payable
     virtual
     override
     ensure(deadline)
-    returns (uint[] memory amounts);
+    returns (uint256[] memory amounts);
 ```
 
 ### _swapSupportingFeeOnTransferTokens
@@ -277,11 +287,11 @@ function _swapSupportingFeeOnTransferTokens(address[] memory path, address _to) 
 
 ```solidity
 function swapExactTokensForTokensSupportingFeeOnTransferTokens(
-    uint amountIn,
-    uint amountOutMin,
+    uint256 amountIn,
+    uint256 amountOutMin,
     address[] calldata path,
     address to,
-    uint deadline
+    uint256 deadline
 ) external virtual override ensure(deadline);
 ```
 
@@ -290,10 +300,10 @@ function swapExactTokensForTokensSupportingFeeOnTransferTokens(
 
 ```solidity
 function swapExactETHForTokensSupportingFeeOnTransferTokens(
-    uint amountOutMin,
+    uint256 amountOutMin,
     address[] calldata path,
     address to,
-    uint deadline
+    uint256 deadline
 ) external payable virtual override ensure(deadline);
 ```
 
@@ -302,11 +312,11 @@ function swapExactETHForTokensSupportingFeeOnTransferTokens(
 
 ```solidity
 function swapExactTokensForETHSupportingFeeOnTransferTokens(
-    uint amountIn,
-    uint amountOutMin,
+    uint256 amountIn,
+    uint256 amountOutMin,
     address[] calldata path,
     address to,
-    uint deadline
+    uint256 deadline
 ) external virtual override ensure(deadline);
 ```
 
@@ -314,54 +324,59 @@ function swapExactTokensForETHSupportingFeeOnTransferTokens(
 
 
 ```solidity
-function quote(uint amountA, uint reserveA, uint reserveB) public pure virtual override returns (uint amountB);
+function quote(uint256 amountA, uint256 reserveA, uint256 reserveB)
+    public
+    pure
+    virtual
+    override
+    returns (uint256 amountB);
 ```
 
 ### getAmountOut
 
 
 ```solidity
-function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut)
+function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut)
     public
     pure
     virtual
     override
-    returns (uint amountOut);
+    returns (uint256 amountOut);
 ```
 
 ### getAmountIn
 
 
 ```solidity
-function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut)
+function getAmountIn(uint256 amountOut, uint256 reserveIn, uint256 reserveOut)
     public
     pure
     virtual
     override
-    returns (uint amountIn);
+    returns (uint256 amountIn);
 ```
 
 ### getAmountsOut
 
 
 ```solidity
-function getAmountsOut(uint amountIn, address[] memory path)
+function getAmountsOut(uint256 amountIn, address[] memory path)
     public
     view
     virtual
     override
-    returns (uint[] memory amounts);
+    returns (uint256[] memory amounts);
 ```
 
 ### getAmountsIn
 
 
 ```solidity
-function getAmountsIn(uint amountOut, address[] memory path)
+function getAmountsIn(uint256 amountOut, address[] memory path)
     public
     view
     virtual
     override
-    returns (uint[] memory amounts);
+    returns (uint256[] memory amounts);
 ```
 

@@ -1,5 +1,5 @@
 # LibC3Carbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/Bridges/LibC3Carbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/Bridges/LibC3Carbon.sol)
 
 **Author:**
 Cujo
@@ -14,7 +14,7 @@ Calls freeRedeem on a C3 pool and retires the underlying C3T
 ```solidity
 function freeRedeemAndRetire(
     address poolToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -44,7 +44,7 @@ Calls taxedRedeem on a C3 pool and retires the underlying C3T
 function redeemSpecificAndRetire(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -75,7 +75,7 @@ Retire a C3T token
 function retireC3T(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -103,7 +103,10 @@ Return the additional fee needed to redeem specific number of project tokens.
 
 
 ```solidity
-function getExactCarbonSpecificRedeemFee(address poolToken, uint amount) internal view returns (uint poolFeeAmount);
+function getExactCarbonSpecificRedeemFee(address poolToken, uint256 amount)
+    internal
+    view
+    returns (uint256 poolFeeAmount);
 ```
 **Parameters**
 
@@ -125,7 +128,10 @@ Return the amount that can be specifically redeemed from a C3 given x number of 
 
 
 ```solidity
-function getExactSourceSpecificRetireAmount(address poolToken, uint amount) internal view returns (uint retireAmount);
+function getExactSourceSpecificRetireAmount(address poolToken, uint256 amount)
+    internal
+    view
+    returns (uint256 retireAmount);
 ```
 **Parameters**
 
@@ -147,9 +153,9 @@ Receives and redeems a number of pool tokens and sends the C3T to a destination.
 
 
 ```solidity
-function redeemPoolAuto(address poolToken, uint amount, LibTransfer.To toMode)
+function redeemPoolAuto(address poolToken, uint256 amount, LibTransfer.To toMode)
     internal
-    returns (address[] memory allProjectTokens, uint[] memory amounts);
+    returns (address[] memory allProjectTokens, uint256[] memory amounts);
 ```
 **Parameters**
 
@@ -176,9 +182,9 @@ Receives and redeems a number of pool tokens and sends the C3T to a destination.
 function redeemPoolSpecific(
     address poolToken,
     address[] memory projectTokens,
-    uint[] memory amounts,
+    uint256[] memory amounts,
     LibTransfer.To toMode
-) internal returns (uint[] memory);
+) internal returns (uint256[] memory);
 ```
 **Parameters**
 
@@ -196,6 +202,13 @@ function redeemPoolSpecific(
 |`<none>`|`uint256[]`|redeemedAmounts      Amounts of the project tokens redeemed|
 
 
+### isValid
+
+
+```solidity
+function isValid(address token) internal returns (bool);
+```
+
 ## Events
 ### CarbonRetired
 
@@ -209,7 +222,7 @@ event CarbonRetired(
     string retirementMessage,
     address indexed carbonPool,
     address carbonToken,
-    uint retiredAmount
+    uint256 retiredAmount
 );
 ```
 

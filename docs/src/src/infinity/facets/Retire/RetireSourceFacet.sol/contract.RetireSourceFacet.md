@@ -1,5 +1,5 @@
 # RetireSourceFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/facets/Retire/RetireSourceFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/facets/Retire/RetireSourceFacet.sol)
 
 **Inherits:**
 [ReentrancyGuard](/src/infinity/ReentrancyGuard.sol/abstract.ReentrancyGuard.md)
@@ -15,13 +15,13 @@ Retires an exact amount of a source token using default redemption
 function retireExactSourceDefault(
     address sourceToken,
     address poolToken,
-    uint maxAmountIn,
+    uint256 maxAmountIn,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     LibTransfer.From fromMode
-) external payable nonReentrant returns (uint retirementIndex);
+) external payable nonReentrant returns (uint256 retirementIndex);
 ```
 **Parameters**
 
@@ -55,13 +55,13 @@ function retireExactSourceSpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint maxAmountIn,
+    uint256 maxAmountIn,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     LibTransfer.From fromMode
-) external payable nonReentrant returns (uint retirementIndex);
+) external payable nonReentrant returns (uint256 retirementIndex);
 ```
 **Parameters**
 
@@ -97,7 +97,7 @@ event CarbonRetired(
     string retirementMessage,
     address indexed carbonPool,
     address poolToken,
-    uint retiredAmount
+    uint256 retiredAmount
 );
 ```
 

@@ -1,5 +1,5 @@
 # ITridentRouter
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/ITrident.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/ITrident.sol)
 
 Trident pool router interface.
 
@@ -12,7 +12,7 @@ Trident pool router interface.
 function exactInputSingleWithNativeToken(ExactInputSingleParams calldata params)
     external
     payable
-    returns (uint amountOut);
+    returns (uint256 amountOut);
 ```
 
 ## Structs
@@ -20,8 +20,8 @@ function exactInputSingleWithNativeToken(ExactInputSingleParams calldata params)
 
 ```solidity
 struct ExactInputSingleParams {
-    uint amountIn;
-    uint amountOutMinimum;
+    uint256 amountIn;
+    uint256 amountOutMinimum;
     address pool;
     address tokenIn;
     bytes data;

@@ -1,5 +1,5 @@
 # KlimaStaking
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/regular/KlimaStaking_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/regular/KlimaStaking_v2.sol)
 
 **Inherits:**
 [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
@@ -44,7 +44,7 @@ address public locker;
 ### totalBonus
 
 ```solidity
-uint public totalBonus;
+uint256 public totalBonus;
 ```
 
 
@@ -58,7 +58,7 @@ address public warmupContract;
 ### warmupPeriod
 
 ```solidity
-uint public warmupPeriod;
+uint256 public warmupPeriod;
 ```
 
 
@@ -74,7 +74,7 @@ mapping(address => Claim) public warmupInfo;
 
 
 ```solidity
-constructor(address _KLIMA, address _sKLIMA, uint _epochLength, uint _firstEpochNumber, uint _firstEpochBlock);
+constructor(address _KLIMA, address _sKLIMA, uint256 _epochLength, uint256 _firstEpochNumber, uint256 _firstEpochBlock);
 ```
 
 ### stake
@@ -83,7 +83,7 @@ stake KLIMA to enter warmup
 
 
 ```solidity
-function stake(uint _amount, address _recipient) external returns (bool);
+function stake(uint256 _amount, address _recipient) external returns (bool);
 ```
 **Parameters**
 
@@ -138,7 +138,7 @@ redeem sKLIMA for KLIMA
 
 
 ```solidity
-function unstake(uint _amount, bool _trigger) external;
+function unstake(uint256 _amount, bool _trigger) external;
 ```
 **Parameters**
 
@@ -154,7 +154,7 @@ returns the sKLIMA index, which tracks rebase growth
 
 
 ```solidity
-function index() public view returns (uint);
+function index() public view returns (uint256);
 ```
 **Returns**
 
@@ -178,7 +178,7 @@ returns contract KLIMA holdings, including bonuses provided
 
 
 ```solidity
-function contractBalance() public view returns (uint);
+function contractBalance() public view returns (uint256);
 ```
 **Returns**
 
@@ -193,7 +193,7 @@ provide bonus to locked staking contract
 
 
 ```solidity
-function giveLockBonus(uint _amount) external;
+function giveLockBonus(uint256 _amount) external;
 ```
 **Parameters**
 
@@ -208,7 +208,7 @@ reclaim bonus from locked staking contract
 
 
 ```solidity
-function returnLockBonus(uint _amount) external;
+function returnLockBonus(uint256 _amount) external;
 ```
 **Parameters**
 
@@ -239,7 +239,7 @@ set warmup period for new stakers
 
 
 ```solidity
-function setWarmup(uint _warmupPeriod) external onlyManager;
+function setWarmup(uint256 _warmupPeriod) external onlyManager;
 ```
 **Parameters**
 
@@ -253,10 +253,10 @@ function setWarmup(uint _warmupPeriod) external onlyManager;
 
 ```solidity
 struct Epoch {
-    uint length;
-    uint number;
-    uint endBlock;
-    uint distribute;
+    uint256 length;
+    uint256 number;
+    uint256 endBlock;
+    uint256 distribute;
 }
 ```
 
@@ -264,9 +264,9 @@ struct Epoch {
 
 ```solidity
 struct Claim {
-    uint deposit;
-    uint gons;
-    uint expiry;
+    uint256 deposit;
+    uint256 gons;
+    uint256 expiry;
     bool lock;
 }
 ```

@@ -1,5 +1,5 @@
 # UniswapV2Library
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SushiRouterV02.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SushiRouterV02.sol)
 
 
 ## Functions
@@ -24,47 +24,53 @@ function pairFor(address factory, address tokenA, address tokenB) internal pure 
 function getReserves(address factory, address tokenA, address tokenB)
     internal
     view
-    returns (uint reserveA, uint reserveB);
+    returns (uint256 reserveA, uint256 reserveB);
 ```
 
 ### quote
 
 
 ```solidity
-function quote(uint amountA, uint reserveA, uint reserveB) internal pure returns (uint amountB);
+function quote(uint256 amountA, uint256 reserveA, uint256 reserveB) internal pure returns (uint256 amountB);
 ```
 
 ### getAmountOut
 
 
 ```solidity
-function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) internal pure returns (uint amountOut);
+function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut)
+    internal
+    pure
+    returns (uint256 amountOut);
 ```
 
 ### getAmountIn
 
 
 ```solidity
-function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) internal pure returns (uint amountIn);
+function getAmountIn(uint256 amountOut, uint256 reserveIn, uint256 reserveOut)
+    internal
+    pure
+    returns (uint256 amountIn);
 ```
 
 ### getAmountsOut
 
 
 ```solidity
-function getAmountsOut(address factory, uint amountIn, address[] memory path)
+function getAmountsOut(address factory, uint256 amountIn, address[] memory path)
     internal
     view
-    returns (uint[] memory amounts);
+    returns (uint256[] memory amounts);
 ```
 
 ### getAmountsIn
 
 
 ```solidity
-function getAmountsIn(address factory, uint amountOut, address[] memory path)
+function getAmountsIn(address factory, uint256 amountOut, address[] memory path)
     internal
     view
-    returns (uint[] memory amounts);
+    returns (uint256[] memory amounts);
 ```
 

@@ -1,5 +1,5 @@
 # LibDiamond
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/LibDiamond.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/LibDiamond.sol)
 
 \
 Author: Nick Mudge <nick@perfectabstractions.com> (https://twitter.com/mudgen)
@@ -136,7 +136,7 @@ struct FacetAddressAndPosition {
 ```solidity
 struct FacetFunctionSelectors {
     bytes4[] functionSelectors;
-    uint facetAddressPosition;
+    uint256 facetAddressPosition;
 }
 ```
 

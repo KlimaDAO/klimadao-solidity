@@ -1,5 +1,5 @@
 # KlimaCarbonRetirements
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/retirement_v1/KlimaCarbonRetirements.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/retirement_v1/KlimaCarbonRetirements.sol)
 
 **Inherits:**
 [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
@@ -39,7 +39,7 @@ Stores the details of an offset transaction for future use
 function carbonRetired(
     address _retiree,
     address _pool,
-    uint _amount,
+    uint256 _amount,
     string calldata _beneficiaryString,
     string calldata _retirementMessage
 ) public;
@@ -61,7 +61,7 @@ Return any unclaimed NFT totals for an address
 
 
 ```solidity
-function getUnclaimedTotal(address _minter) public view returns (uint);
+function getUnclaimedTotal(address _minter) public view returns (uint256);
 ```
 **Parameters**
 
@@ -82,7 +82,7 @@ This function updates the total claimed amount for minting an NFT.
 
 
 ```solidity
-function offsetClaimed(address _minter, uint _amount) public returns (bool);
+function offsetClaimed(address _minter, uint256 _amount) public returns (bool);
 ```
 **Parameters**
 
@@ -98,10 +98,10 @@ This returns information on a specific retirement for an address.
 
 
 ```solidity
-function getRetirementIndexInfo(address _retiree, uint _index)
+function getRetirementIndexInfo(address _retiree, uint256 _index)
     public
     view
-    returns (address, uint, string memory, string memory);
+    returns (address, uint256, string memory, string memory);
 ```
 **Parameters**
 
@@ -126,7 +126,7 @@ This returns the total amount offset by an address for a specific pool.
 
 
 ```solidity
-function getRetirementPoolInfo(address _retiree, address _pool) public view returns (uint);
+function getRetirementPoolInfo(address _retiree, address _pool) public view returns (uint256);
 ```
 **Parameters**
 
@@ -148,7 +148,7 @@ This returns totals about retirements and claims on an address
 
 
 ```solidity
-function getRetirementTotals(address _retiree) public view returns (uint, uint, uint);
+function getRetirementTotals(address _retiree) public view returns (uint256, uint256, uint256);
 ```
 **Parameters**
 
@@ -255,14 +255,14 @@ event MinterRemoved(address minter);
 
 ```solidity
 struct Retirement {
-    uint totalRetirements;
-    uint totalCarbonRetired;
-    uint totalClaimed;
-    mapping(uint => address) retiredPool;
-    mapping(uint => uint) retiredAmount;
-    mapping(uint => string) retirementBeneficiary;
-    mapping(uint => string) retirementMessage;
-    mapping(address => uint) totalPoolRetired;
+    uint256 totalRetirements;
+    uint256 totalCarbonRetired;
+    uint256 totalClaimed;
+    mapping(uint256 => address) retiredPool;
+    mapping(uint256 => uint256) retiredAmount;
+    mapping(uint256 => string) retirementBeneficiary;
+    mapping(uint256 => string) retirementMessage;
+    mapping(address => uint256) totalPoolRetired;
 }
 ```
 

@@ -1,5 +1,5 @@
 # IERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol)
 
 
 ## Functions
@@ -7,54 +7,54 @@
 
 
 ```solidity
-function totalSupply() external view returns (uint);
+function totalSupply() external view returns (uint256);
 ```
 
 ### balanceOf
 
 
 ```solidity
-function balanceOf(address account) external view returns (uint);
+function balanceOf(address account) external view returns (uint256);
 ```
 
 ### transfer
 
 
 ```solidity
-function transfer(address recipient, uint amount) external returns (bool);
+function transfer(address recipient, uint256 amount) external returns (bool);
 ```
 
 ### allowance
 
 
 ```solidity
-function allowance(address owner, address spender) external view returns (uint);
+function allowance(address owner, address spender) external view returns (uint256);
 ```
 
 ### approve
 
 
 ```solidity
-function approve(address spender, uint amount) external returns (bool);
+function approve(address spender, uint256 amount) external returns (bool);
 ```
 
 ### transferFrom
 
 
 ```solidity
-function transferFrom(address sender, address recipient, uint amount) external returns (bool);
+function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 ```
 
 ## Events
 ### Transfer
 
 ```solidity
-event Transfer(address indexed from, address indexed to, uint value);
+event Transfer(address indexed from, address indexed to, uint256 value);
 ```
 
 ### Approval
 
 ```solidity
-event Approval(address indexed owner, address indexed spender, uint value);
+event Approval(address indexed owner, address indexed spender, uint256 value);
 ```
 

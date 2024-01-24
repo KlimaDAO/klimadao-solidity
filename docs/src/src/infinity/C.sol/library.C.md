@@ -1,5 +1,5 @@
 # C
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/C.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/C.sol)
 
 **Author:**
 Cujo
@@ -9,7 +9,7 @@ Cujo
 ### CHAIN_ID
 
 ```solidity
-uint private constant CHAIN_ID = 137;
+uint256 private constant CHAIN_ID = 137;
 ```
 
 
@@ -90,6 +90,13 @@ address private constant SUSHI_TRIDENT_POLYGON = 0xc5017BE80b4446988e86861683962
 ```
 
 
+### CARBONMARK
+
+```solidity
+address private constant CARBONMARK = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821;
+```
+
+
 ### BCT
 
 ```solidity
@@ -150,6 +157,27 @@ address private constant KLIMA_CARBON_RETIREMENTS = 0xac298CD34559B9AcfaedeA8344
 
 ```solidity
 address private constant KLIMA_RETIREMENT_BOND = 0xa595f0d598DaF144e5a7ca91E6D9A5bAA09dDeD0;
+```
+
+
+### TOUCAN_REGISTRY
+
+```solidity
+address constant TOUCAN_REGISTRY = 0x263fA1c180889b3a3f46330F32a4a23287E99FC9;
+```
+
+
+### C3_PROJECT_FACTORY
+
+```solidity
+address constant C3_PROJECT_FACTORY = 0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B;
+```
+
+
+### ICR_PROJECT_REGISTRY
+
+```solidity
+address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d8A;
 ```
 
 
@@ -292,5 +320,33 @@ function klimaCarbonRetirements() internal pure returns (address);
 
 ```solidity
 function klimaRetirementBond() internal pure returns (address);
+```
+
+### toucanRegistry
+
+
+```solidity
+function toucanRegistry() internal pure returns (address);
+```
+
+### c3ProjectFactory
+
+
+```solidity
+function c3ProjectFactory() internal pure returns (address);
+```
+
+### carbonmark
+
+
+```solidity
+function carbonmark() internal pure returns (address);
+```
+
+### icrProjectRegistry
+
+
+```solidity
+function icrProjectRegistry() internal pure returns (address);
 ```
 

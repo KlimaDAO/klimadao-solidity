@@ -1,5 +1,5 @@
 # DiamondInit
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/init/DiamondInit.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/init/DiamondInit.sol)
 
 \
 Author: Nick Mudge <nick@perfectabstractions.com> (https://twitter.com/mudgen)
@@ -19,7 +19,7 @@ AppStorage internal s;
 ### MAX_INT
 
 ```solidity
-uint private constant MAX_INT = 2 ** 256 - 1;
+uint256 private constant MAX_INT = 2 ** 256 - 1;
 ```
 
 

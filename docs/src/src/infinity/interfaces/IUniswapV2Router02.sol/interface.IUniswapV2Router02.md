@@ -1,5 +1,5 @@
 # IUniswapV2Router02
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/IUniswapV2Router02.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/IUniswapV2Router02.sol)
 
 **Inherits:**
 [IUniswapV2Router01](/src/retirement_v1/interfaces/IUniswapV2Router01.sol/interface.IUniswapV2Router01.md)
@@ -12,12 +12,12 @@
 ```solidity
 function removeLiquidityETHSupportingFeeOnTransferTokens(
     address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 liquidity,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline
-) external returns (uint amountETH);
+    uint256 deadline
+) external returns (uint256 amountETH);
 ```
 
 ### removeLiquidityETHWithPermitSupportingFeeOnTransferTokens
@@ -26,16 +26,16 @@ function removeLiquidityETHSupportingFeeOnTransferTokens(
 ```solidity
 function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
     address token,
-    uint liquidity,
-    uint amountTokenMin,
-    uint amountETHMin,
+    uint256 liquidity,
+    uint256 amountTokenMin,
+    uint256 amountETHMin,
     address to,
-    uint deadline,
+    uint256 deadline,
     bool approveMax,
     uint8 v,
     bytes32 r,
     bytes32 s
-) external returns (uint amountETH);
+) external returns (uint256 amountETH);
 ```
 
 ### swapExactTokensForTokensSupportingFeeOnTransferTokens
@@ -43,11 +43,11 @@ function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
 
 ```solidity
 function swapExactTokensForTokensSupportingFeeOnTransferTokens(
-    uint amountIn,
-    uint amountOutMin,
+    uint256 amountIn,
+    uint256 amountOutMin,
     address[] calldata path,
     address to,
-    uint deadline
+    uint256 deadline
 ) external;
 ```
 
@@ -56,10 +56,10 @@ function swapExactTokensForTokensSupportingFeeOnTransferTokens(
 
 ```solidity
 function swapExactETHForTokensSupportingFeeOnTransferTokens(
-    uint amountOutMin,
+    uint256 amountOutMin,
     address[] calldata path,
     address to,
-    uint deadline
+    uint256 deadline
 ) external payable;
 ```
 
@@ -68,11 +68,11 @@ function swapExactETHForTokensSupportingFeeOnTransferTokens(
 
 ```solidity
 function swapExactTokensForETHSupportingFeeOnTransferTokens(
-    uint amountIn,
-    uint amountOutMin,
+    uint256 amountIn,
+    uint256 amountOutMin,
     address[] calldata path,
     address to,
-    uint deadline
+    uint256 deadline
 ) external;
 ```
 

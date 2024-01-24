@@ -1,5 +1,5 @@
 # LibKlima
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/LibKlima.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/LibKlima.sol)
 
 **Author:**
 Cujo
@@ -12,7 +12,7 @@ Returns wsKLIMA amount for provided sKLIMA amount
 
 
 ```solidity
-function toWrappedAmount(uint amount) internal view returns (uint wrappedAmount);
+function toWrappedAmount(uint256 amount) internal view returns (uint256 wrappedAmount);
 ```
 **Parameters**
 
@@ -33,7 +33,7 @@ Returns sKLIMA amount for provided wsKLIMA amount
 
 
 ```solidity
-function toUnwrappedAmount(uint amount) internal view returns (uint unwrappedAmount);
+function toUnwrappedAmount(uint256 amount) internal view returns (uint256 unwrappedAmount);
 ```
 **Parameters**
 
@@ -54,7 +54,7 @@ Unwraps and unstakes provided wsKLIMA amount
 
 
 ```solidity
-function unwrapKlima(uint amount) internal returns (uint unwrappedAmount);
+function unwrapKlima(uint256 amount) internal returns (uint256 unwrappedAmount);
 ```
 **Parameters**
 
@@ -75,7 +75,7 @@ Unstakes provided sKLIMA amount
 
 
 ```solidity
-function unstakeKlima(uint amount) internal;
+function unstakeKlima(uint256 amount) internal;
 ```
 **Parameters**
 
@@ -90,7 +90,7 @@ Stakes and wraps provided KLIMA amount
 
 
 ```solidity
-function wrapKlima(uint amount) internal returns (uint wrappedAmount);
+function wrapKlima(uint256 amount) internal returns (uint256 wrappedAmount);
 ```
 **Parameters**
 
@@ -111,7 +111,7 @@ Stakes provided KLIMA amount
 
 
 ```solidity
-function stakeKlima(uint amount) internal;
+function stakeKlima(uint256 amount) internal;
 ```
 **Parameters**
 

@@ -1,5 +1,5 @@
 # TWAPOracleUpdater
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/KlimaToken.sol)
 
 **Inherits:**
 [ERC20Permit](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20Permit.md), [VaultOwned](/src/protocol/tokens/regular/KlimaToken.sol/contract.VaultOwned.md)
@@ -23,7 +23,7 @@ ITWAPOracle public twapOracle;
 ### twapEpochPeriod
 
 ```solidity
-uint public twapEpochPeriod;
+uint256 public twapEpochPeriod;
 ```
 
 
@@ -46,7 +46,7 @@ function changeTWAPOracle(address newTWAPOracle_) external onlyOwner;
 
 
 ```solidity
-function changeTWAPEpochPeriod(uint newTWAPEpochPeriod_) external onlyOwner;
+function changeTWAPEpochPeriod(uint256 newTWAPEpochPeriod_) external onlyOwner;
 ```
 
 ### addTWAPSource
@@ -67,14 +67,14 @@ function removeTWAPSource(address twapSourceToRemove_) external onlyOwner;
 
 
 ```solidity
-function _uodateTWAPOracle(address dexPoolToUpdateFrom_, uint twapEpochPeriodToUpdate_) internal;
+function _uodateTWAPOracle(address dexPoolToUpdateFrom_, uint256 twapEpochPeriodToUpdate_) internal;
 ```
 
 ### _beforeTokenTransfer
 
 
 ```solidity
-function _beforeTokenTransfer(address from_, address to_, uint amount_) internal virtual override;
+function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal virtual override;
 ```
 
 ## Events
@@ -87,7 +87,7 @@ event TWAPOracleChanged(address indexed previousTWAPOracle, address indexed newT
 ### TWAPEpochChanged
 
 ```solidity
-event TWAPEpochChanged(uint previousTWAPEpochPeriod, uint newTWAPEpochPeriod);
+event TWAPEpochChanged(uint256 previousTWAPEpochPeriod, uint256 newTWAPEpochPeriod);
 ```
 
 ### TWAPSourceAdded

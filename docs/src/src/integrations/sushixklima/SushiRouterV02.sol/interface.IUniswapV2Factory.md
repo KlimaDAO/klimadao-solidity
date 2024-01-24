@@ -1,5 +1,5 @@
 # IUniswapV2Factory
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SushiRouterV02.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SushiRouterV02.sol)
 
 
 ## Functions
@@ -35,14 +35,14 @@ function getPair(address tokenA, address tokenB) external view returns (address 
 
 
 ```solidity
-function allPairs(uint) external view returns (address pair);
+function allPairs(uint256) external view returns (address pair);
 ```
 
 ### allPairsLength
 
 
 ```solidity
-function allPairsLength() external view returns (uint);
+function allPairsLength() external view returns (uint256);
 ```
 
 ### createPair
@@ -77,6 +77,6 @@ function setMigrator(address) external;
 ### PairCreated
 
 ```solidity
-event PairCreated(address indexed token0, address indexed token1, address pair, uint);
+event PairCreated(address indexed token0, address indexed token1, address pair, uint256);
 ```
 

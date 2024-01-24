@@ -1,5 +1,5 @@
 # IERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 
 ## Functions
@@ -9,7 +9,7 @@
 
 
 ```solidity
-function totalSupply() external view returns (uint);
+function totalSupply() external view returns (uint256);
 ```
 
 ### balanceOf
@@ -18,7 +18,7 @@ function totalSupply() external view returns (uint);
 
 
 ```solidity
-function balanceOf(address account) external view returns (uint);
+function balanceOf(address account) external view returns (uint256);
 ```
 
 ### transfer
@@ -29,7 +29,7 @@ Emits a {Transfer} event.*
 
 
 ```solidity
-function transfer(address recipient, uint amount) external returns (bool);
+function transfer(address recipient, uint256 amount) external returns (bool);
 ```
 
 ### allowance
@@ -41,7 +41,7 @@ This value changes when {approve} or {transferFrom} are called.*
 
 
 ```solidity
-function allowance(address owner, address spender) external view returns (uint);
+function allowance(address owner, address spender) external view returns (uint256);
 ```
 
 ### approve
@@ -58,7 +58,7 @@ Emits an {Approval} event.*
 
 
 ```solidity
-function approve(address spender, uint amount) external returns (bool);
+function approve(address spender, uint256 amount) external returns (bool);
 ```
 
 ### transferFrom
@@ -71,7 +71,7 @@ Emits a {Transfer} event.*
 
 
 ```solidity
-function transferFrom(address sender, address recipient, uint amount) external returns (bool);
+function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 ```
 
 ## Events
@@ -82,7 +82,7 @@ Note that `value` may be zero.*
 
 
 ```solidity
-event Transfer(address indexed from, address indexed to, uint value);
+event Transfer(address indexed from, address indexed to, uint256 value);
 ```
 
 ### Approval
@@ -91,6 +91,6 @@ a call to {approve}. `value` is the new allowance.*
 
 
 ```solidity
-event Approval(address indexed owner, address indexed spender, uint value);
+event Approval(address indexed owner, address indexed spender, uint256 value);
 ```
 

@@ -1,5 +1,5 @@
 # Storage
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/AppStorage.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/AppStorage.sol)
 
 
 ## Structs
@@ -20,6 +20,19 @@ struct DefaultSwap {
     uint8[] swapDexes;
     address[] ammRouters;
     mapping(uint8 => address[]) swapPaths;
+}
+```
+
+### Token1155Settings
+Stores the transient details of 1155 tokens received.
+
+
+```solidity
+struct Token1155Settings {
+    uint256 tokenId;
+    uint256 value;
+    uint256[] ids;
+    uint256[] values;
 }
 ```
 

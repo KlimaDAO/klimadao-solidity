@@ -1,5 +1,5 @@
 # KlimaRetirementAggregator
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/retirement_v1/KlimaRetirementAggregator.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/retirement_v1/KlimaRetirementAggregator.sol)
 
 **Inherits:**
 Initializable, ContextUpgradeable, OwnableUpgradeable
@@ -81,14 +81,21 @@ mapping(address => bool) public isPoolToken;
 ### poolBridge
 
 ```solidity
-mapping(address => uint) public poolBridge;
+mapping(address => uint256) public poolBridge;
 ```
 
 
 ### bridgeHelper
 
 ```solidity
-mapping(uint => address) public bridgeHelper;
+mapping(uint256 => address) public bridgeHelper;
+```
+
+
+### INFINITY
+
+```solidity
+address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
 ```
 
 
@@ -115,7 +122,7 @@ to swap to the appropriate pool and then retire.
 function retireCarbon(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -142,7 +149,7 @@ function retireCarbon(
 function retireCarbon(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     string memory _retireEntityString,
     address _beneficiaryAddress,
@@ -167,7 +174,7 @@ function retireCarbonFrom(
     address _initiator,
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -199,7 +206,7 @@ on the bridge's specific helper contract.
 function _retireCarbon(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -228,7 +235,7 @@ function _retireCarbon(
 function _retireCarbon(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     string memory _retireEntityString,
     address _beneficiaryAddress,
@@ -253,7 +260,7 @@ to swap to the appropriate pool and then retire.
 function retireCarbonSpecific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -282,7 +289,7 @@ function retireCarbonSpecific(
 function retireCarbonSpecific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     string memory _retireEntityString,
     address _beneficiaryAddress,
@@ -300,7 +307,7 @@ function retireCarbonSpecificFrom(
     address _initiator,
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -320,7 +327,7 @@ on the bridge's specific helper contract.
 function _retireCarbonSpecific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,
@@ -351,7 +358,7 @@ function _retireCarbonSpecific(
 function _retireCarbonSpecific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     string memory _retireEntityString,
     address _beneficiaryAddress,
@@ -366,7 +373,7 @@ function _retireCarbonSpecific(
 
 
 ```solidity
-function _prepareRetireSpecific(address _sourceToken, address _poolToken, uint _amount, bool _amountInCarbon)
+function _prepareRetireSpecific(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
     internal;
 ```
 
@@ -380,10 +387,10 @@ Any swap slippage buffers and fees are included in the return value.
 
 
 ```solidity
-function getSourceAmount(address _sourceToken, address _poolToken, uint _amount, bool _amountInCarbon)
+function getSourceAmount(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
     public
     view
-    returns (uint, uint);
+    returns (uint256, uint256);
 ```
 **Parameters**
 
@@ -409,10 +416,10 @@ for specific retirements.
 
 
 ```solidity
-function getSourceAmountSpecific(address _sourceToken, address _poolToken, uint _amount, bool _amountInCarbon)
+function getSourceAmountSpecific(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
     public
     view
-    returns (uint, uint);
+    returns (uint256, uint256);
 ```
 **Parameters**
 
@@ -438,7 +445,7 @@ resulting from possible migrations.
 
 
 ```solidity
-function setAddress(uint _selection, address _newAddress) external onlyOwner returns (bool);
+function setAddress(uint256 _selection, address _newAddress) external onlyOwner returns (bool);
 ```
 **Parameters**
 
@@ -460,7 +467,7 @@ Add a new carbon pool to retire with helper contract.
 
 
 ```solidity
-function addPool(address _poolToken, uint _poolBridge) external onlyOwner returns (bool);
+function addPool(address _poolToken, uint256 _poolBridge) external onlyOwner returns (bool);
 ```
 **Parameters**
 
@@ -503,7 +510,7 @@ Set the helper contract to be used with a carbon bridge.
 
 
 ```solidity
-function setBridgeHelper(uint _bridgeID, address _helper) external onlyOwner returns (bool);
+function setBridgeHelper(uint256 _bridgeID, address _helper) external onlyOwner returns (bool);
 ```
 **Parameters**
 
@@ -541,13 +548,13 @@ function feeWithdraw(address _token, address _recipient) external onlyOwner retu
 
 
 ```solidity
-event AddressUpdated(uint addressIndex, address indexed oldAddress, address indexed newAddress);
+event AddressUpdated(uint256 addressIndex, address indexed oldAddress, address indexed newAddress);
 ```
 
 ### PoolAdded
 
 ```solidity
-event PoolAdded(address poolToken, uint bridge);
+event PoolAdded(address poolToken, uint256 bridge);
 ```
 
 ### PoolRemoved
@@ -559,6 +566,6 @@ event PoolRemoved(address poolToken);
 ### BridgeHelperUpdated
 
 ```solidity
-event BridgeHelperUpdated(uint bridgeID, address helper);
+event BridgeHelperUpdated(uint256 bridgeID, address helper);
 ```
 

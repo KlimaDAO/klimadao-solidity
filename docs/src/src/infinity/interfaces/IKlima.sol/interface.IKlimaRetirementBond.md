@@ -1,5 +1,5 @@
 # IKlimaRetirementBond
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/IKlima.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/IKlima.sol)
 
 
 ## Functions
@@ -7,14 +7,14 @@
 
 
 ```solidity
-function swapToExact(address poolToken, uint amount) external;
+function swapToExact(address poolToken, uint256 amount) external;
 ```
 
 ### getKlimaAmount
 
 
 ```solidity
-function getKlimaAmount(uint poolAmount, address poolToken) external view returns (uint klimaNeeded);
+function getKlimaAmount(uint256 poolAmount, address poolToken) external view returns (uint256 klimaNeeded);
 ```
 
 ### owner

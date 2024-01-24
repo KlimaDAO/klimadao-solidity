@@ -1,5 +1,5 @@
 # CarbonRetirementBondDepository
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/bonds/CarbonRetirementBondDepository.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/bonds/CarbonRetirementBondDepository.sol)
 
 **Inherits:**
 Ownable2Step
@@ -53,7 +53,7 @@ Divisor used for calculating percentages.
 
 
 ```solidity
-uint public constant FEE_DIVISOR = 10_000;
+uint256 public constant FEE_DIVISOR = 10_000;
 ```
 
 
@@ -89,7 +89,7 @@ Mapping that stores the DAO fee charged for a specific pool token.
 
 
 ```solidity
-mapping(address => uint) public daoFee;
+mapping(address => uint256) public daoFee;
 ```
 
 
@@ -98,7 +98,7 @@ Mapping that stores the maximum slippage tolerated for a specific pool token.
 
 
 ```solidity
-mapping(address => uint) public maxSlippage;
+mapping(address => uint256) public maxSlippage;
 ```
 
 
@@ -120,7 +120,7 @@ Swaps the specified amount of pool tokens for KLIMA tokens.
 
 
 ```solidity
-function swapToExact(address poolToken, uint poolAmount) external;
+function swapToExact(address poolToken, uint256 poolAmount) external;
 ```
 **Parameters**
 
@@ -140,12 +140,12 @@ Retires the specified amount of carbon for the given pool token using KI.
 ```solidity
 function retireCarbonDefault(
     address poolToken,
-    uint retireAmount,
+    uint256 retireAmount,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 **Parameters**
 
@@ -177,12 +177,12 @@ Uses the provided project token for the underlying credit to retire.
 function retireCarbonSpecific(
     address poolToken,
     address projectToken,
-    uint retireAmount,
+    uint256 retireAmount,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 **Parameters**
 
@@ -243,7 +243,7 @@ Updates the maximum slippage percentage for a specified pool token.
 
 
 ```solidity
-function updateMaxSlippage(address poolToken, uint _maxSlippage) external onlyOwner;
+function updateMaxSlippage(address poolToken, uint256 _maxSlippage) external onlyOwner;
 ```
 **Parameters**
 
@@ -259,7 +259,7 @@ Updates the DAO fee for a specified pool token.
 
 
 ```solidity
-function updateDaoFee(address poolToken, uint _daoFee) external onlyOwner;
+function updateDaoFee(address poolToken, uint256 _daoFee) external onlyOwner;
 ```
 **Parameters**
 
@@ -309,7 +309,7 @@ If the raw amount needed from the dex exceeds slippage, than the limited amount 
 
 
 ```solidity
-function getKlimaAmount(uint poolAmount, address poolToken) public view returns (uint klimaNeeded);
+function getKlimaAmount(uint256 poolAmount, address poolToken) public view returns (uint256 klimaNeeded);
 ```
 **Parameters**
 
@@ -334,7 +334,7 @@ A fee is also transferred to the DAO address based on the fee divisor and the co
 
 
 ```solidity
-function _transferAndBurnKlima(uint totalKlima, address poolToken) private;
+function _transferAndBurnKlima(uint256 totalKlima, address poolToken) private;
 ```
 **Parameters**
 
@@ -352,7 +352,7 @@ Returns the current market price of the pool token in terms of KLIMA tokens.
 
 
 ```solidity
-function getMarketQuote(address poolToken, uint amountOut) internal view returns (uint currentPrice);
+function getMarketQuote(address poolToken, uint256 amountOut) internal view returns (uint256 currentPrice);
 ```
 **Parameters**
 
@@ -390,36 +390,36 @@ event ReferenceKlimaPositionChanged(address lp, uint8 oldPosition, uint8 newPosi
 ### DaoFeeChanged
 
 ```solidity
-event DaoFeeChanged(address pool, uint oldFee, uint newFee);
+event DaoFeeChanged(address pool, uint256 oldFee, uint256 newFee);
 ```
 
 ### PoolSlippageChanged
 
 ```solidity
-event PoolSlippageChanged(address pool, uint oldSlippage, uint newSlippage);
+event PoolSlippageChanged(address pool, uint256 oldSlippage, uint256 newSlippage);
 ```
 
 ### MarketOpened
 
 ```solidity
-event MarketOpened(address pool, uint amount);
+event MarketOpened(address pool, uint256 amount);
 ```
 
 ### MarketClosed
 
 ```solidity
-event MarketClosed(address pool, uint amount);
+event MarketClosed(address pool, uint256 amount);
 ```
 
 ### CarbonBonded
 
 ```solidity
-event CarbonBonded(address pool, uint poolAmount);
+event CarbonBonded(address pool, uint256 poolAmount);
 ```
 
 ### KlimaBonded
 
 ```solidity
-event KlimaBonded(uint daoFee, uint klimaBurned);
+event KlimaBonded(uint256 daoFee, uint256 klimaBurned);
 ```
 

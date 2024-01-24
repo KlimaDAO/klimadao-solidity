@@ -1,5 +1,5 @@
 # LibRetire
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/LibRetire.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/LibRetire.sol)
 
 **Author:**
 Cujo
@@ -14,7 +14,7 @@ Retire received carbon based on the bridge of the provided pool tokens using def
 ```solidity
 function retireReceivedCarbon(
     address poolToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -44,13 +44,13 @@ Retire received carbon based on the bridge of the provided pool tokens using spe
 function retireReceivedExactCarbonSpecific(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage
-) internal returns (uint redeemedAmount);
+) internal returns (uint256 redeemedAmount);
 ```
 **Parameters**
 
@@ -58,6 +58,37 @@ function retireReceivedExactCarbonSpecific(
 |----|----|-----------|
 |`poolToken`|`address`|           Pool token used to retire|
 |`projectToken`|`address`|        Project token being retired|
+|`amount`|`uint256`|              The amount of carbon to retire|
+|`retiringAddress`|`address`||
+|`retiringEntityString`|`string`|String description of the retiring entity|
+|`beneficiaryAddress`|`address`|  0x address for the beneficiary|
+|`beneficiaryString`|`string`|   String description of the beneficiary|
+|`retirementMessage`|`string`|   String message for this specific retirement|
+
+
+### retireReceivedCreditToken
+
+Retire received carbon based on the bridge of the provided pool tokens using default redemption
+
+
+```solidity
+function retireReceivedCreditToken(
+    address creditToken,
+    uint256 tokenId,
+    uint256 amount,
+    address retiringAddress,
+    string memory retiringEntityString,
+    address beneficiaryAddress,
+    string memory beneficiaryString,
+    string memory retirementMessage
+) internal;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`creditToken`|`address`|         Pool token used to retire|
+|`tokenId`|`uint256`||
 |`amount`|`uint256`|              The amount of carbon to retire|
 |`retiringAddress`|`address`||
 |`retiringEntityString`|`string`|String description of the retiring entity|
@@ -75,13 +106,13 @@ Additional function to handle the differences in wanting to fully retire x pool 
 function retireReceivedCarbonSpecificFromSource(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage
-) internal returns (uint redeemedAmount);
+) internal returns (uint256 redeemedAmount);
 ```
 **Parameters**
 
@@ -109,7 +140,7 @@ Returns the total carbon needed fee included
 
 
 ```solidity
-function getTotalCarbon(uint retireAmount) internal view returns (uint totalCarbon);
+function getTotalCarbon(uint256 retireAmount) internal view returns (uint256 totalCarbon);
 ```
 **Parameters**
 
@@ -130,7 +161,7 @@ Returns the total carbon needed fee included
 
 
 ```solidity
-function getTotalCarbonSpecific(address poolToken, uint retireAmount) internal view returns (uint totalCarbon);
+function getTotalCarbonSpecific(address poolToken, uint256 retireAmount) internal view returns (uint256 totalCarbon);
 ```
 **Parameters**
 
@@ -152,7 +183,7 @@ Returns the total fee needed to retire x number of tokens
 
 
 ```solidity
-function getFee(uint carbonAmount) internal view returns (uint fee);
+function getFee(uint256 carbonAmount) internal view returns (uint256 fee);
 ```
 **Parameters**
 
@@ -176,7 +207,7 @@ Saves the details of the retirement over to KlimaCarbonRetirements and project d
 function saveRetirementDetails(
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage
@@ -198,42 +229,42 @@ function saveRetirementDetails(
 
 
 ```solidity
-function getTotalRetirements(address account) internal view returns (uint totalRetirements);
+function getTotalRetirements(address account) internal view returns (uint256 totalRetirements);
 ```
 
 ### getTotalCarbonRetired
 
 
 ```solidity
-function getTotalCarbonRetired(address account) internal view returns (uint totalCarbonRetired);
+function getTotalCarbonRetired(address account) internal view returns (uint256 totalCarbonRetired);
 ```
 
 ### getTotalPoolRetired
 
 
 ```solidity
-function getTotalPoolRetired(address account, address poolToken) internal view returns (uint totalPoolRetired);
+function getTotalPoolRetired(address account, address poolToken) internal view returns (uint256 totalPoolRetired);
 ```
 
 ### getTotalProjectRetired
 
 
 ```solidity
-function getTotalProjectRetired(address account, address projectToken) internal view returns (uint);
+function getTotalProjectRetired(address account, address projectToken) internal view returns (uint256);
 ```
 
 ### getTotalRewardsClaimed
 
 
 ```solidity
-function getTotalRewardsClaimed(address account) internal view returns (uint totalClaimed);
+function getTotalRewardsClaimed(address account) internal view returns (uint256 totalClaimed);
 ```
 
 ### getRetirementDetails
 
 
 ```solidity
-function getRetirementDetails(address account, uint retirementIndex)
+function getRetirementDetails(address account, uint256 retirementIndex)
     internal
     view
     returns (
@@ -242,8 +273,21 @@ function getRetirementDetails(address account, uint retirementIndex)
         address beneficiaryAddress,
         string memory beneficiary,
         string memory retirementMessage,
-        uint amount
+        uint256 amount
     );
+```
+
+## Structs
+### RetireDetails
+
+```solidity
+struct RetireDetails {
+    address retiringAddress;
+    string retiringEntityString;
+    address beneficiaryAddress;
+    string beneficiaryString;
+    string retirementMessage;
+}
 ```
 
 ## Enums
@@ -253,7 +297,8 @@ function getRetirementDetails(address account, uint retirementIndex)
 enum CarbonBridge {
     TOUCAN,
     MOSS,
-    C3
+    C3,
+    ICR
 }
 ```
 

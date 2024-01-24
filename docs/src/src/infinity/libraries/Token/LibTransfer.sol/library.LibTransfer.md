@@ -1,5 +1,5 @@
 # LibTransfer
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/Token/LibTransfer.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/Token/LibTransfer.sol)
 
 **Author:**
 publius
@@ -10,23 +10,34 @@ publius
 
 
 ```solidity
-function transferToken(IERC20 token, address recipient, uint amount, From fromMode, To toMode)
+function transferToken(IERC20 token, address recipient, uint256 amount, From fromMode, To toMode)
     internal
-    returns (uint transferredAmount);
+    returns (uint256 transferredAmount);
 ```
 
 ### receiveToken
 
 
 ```solidity
-function receiveToken(IERC20 token, uint amount, address sender, From mode) internal returns (uint receivedAmount);
+function receiveToken(IERC20 token, uint256 amount, address sender, From mode)
+    internal
+    returns (uint256 receivedAmount);
+```
+
+### receive1155Token
+
+
+```solidity
+function receive1155Token(IERC1155 token, uint256 tokenId, uint256 amount, address sender, From mode)
+    internal
+    returns (uint256 receivedAmount);
 ```
 
 ### sendToken
 
 
 ```solidity
-function sendToken(IERC20 token, uint amount, address recipient, To mode) internal;
+function sendToken(IERC20 token, uint256 amount, address recipient, To mode) internal;
 ```
 
 ## Enums

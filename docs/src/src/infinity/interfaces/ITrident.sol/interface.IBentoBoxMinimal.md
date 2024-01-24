@@ -1,5 +1,5 @@
 # IBentoBoxMinimal
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/ITrident.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/ITrident.sol)
 
 
 ## Functions
@@ -17,6 +17,6 @@ function setMasterContractApproval(address user, address masterContract, bool ap
 
 
 ```solidity
-function toAmount(IERC20 token, uint share, bool roundUp) external view returns (uint amount);
+function toAmount(IERC20 token, uint256 share, bool roundUp) external view returns (uint256 amount);
 ```
 

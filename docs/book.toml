@@ -18,4 +18,4 @@ enable = true
 level = 1
 
 [preprocessor.custom]
-command = "python3 ./docs/preprocess_summary.py"
+command = "python3 docs/preprocess_summary.py"

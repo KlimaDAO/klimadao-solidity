@@ -1,5 +1,5 @@
 # SafeMathUniswap
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SushiRouterV02.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SushiRouterV02.sol)
 
 
 ## Functions
@@ -7,20 +7,20 @@
 
 
 ```solidity
-function add(uint x, uint y) internal pure returns (uint z);
+function add(uint256 x, uint256 y) internal pure returns (uint256 z);
 ```
 
 ### sub
 
 
 ```solidity
-function sub(uint x, uint y) internal pure returns (uint z);
+function sub(uint256 x, uint256 y) internal pure returns (uint256 z);
 ```
 
 ### mul
 
 
 ```solidity
-function mul(uint x, uint y) internal pure returns (uint z);
+function mul(uint256 x, uint256 y) internal pure returns (uint256 z);
 ```
 

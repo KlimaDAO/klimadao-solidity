@@ -1,5 +1,5 @@
 # LibMossCarbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/Bridges/LibMossCarbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/Bridges/LibMossCarbon.sol)
 
 **Author:**
 Cujo
@@ -14,7 +14,7 @@ Retires Moss MCO2 tokens on Polygon
 ```solidity
 function offsetCarbon(
     address poolToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
@@ -48,7 +48,7 @@ event CarbonRetired(
     string retirementMessage,
     address indexed carbonPool,
     address carbonToken,
-    uint retiredAmount
+    uint256 retiredAmount
 );
 ```
 

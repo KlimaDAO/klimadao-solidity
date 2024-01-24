@@ -1,5 +1,5 @@
 # IKlimaRetirementAggregator
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SwapRetirementHolder.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SwapRetirementHolder.sol)
 
 
 ## Functions
@@ -10,7 +10,7 @@
 function retireCarbon(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     address _beneficiaryAddress,
     string memory _beneficiaryString,

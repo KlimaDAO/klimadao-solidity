@@ -1,5 +1,5 @@
 # IRetireToucanCarbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/retirement_v1/interfaces/IRetireToucanCarbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/retirement_v1/interfaces/IRetireToucanCarbon.sol)
 
 
 ## Functions
@@ -10,7 +10,7 @@
 function retireToucan(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     string memory _retireEntityString,
     address _beneficiaryAddress,
@@ -27,7 +27,7 @@ function retireToucan(
 function retireToucanSpecific(
     address _sourceToken,
     address _poolToken,
-    uint _amount,
+    uint256 _amount,
     bool _amountInCarbon,
     string memory _retireEntityString,
     address _beneficiaryAddress,
@@ -42,9 +42,9 @@ function retireToucanSpecific(
 
 
 ```solidity
-function getNeededBuyAmount(address _sourceToken, address _poolToken, uint _poolAmount, bool _retireSpecific)
+function getNeededBuyAmount(address _sourceToken, address _poolToken, uint256 _poolAmount, bool _retireSpecific)
     external
     view
-    returns (uint, uint);
+    returns (uint256, uint256);
 ```
 

@@ -1,5 +1,5 @@
 # KlimaIDONFT
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/upgradeable/KlimaIDONFT.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/upgradeable/KlimaIDONFT.sol)
 
 **Inherits:**
 Initializable, ContextUpgradeable, AccessControlEnumerableUpgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, ERC721PausableUpgradeable
@@ -37,7 +37,7 @@ string private _baseTokenURI;
 ### __gap
 
 ```solidity
-uint[48] private __gap;
+uint256[48] private __gap;
 ```
 
 
@@ -95,21 +95,21 @@ function tokenURI() public view returns (string memory);
 
 
 ```solidity
-function totalSupply() public view override returns (uint);
+function totalSupply() public view override returns (uint256);
 ```
 
 ### burn
 
 
 ```solidity
-function burn(uint tokenId) public override;
+function burn(uint256 tokenId) public override;
 ```
 
 ### _burn
 
 
 ```solidity
-function _burn(uint tokenId) internal virtual override(ERC721Upgradeable);
+function _burn(uint256 tokenId) internal virtual override(ERC721Upgradeable);
 ```
 
 ### mint
@@ -144,7 +144,7 @@ function unpause() public virtual onlyPauser;
 
 
 ```solidity
-function _beforeTokenTransfer(address from, address to, uint tokenId)
+function _beforeTokenTransfer(address from, address to, uint256 tokenId)
     internal
     virtual
     override(ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721PausableUpgradeable);

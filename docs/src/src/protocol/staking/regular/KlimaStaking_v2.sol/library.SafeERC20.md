@@ -1,5 +1,5 @@
 # SafeERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/regular/KlimaStaking_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/regular/KlimaStaking_v2.sol)
 
 
 ## Functions
@@ -7,14 +7,14 @@
 
 
 ```solidity
-function safeTransfer(IERC20 token, address to, uint value) internal;
+function safeTransfer(IERC20 token, address to, uint256 value) internal;
 ```
 
 ### safeTransferFrom
 
 
 ```solidity
-function safeTransferFrom(IERC20 token, address from, address to, uint value) internal;
+function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal;
 ```
 
 ### safeApprove
@@ -26,21 +26,21 @@ Whenever possible, use {safeIncreaseAllowance} and
 
 
 ```solidity
-function safeApprove(IERC20 token, address spender, uint value) internal;
+function safeApprove(IERC20 token, address spender, uint256 value) internal;
 ```
 
 ### safeIncreaseAllowance
 
 
 ```solidity
-function safeIncreaseAllowance(IERC20 token, address spender, uint value) internal;
+function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal;
 ```
 
 ### safeDecreaseAllowance
 
 
 ```solidity
-function safeDecreaseAllowance(IERC20 token, address spender, uint value) internal;
+function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal;
 ```
 
 ### _callOptionalReturn

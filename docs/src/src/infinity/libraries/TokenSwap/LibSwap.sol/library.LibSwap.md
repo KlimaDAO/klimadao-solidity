@@ -1,5 +1,5 @@
 # LibSwap
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/libraries/TokenSwap/LibSwap.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/libraries/TokenSwap/LibSwap.sol)
 
 **Author:**
 Cujo
@@ -12,9 +12,9 @@ Swaps to an exact number of carbon tokens
 
 
 ```solidity
-function swapToExactCarbonDefault(address sourceToken, address carbonToken, uint sourceAmount, uint carbonAmount)
+function swapToExactCarbonDefault(address sourceToken, address carbonToken, uint256 sourceAmount, uint256 carbonAmount)
     internal
-    returns (uint carbonReceived);
+    returns (uint256 carbonReceived);
 ```
 **Parameters**
 
@@ -38,9 +38,9 @@ Swaps to an exact number of source tokens
 
 
 ```solidity
-function swapExactSourceToCarbonDefault(address sourceToken, address carbonToken, uint amount)
+function swapExactSourceToCarbonDefault(address sourceToken, address carbonToken, uint256 amount)
     internal
-    returns (uint carbonReceived);
+    returns (uint256 carbonReceived);
 ```
 **Parameters**
 
@@ -79,7 +79,7 @@ Swaps a given amount of USDC for KLIMA using Sushiswap
 
 
 ```solidity
-function swapToKlimaFromUsdc(uint sourceAmount, uint klimaAmount) internal returns (uint klimaReceived);
+function swapToKlimaFromUsdc(uint256 sourceAmount, uint256 klimaAmount) internal returns (uint256 klimaReceived);
 ```
 **Parameters**
 
@@ -101,9 +101,9 @@ Swaps from arbitrary token routed through USDC for KLIMA
 
 
 ```solidity
-function swapToKlimaFromOther(address sourceToken, uint sourceAmount, uint klimaAmount)
+function swapToKlimaFromOther(address sourceToken, uint256 sourceAmount, uint256 klimaAmount)
     internal
-    returns (uint klimaReceived);
+    returns (uint256 klimaReceived);
 ```
 **Parameters**
 
@@ -126,9 +126,9 @@ Performs a swap with Retirement Bonds for carbon to retire.
 
 
 ```solidity
-function swapWithRetirementBonds(address sourceToken, address carbonToken, uint sourceAmount, uint carbonAmount)
+function swapWithRetirementBonds(address sourceToken, address carbonToken, uint256 sourceAmount, uint256 carbonAmount)
     internal
-    returns (uint carbonRecieved);
+    returns (uint256 carbonRecieved);
 ```
 **Parameters**
 
@@ -152,10 +152,10 @@ Get the source amount needed when swapping within a single DEX
 
 
 ```solidity
-function getSourceAmount(address sourceToken, address carbonToken, uint amount)
+function getSourceAmount(address sourceToken, address carbonToken, uint256 amount)
     internal
     view
-    returns (uint sourceNeeded);
+    returns (uint256 sourceNeeded);
 ```
 **Parameters**
 
@@ -178,10 +178,10 @@ Get the source amount needed when swapping between multiple DEXs
 
 
 ```solidity
-function getMultipleSourceAmount(address sourceToken, address carbonToken, uint amount)
+function getMultipleSourceAmount(address sourceToken, address carbonToken, uint256 amount)
     internal
     view
-    returns (uint[] memory);
+    returns (uint256[] memory);
 ```
 **Parameters**
 
@@ -205,10 +205,10 @@ amount needed if a DEX swap is required.
 
 
 ```solidity
-function getSourceAmountFromRetirementBond(address sourceToken, address carbonToken, uint amount)
+function getSourceAmountFromRetirementBond(address sourceToken, address carbonToken, uint256 amount)
     internal
     view
-    returns (uint sourceNeeded);
+    returns (uint256 sourceNeeded);
 ```
 **Parameters**
 
@@ -231,10 +231,10 @@ Get the source amount needed when swapping between multiple DEXs
 
 
 ```solidity
-function getDefaultAmountOut(address sourceToken, address carbonToken, uint amount)
+function getDefaultAmountOut(address sourceToken, address carbonToken, uint256 amount)
     internal
     view
-    returns (uint amountOut);
+    returns (uint256 amountOut);
 ```
 **Parameters**
 
@@ -257,9 +257,9 @@ Perform a toExact swap depending on the dex provided
 
 
 ```solidity
-function _performToExactSwap(uint8 dex, address router, address[] memory path, uint maxAmountIn, uint amount)
+function _performToExactSwap(uint8 dex, address router, address[] memory path, uint256 maxAmountIn, uint256 amount)
     private
-    returns (uint amountOut);
+    returns (uint256 amountOut);
 ```
 **Parameters**
 
@@ -284,9 +284,9 @@ Perform a swap using all source tokens
 
 
 ```solidity
-function _performExactSourceSwap(uint8 dex, address router, address[] memory path, uint amount)
+function _performExactSourceSwap(uint8 dex, address router, address[] memory path, uint256 amount)
     private
-    returns (uint amountOut);
+    returns (uint256 amountOut);
 ```
 **Parameters**
 
@@ -310,10 +310,10 @@ Return the amountIn needed for an exact swap
 
 
 ```solidity
-function _getAmountIn(uint8 dex, address router, address[] memory path, uint amount)
+function _getAmountIn(uint8 dex, address router, address[] memory path, uint256 amount)
     private
     view
-    returns (uint amountIn);
+    returns (uint256 amountIn);
 ```
 **Parameters**
 
@@ -337,10 +337,10 @@ Return the amountIn needed for an exact swap
 
 
 ```solidity
-function _getAmountOut(uint8 dex, address router, address[] memory path, uint amount)
+function _getAmountOut(uint8 dex, address router, address[] memory path, uint256 amount)
     private
     view
-    returns (uint amountOut);
+    returns (uint256 amountOut);
 ```
 **Parameters**
 

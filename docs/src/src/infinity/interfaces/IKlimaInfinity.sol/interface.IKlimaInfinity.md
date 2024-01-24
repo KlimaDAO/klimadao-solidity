@@ -1,5 +1,5 @@
 # IKlimaInfinity
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/IKlimaInfinity.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/IKlimaInfinity.sol)
 
 
 ## Functions
@@ -10,13 +10,13 @@
 function toucan_retireExactCarbonPoolDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactCarbonPoolWithEntityDefault
@@ -26,14 +26,14 @@ function toucan_retireExactCarbonPoolDefault(
 function toucan_retireExactCarbonPoolWithEntityDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactSourcePoolDefault
@@ -43,13 +43,13 @@ function toucan_retireExactCarbonPoolWithEntityDefault(
 function toucan_retireExactSourcePoolDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactSourcePoolWithEntityDefault
@@ -59,14 +59,14 @@ function toucan_retireExactSourcePoolDefault(
 function toucan_retireExactSourcePoolWithEntityDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactCarbonPoolSpecific
@@ -77,13 +77,13 @@ function toucan_retireExactCarbonPoolSpecific(
     address sourceToken,
     address carbonToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactCarbonPoolWithEntitySpecific
@@ -94,14 +94,14 @@ function toucan_retireExactCarbonPoolWithEntitySpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactSourcePoolWithEntitySpecific
@@ -112,14 +112,14 @@ function toucan_retireExactSourcePoolWithEntitySpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### toucan_retireExactSourcePoolSpecific
@@ -130,13 +130,13 @@ function toucan_retireExactSourcePoolSpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### moss_retireExactCarbonPoolDefault
@@ -146,13 +146,13 @@ function toucan_retireExactSourcePoolSpecific(
 function moss_retireExactCarbonPoolDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### moss_retireExactCarbonPoolWithEntityDefault
@@ -162,14 +162,14 @@ function moss_retireExactCarbonPoolDefault(
 function moss_retireExactCarbonPoolWithEntityDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### moss_retireExactSourcePoolDefault
@@ -179,13 +179,13 @@ function moss_retireExactCarbonPoolWithEntityDefault(
 function moss_retireExactSourcePoolDefault(
     address sourceToken,
     address carbonToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### moss_retireExactSourcePoolWithEntityDefault
@@ -195,14 +195,14 @@ function moss_retireExactSourcePoolDefault(
 function moss_retireExactSourcePoolWithEntityDefault(
     address sourceToken,
     address carbonToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactCarbonPoolDefault
@@ -212,13 +212,13 @@ function moss_retireExactSourcePoolWithEntityDefault(
 function c3_retireExactCarbonPoolDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactCarbonPoolWithEntityDefault
@@ -228,14 +228,14 @@ function c3_retireExactCarbonPoolDefault(
 function c3_retireExactCarbonPoolWithEntityDefault(
     address sourceToken,
     address carbonToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactSourcePoolDefault
@@ -245,13 +245,13 @@ function c3_retireExactCarbonPoolWithEntityDefault(
 function c3_retireExactSourcePoolDefault(
     address sourceToken,
     address carbonToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactSourcePoolWithEntityDefault
@@ -261,14 +261,14 @@ function c3_retireExactSourcePoolDefault(
 function c3_retireExactSourcePoolWithEntityDefault(
     address sourceToken,
     address carbonToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactCarbonPoolSpecific
@@ -279,13 +279,13 @@ function c3_retireExactCarbonPoolSpecific(
     address sourceToken,
     address carbonToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactCarbonPoolWithEntitySpecific
@@ -296,14 +296,14 @@ function c3_retireExactCarbonPoolWithEntitySpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint amount,
+    uint256 amount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactSourcePoolWithEntitySpecific
@@ -314,14 +314,14 @@ function c3_retireExactSourcePoolWithEntitySpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 
 ### c3_retireExactSourcePoolSpecific
@@ -332,12 +332,12 @@ function c3_retireExactSourcePoolSpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint sourceAmount,
+    uint256 sourceAmount,
     address retiringAddress,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external returns (uint retirementIndex);
+) external returns (uint256 retirementIndex);
 ```
 

@@ -1,5 +1,5 @@
 # IKlimaInfinity
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/interfaces/IKlimaInfinity.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/interfaces/IKlimaInfinity.sol)
 
 
 ## Functions
@@ -10,14 +10,14 @@
 function retireExactCarbonDefault(
     address sourceToken,
     address poolToken,
-    uint maxAmountIn,
-    uint retireAmount,
+    uint256 maxAmountIn,
+    uint256 retireAmount,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external payable returns (uint retirementIndex);
+) external payable returns (uint256 retirementIndex);
 ```
 
 ### retireExactCarbonSpecific
@@ -28,14 +28,14 @@ function retireExactCarbonSpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint maxAmountIn,
-    uint retireAmount,
+    uint256 maxAmountIn,
+    uint256 retireAmount,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external payable returns (uint retirementIndex);
+) external payable returns (uint256 retirementIndex);
 ```
 
 ### retireExactSourceDefault
@@ -45,13 +45,13 @@ function retireExactCarbonSpecific(
 function retireExactSourceDefault(
     address sourceToken,
     address poolToken,
-    uint maxAmountIn,
+    uint256 maxAmountIn,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external payable returns (uint retirementIndex);
+) external payable returns (uint256 retirementIndex);
 ```
 
 ### retireExactSourceSpecific
@@ -62,42 +62,42 @@ function retireExactSourceSpecific(
     address sourceToken,
     address poolToken,
     address projectToken,
-    uint maxAmountIn,
+    uint256 maxAmountIn,
     string memory retiringEntityString,
     address beneficiaryAddress,
     string memory beneficiaryString,
     string memory retirementMessage,
     uint8 fromMode
-) external payable returns (uint retirementIndex);
+) external payable returns (uint256 retirementIndex);
 ```
 
 ### getSourceAmountDefaultRetirement
 
 
 ```solidity
-function getSourceAmountDefaultRetirement(address sourceToken, address carbonToken, uint retireAmount)
+function getSourceAmountDefaultRetirement(address sourceToken, address carbonToken, uint256 retireAmount)
     external
     view
-    returns (uint amountIn);
+    returns (uint256 amountIn);
 ```
 
 ### getSourceAmountSpecificRetirement
 
 
 ```solidity
-function getSourceAmountSpecificRetirement(address sourceToken, address carbonToken, uint retireAmount)
+function getSourceAmountSpecificRetirement(address sourceToken, address carbonToken, uint256 retireAmount)
     external
     view
-    returns (uint amountIn);
+    returns (uint256 amountIn);
 ```
 
 ### getSourceAmountSwapOnly
 
 
 ```solidity
-function getSourceAmountSwapOnly(address sourceToken, address carbonToken, uint amountOut)
+function getSourceAmountSwapOnly(address sourceToken, address carbonToken, uint256 amountOut)
     external
     view
-    returns (uint amountIn);
+    returns (uint256 amountIn);
 ```
 

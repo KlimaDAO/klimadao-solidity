@@ -1,5 +1,5 @@
 # SafeMath
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 Submitted for verification at Etherscan.io on 2021-06-12
 
@@ -25,7 +25,7 @@ Requirements:
 
 
 ```solidity
-function add(uint a, uint b) internal pure returns (uint);
+function add(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### sub
@@ -38,7 +38,7 @@ Requirements:
 
 
 ```solidity
-function sub(uint a, uint b) internal pure returns (uint);
+function sub(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### sub
@@ -51,7 +51,7 @@ Requirements:
 
 
 ```solidity
-function sub(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### mul
@@ -64,7 +64,7 @@ Requirements:
 
 
 ```solidity
-function mul(uint a, uint b) internal pure returns (uint);
+function mul(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### div
@@ -79,7 +79,7 @@ Requirements:
 
 
 ```solidity
-function div(uint a, uint b) internal pure returns (uint);
+function div(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### div
@@ -94,7 +94,7 @@ Requirements:
 
 
 ```solidity
-function div(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### mod
@@ -109,7 +109,7 @@ Requirements:
 
 
 ```solidity
-function mod(uint a, uint b) internal pure returns (uint);
+function mod(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### mod
@@ -124,35 +124,35 @@ Requirements:
 
 
 ```solidity
-function mod(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### sqrrt
 
 
 ```solidity
-function sqrrt(uint a) internal pure returns (uint c);
+function sqrrt(uint256 a) internal pure returns (uint256 c);
 ```
 
 ### percentageAmount
 
 
 ```solidity
-function percentageAmount(uint total_, uint8 percentage_) internal pure returns (uint percentAmount_);
+function percentageAmount(uint256 total_, uint8 percentage_) internal pure returns (uint256 percentAmount_);
 ```
 
 ### substractPercentage
 
 
 ```solidity
-function substractPercentage(uint total_, uint8 percentageToSub_) internal pure returns (uint result_);
+function substractPercentage(uint256 total_, uint8 percentageToSub_) internal pure returns (uint256 result_);
 ```
 
 ### percentageOfTotal
 
 
 ```solidity
-function percentageOfTotal(uint part_, uint total_) internal pure returns (uint percent_);
+function percentageOfTotal(uint256 part_, uint256 total_) internal pure returns (uint256 percent_);
 ```
 
 ### average
@@ -164,20 +164,20 @@ zero.*
 
 
 ```solidity
-function average(uint a, uint b) internal pure returns (uint);
+function average(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### quadraticPricing
 
 
 ```solidity
-function quadraticPricing(uint payment_, uint multiplier_) internal pure returns (uint);
+function quadraticPricing(uint256 payment_, uint256 multiplier_) internal pure returns (uint256);
 ```
 
 ### bondingCurve
 
 
 ```solidity
-function bondingCurve(uint supply_, uint multiplier_) internal pure returns (uint);
+function bondingCurve(uint256 supply_, uint256 multiplier_) internal pure returns (uint256);
 ```
 

@@ -1,5 +1,5 @@
 # IUniswapV2Pair
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/retirement_v1/interfaces/IUniswapV2Pair.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/retirement_v1/interfaces/IUniswapV2Pair.sol)
 
 
 ## Functions
@@ -28,42 +28,42 @@ function decimals() external pure returns (uint8);
 
 
 ```solidity
-function totalSupply() external view returns (uint);
+function totalSupply() external view returns (uint256);
 ```
 
 ### balanceOf
 
 
 ```solidity
-function balanceOf(address owner) external view returns (uint);
+function balanceOf(address owner) external view returns (uint256);
 ```
 
 ### allowance
 
 
 ```solidity
-function allowance(address owner, address spender) external view returns (uint);
+function allowance(address owner, address spender) external view returns (uint256);
 ```
 
 ### approve
 
 
 ```solidity
-function approve(address spender, uint value) external returns (bool);
+function approve(address spender, uint256 value) external returns (bool);
 ```
 
 ### transfer
 
 
 ```solidity
-function transfer(address to, uint value) external returns (bool);
+function transfer(address to, uint256 value) external returns (bool);
 ```
 
 ### transferFrom
 
 
 ```solidity
-function transferFrom(address from, address to, uint value) external returns (bool);
+function transferFrom(address from, address to, uint256 value) external returns (bool);
 ```
 
 ### DOMAIN_SEPARATOR
@@ -84,21 +84,22 @@ function PERMIT_TYPEHASH() external pure returns (bytes32);
 
 
 ```solidity
-function nonces(address owner) external view returns (uint);
+function nonces(address owner) external view returns (uint256);
 ```
 
 ### permit
 
 
 ```solidity
-function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+    external;
 ```
 
 ### MINIMUM_LIQUIDITY
 
 
 ```solidity
-function MINIMUM_LIQUIDITY() external pure returns (uint);
+function MINIMUM_LIQUIDITY() external pure returns (uint256);
 ```
 
 ### factory
@@ -133,42 +134,42 @@ function getReserves() external view returns (uint112 reserve0, uint112 reserve1
 
 
 ```solidity
-function price0CumulativeLast() external view returns (uint);
+function price0CumulativeLast() external view returns (uint256);
 ```
 
 ### price1CumulativeLast
 
 
 ```solidity
-function price1CumulativeLast() external view returns (uint);
+function price1CumulativeLast() external view returns (uint256);
 ```
 
 ### kLast
 
 
 ```solidity
-function kLast() external view returns (uint);
+function kLast() external view returns (uint256);
 ```
 
 ### mint
 
 
 ```solidity
-function mint(address to) external returns (uint liquidity);
+function mint(address to) external returns (uint256 liquidity);
 ```
 
 ### burn
 
 
 ```solidity
-function burn(address to) external returns (uint amount0, uint amount1);
+function burn(address to) external returns (uint256 amount0, uint256 amount1);
 ```
 
 ### swap
 
 
 ```solidity
-function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+function swap(uint256 amount0Out, uint256 amount1Out, address to, bytes calldata data) external;
 ```
 
 ### skim
@@ -196,32 +197,37 @@ function initialize(address, address) external;
 ### Approval
 
 ```solidity
-event Approval(address indexed owner, address indexed spender, uint value);
+event Approval(address indexed owner, address indexed spender, uint256 value);
 ```
 
 ### Transfer
 
 ```solidity
-event Transfer(address indexed from, address indexed to, uint value);
+event Transfer(address indexed from, address indexed to, uint256 value);
 ```
 
 ### Mint
 
 ```solidity
-event Mint(address indexed sender, uint amount0, uint amount1);
+event Mint(address indexed sender, uint256 amount0, uint256 amount1);
 ```
 
 ### Burn
 
 ```solidity
-event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
+event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
 ```
 
 ### Swap
 
 ```solidity
 event Swap(
-    address indexed sender, uint amount0In, uint amount1In, uint amount0Out, uint amount1Out, address indexed to
+    address indexed sender,
+    uint256 amount0In,
+    uint256 amount1In,
+    uint256 amount0Out,
+    uint256 amount1Out,
+    address indexed to
 );
 ```
 

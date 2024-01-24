@@ -1,5 +1,5 @@
 # AltExercisepOLY
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/pKLIMA/AltExercisepKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/pKLIMA/AltExercisepKLIMA.sol)
 
 Exercise contract for unapproved sellers prior to migrating pOLY.
 It is not possible for a user to use both (no double dipping).
@@ -81,14 +81,14 @@ constructor(address _pOLY, address _ohm, address _dai, address _treasury, addres
 
 
 ```solidity
-function setTerms(address _vester, uint _rate, uint _claimed, uint _max) external;
+function setTerms(address _vester, uint256 _rate, uint256 _claimed, uint256 _max) external;
 ```
 
 ### exercise
 
 
 ```solidity
-function exercise(uint _amount) external;
+function exercise(uint256 _amount) external;
 ```
 
 ### pushWalletChange
@@ -109,14 +109,14 @@ function pullWalletChange(address _oldWallet) external;
 
 
 ```solidity
-function redeemableFor(address _vester) public view returns (uint);
+function redeemableFor(address _vester) public view returns (uint256);
 ```
 
 ### redeemable
 
 
 ```solidity
-function redeemable(Term memory _info) internal view returns (uint);
+function redeemable(Term memory _info) internal view returns (uint256);
 ```
 
 ### pushOwnership
@@ -138,9 +138,9 @@ function pullOwnership() external returns (bool);
 
 ```solidity
 struct Term {
-    uint percent;
-    uint claimed;
-    uint max;
+    uint256 percent;
+    uint256 claimed;
+    uint256 max;
 }
 ```
 

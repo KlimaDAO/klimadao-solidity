@@ -1,5 +1,5 @@
 # Account
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/AppStorage.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/AppStorage.sol)
 
 **Author:**
 Cujo
@@ -15,8 +15,8 @@ struct Retirement {
     address beneficiaryAddress;
     string beneficiary;
     string retirementMessage;
-    uint amount;
-    uint pledgeID;
+    uint256 amount;
+    uint256 pledgeID;
 }
 ```
 
@@ -24,12 +24,12 @@ struct Retirement {
 
 ```solidity
 struct State {
-    mapping(uint => Retirement) retirements;
-    mapping(address => uint) totalPoolRetired;
-    mapping(address => uint) totalProjectRetired;
-    uint totalRetirements;
-    uint totalCarbonRetired;
-    uint totalRewardsClaimed;
+    mapping(uint256 => Retirement) retirements;
+    mapping(address => uint256) totalPoolRetired;
+    mapping(address => uint256) totalProjectRetired;
+    uint256 totalRetirements;
+    uint256 totalCarbonRetired;
+    uint256 totalRewardsClaimed;
 }
 ```
 

@@ -1,5 +1,5 @@
 # RedeemToucanPoolFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol)
 
 **Inherits:**
 [ReentrancyGuard](/src/infinity/ReentrancyGuard.sol/abstract.ReentrancyGuard.md)
@@ -15,11 +15,11 @@ Redeems default underlying carbon tokens from a Toucan Pool
 function toucanRedeemExactCarbonPoolDefault(
     address sourceToken,
     address poolToken,
-    uint amount,
-    uint maxAmountIn,
+    uint256 amount,
+    uint256 maxAmountIn,
     LibTransfer.From fromMode,
     LibTransfer.To toMode
-) external nonReentrant returns (address[] memory projectTokens, uint[] memory amounts);
+) external nonReentrant returns (address[] memory projectTokens, uint256[] memory amounts);
 ```
 **Parameters**
 
@@ -49,12 +49,12 @@ Redeems specific underlying carbon tokens from a Toucan Pool
 function toucanRedeemExactCarbonPoolSpecific(
     address sourceToken,
     address poolToken,
-    uint maxAmountIn,
+    uint256 maxAmountIn,
     address[] memory projectTokens,
-    uint[] memory amounts,
+    uint256[] memory amounts,
     LibTransfer.From fromMode,
     LibTransfer.To toMode
-) external nonReentrant returns (uint[] memory redeemedAmounts);
+) external nonReentrant returns (uint256[] memory redeemedAmounts);
 ```
 **Parameters**
 

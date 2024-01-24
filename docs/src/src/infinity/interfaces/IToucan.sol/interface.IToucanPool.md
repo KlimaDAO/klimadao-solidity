@@ -1,5 +1,5 @@
 # IToucanPool
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/IToucan.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/IToucan.sol)
 
 
 ## Functions
@@ -7,28 +7,28 @@
 
 
 ```solidity
-function redeemAuto2(uint amount) external returns (address[] memory tco2s, uint[] memory amounts);
+function redeemAuto2(uint256 amount) external returns (address[] memory tco2s, uint256[] memory amounts);
 ```
 
 ### redeemMany
 
 
 ```solidity
-function redeemMany(address[] calldata erc20s, uint[] calldata amounts) external;
+function redeemMany(address[] calldata erc20s, uint256[] calldata amounts) external;
 ```
 
 ### feeRedeemPercentageInBase
 
 
 ```solidity
-function feeRedeemPercentageInBase() external pure returns (uint);
+function feeRedeemPercentageInBase() external pure returns (uint256);
 ```
 
 ### feeRedeemDivider
 
 
 ```solidity
-function feeRedeemDivider() external pure returns (uint);
+function feeRedeemDivider() external pure returns (uint256);
 ```
 
 ### redeemFeeExemptedAddresses

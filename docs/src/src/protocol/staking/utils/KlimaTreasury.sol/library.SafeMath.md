@@ -1,5 +1,5 @@
 # SafeMath
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/utils/KlimaTreasury.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/utils/KlimaTreasury.sol)
 
 
 ## Functions
@@ -7,62 +7,62 @@
 
 
 ```solidity
-function add(uint a, uint b) internal pure returns (uint);
+function add(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### sub
 
 
 ```solidity
-function sub(uint a, uint b) internal pure returns (uint);
+function sub(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### sub
 
 
 ```solidity
-function sub(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### mul
 
 
 ```solidity
-function mul(uint a, uint b) internal pure returns (uint);
+function mul(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### div
 
 
 ```solidity
-function div(uint a, uint b) internal pure returns (uint);
+function div(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### div
 
 
 ```solidity
-function div(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### mod
 
 
 ```solidity
-function mod(uint a, uint b) internal pure returns (uint);
+function mod(uint256 a, uint256 b) internal pure returns (uint256);
 ```
 
 ### mod
 
 
 ```solidity
-function mod(uint a, uint b, string memory errorMessage) internal pure returns (uint);
+function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256);
 ```
 
 ### sqrrt
 
 
 ```solidity
-function sqrrt(uint a) internal pure returns (uint c);
+function sqrrt(uint256 a) internal pure returns (uint256 c);
 ```
 

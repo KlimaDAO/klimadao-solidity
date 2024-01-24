@@ -1,5 +1,5 @@
 # IERC721Receiver
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/interfaces/IERC721Receiver.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/interfaces/IERC721Receiver.sol)
 
 *Interface for any contract that wants to support safeTransfers
 from ERC721 asset contracts.*
@@ -16,7 +16,7 @@ The selector can be obtained in Solidity with `IERC721Receiver.onERC721Received.
 
 
 ```solidity
-function onERC721Received(address operator, address from, uint tokenId, bytes calldata data)
+function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data)
     external
     returns (bytes4);
 ```

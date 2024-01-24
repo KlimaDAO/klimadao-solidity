@@ -1,5 +1,5 @@
 # MetaTransactionsFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/facets/MetaTransactionsFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/facets/MetaTransactionsFacet.sol)
 
 **Inherits:**
 [ReentrancyGuard](/src/infinity/ReentrancyGuard.sol/abstract.ReentrancyGuard.md)
@@ -55,7 +55,7 @@ Query the latest nonce of an address
 
 
 ```solidity
-function getNonce(address user) external view returns (uint nonce_);
+function getNonce(address user) external view returns (uint256 nonce_);
 ```
 **Parameters**
 
@@ -105,7 +105,7 @@ event MetaTransactionExecuted(address userAddress, address payable relayerAddres
 
 ```solidity
 struct MetaTransaction {
-    uint nonce;
+    uint256 nonce;
     address from;
     bytes functionSignature;
 }

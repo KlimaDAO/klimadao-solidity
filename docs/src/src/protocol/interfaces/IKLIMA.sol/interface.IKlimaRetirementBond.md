@@ -1,5 +1,5 @@
 # IKlimaRetirementBond
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/interfaces/IKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/interfaces/IKLIMA.sol)
 
 
 ## Functions
@@ -49,14 +49,14 @@ function closeMarket(address poolToken) external;
 
 
 ```solidity
-function updateMaxSlippage(address poolToken, uint _maxSlippage) external;
+function updateMaxSlippage(address poolToken, uint256 _maxSlippage) external;
 ```
 
 ### updateDaoFee
 
 
 ```solidity
-function updateDaoFee(address poolToken, uint _daoFee) external;
+function updateDaoFee(address poolToken, uint256 _daoFee) external;
 ```
 
 ### setPoolReference

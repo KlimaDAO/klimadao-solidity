@@ -1,5 +1,5 @@
 # SushiswapGreenSwapWrapper
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SushiswapGreenWrapper.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SushiswapGreenWrapper.sol)
 
 **Inherits:**
 Initializable, ContextUpgradeable, OwnableUpgradeable
@@ -28,7 +28,7 @@ address public sushiRouterMain;
 ### sushiAmountOffset
 
 ```solidity
-uint public sushiAmountOffset;
+uint256 public sushiAmountOffset;
 ```
 
 
@@ -47,9 +47,13 @@ configurable, it can be pre-populated with default values from the Sushi UI
 
 
 ```solidity
-function GreenSwapTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
-    public
-    payable;
+function GreenSwapTokensForTokens(
+    uint256 amountIn,
+    uint256 amountOutMin,
+    address[] calldata path,
+    address to,
+    uint256 deadline
+) public payable;
 ```
 
 ### setRetirementHoldingAddress
@@ -70,7 +74,7 @@ function setSushiRouterMain(address _newSushiRouter) public onlyOwner;
 
 
 ```solidity
-function setSushiAmountOffset(uint _newSushiAmountOffset) public onlyOwner;
+function setSushiAmountOffset(uint256 _newSushiAmountOffset) public onlyOwner;
 ```
 
 ## Events
@@ -89,6 +93,6 @@ event newSushiRouter(address newRouter);
 ### newSushiAmountOffset
 
 ```solidity
-event newSushiAmountOffset(uint newAmount);
+event newSushiAmountOffset(uint256 newAmount);
 ```
 

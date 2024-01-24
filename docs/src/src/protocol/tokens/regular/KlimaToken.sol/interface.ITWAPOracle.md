@@ -1,5 +1,5 @@
 # ITWAPOracle
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/KlimaToken.sol)
 
 *Intended to update the TWAP for a token based on accepting an update call from that token.
 expectation is to have this happen in the _beforeTokenTransfer function of ERC20.
@@ -25,7 +25,7 @@ function uniV2CompPairAddressForLastEpochUpdateBlockTimstamp(address) external r
 function priceTokenAddressForPricingTokenAddressForLastEpochUpdateBlockTimstamp(
     address tokenToPrice_,
     address tokenForPriceComparison_,
-    uint epochPeriod_
+    uint256 epochPeriod_
 ) external returns (uint32);
 ```
 
@@ -33,20 +33,22 @@ function priceTokenAddressForPricingTokenAddressForLastEpochUpdateBlockTimstamp(
 
 
 ```solidity
-function pricedTokenForPricingTokenForEpochPeriodForPrice(address, address, uint) external returns (uint);
+function pricedTokenForPricingTokenForEpochPeriodForPrice(address, address, uint256) external returns (uint256);
 ```
 
 ### pricedTokenForPricingTokenForEpochPeriodForLastEpochPrice
 
 
 ```solidity
-function pricedTokenForPricingTokenForEpochPeriodForLastEpochPrice(address, address, uint) external returns (uint);
+function pricedTokenForPricingTokenForEpochPeriodForLastEpochPrice(address, address, uint256)
+    external
+    returns (uint256);
 ```
 
 ### updateTWAP
 
 
 ```solidity
-function updateTWAP(address uniV2CompatPairAddressToUpdate_, uint eopchPeriodToUpdate_) external returns (bool);
+function updateTWAP(address uniV2CompatPairAddressToUpdate_, uint256 eopchPeriodToUpdate_) external returns (bool);
 ```
 

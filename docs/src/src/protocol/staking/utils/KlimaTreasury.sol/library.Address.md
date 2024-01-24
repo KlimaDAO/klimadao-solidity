@@ -1,5 +1,5 @@
 # Address
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/utils/KlimaTreasury.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/utils/KlimaTreasury.sol)
 
 
 ## Functions
@@ -14,7 +14,7 @@ function isContract(address account) internal view returns (bool);
 
 
 ```solidity
-function sendValue(address payable recipient, uint amount) internal;
+function sendValue(address payable recipient, uint256 amount) internal;
 ```
 
 ### functionCall
@@ -35,14 +35,14 @@ function functionCall(address target, bytes memory data, string memory errorMess
 
 
 ```solidity
-function functionCallWithValue(address target, bytes memory data, uint value) internal returns (bytes memory);
+function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory);
 ```
 
 ### functionCallWithValue
 
 
 ```solidity
-function functionCallWithValue(address target, bytes memory data, uint value, string memory errorMessage)
+function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage)
     internal
     returns (bytes memory);
 ```
@@ -51,7 +51,7 @@ function functionCallWithValue(address target, bytes memory data, uint value, st
 
 
 ```solidity
-function _functionCallWithValue(address target, bytes memory data, uint weiValue, string memory errorMessage)
+function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage)
     private
     returns (bytes memory);
 ```

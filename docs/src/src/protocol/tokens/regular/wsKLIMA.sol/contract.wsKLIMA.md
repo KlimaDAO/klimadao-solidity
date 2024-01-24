@@ -1,5 +1,5 @@
 # wsKLIMA
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/tokens/regular/wsKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/tokens/regular/wsKLIMA.sol)
 
 **Inherits:**
 [ERC20](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20.md)
@@ -27,7 +27,7 @@ wrap sKLIMA
 
 
 ```solidity
-function wrap(uint _amount) external returns (uint);
+function wrap(uint256 _amount) external returns (uint256);
 ```
 **Parameters**
 
@@ -48,7 +48,7 @@ unwrap sKLIMA
 
 
 ```solidity
-function unwrap(uint _amount) external returns (uint);
+function unwrap(uint256 _amount) external returns (uint256);
 ```
 **Parameters**
 
@@ -69,7 +69,7 @@ converts wKLIMA amount to sKLIMA
 
 
 ```solidity
-function wKLIMATosKLIMA(uint _amount) public view returns (uint);
+function wKLIMATosKLIMA(uint256 _amount) public view returns (uint256);
 ```
 **Parameters**
 
@@ -90,7 +90,7 @@ converts sKLIMA amount to wKLIMA
 
 
 ```solidity
-function sKLIMATowKLIMA(uint _amount) public view returns (uint);
+function sKLIMATowKLIMA(uint256 _amount) public view returns (uint256);
 ```
 **Parameters**
 

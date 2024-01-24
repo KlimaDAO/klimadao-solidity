@@ -1,5 +1,5 @@
 # SwapRetirementHolder
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/integrations/sushixklima/SwapRetirementHolder.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/integrations/sushixklima/SwapRetirementHolder.sol)
 
 **Inherits:**
 [KeeperCompatibleInterface](/src/integrations/sushixklima/keepers/KeeperCompatibleInterface.sol/interface.KeeperCompatibleInterface.md), [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
@@ -11,21 +11,21 @@ Use an interval in seconds and a timestamp to slow execution of Upkeep
 
 
 ```solidity
-uint public interval;
+uint256 public interval;
 ```
 
 
 ### lastTimeStamp
 
 ```solidity
-uint public lastTimeStamp;
+uint256 public lastTimeStamp;
 ```
 
 
 ### numPendingRetirementAddresses
 
 ```solidity
-uint public numPendingRetirementAddresses;
+uint256 public numPendingRetirementAddresses;
 ```
 
 
@@ -60,21 +60,21 @@ IKlimaRetirementAggregator public KlimaAggregator;
 ### pendingRetirementAmounts
 
 ```solidity
-mapping(address => uint) public pendingRetirementAmounts;
+mapping(address => uint256) public pendingRetirementAmounts;
 ```
 
 
 ### pendingRetirees
 
 ```solidity
-mapping(uint => address) public pendingRetirees;
+mapping(uint256 => address) public pendingRetirees;
 ```
 
 
 ### pendingAddressQueuePosition
 
 ```solidity
-mapping(address => uint) public pendingAddressQueuePosition;
+mapping(address => uint256) public pendingAddressQueuePosition;
 ```
 
 
@@ -83,7 +83,7 @@ mapping(address => uint) public pendingAddressQueuePosition;
 
 
 ```solidity
-constructor(address _KlimaAggregator, uint _interval, address _wrappedNativeAsset, address _carbonToken);
+constructor(address _KlimaAggregator, uint256 _interval, address _wrappedNativeAsset, address _carbonToken);
 ```
 
 ### setKlimaAggregator
@@ -97,7 +97,7 @@ function setKlimaAggregator(address newAggregator) public onlyManager;
 
 
 ```solidity
-function setRetirementInterval(uint newInterval) public onlyManager;
+function setRetirementInterval(uint256 newInterval) public onlyManager;
 ```
 
 ### setSourceCarbonToken
@@ -125,7 +125,7 @@ function performUpkeep(bytes calldata) external override;
 
 
 ```solidity
-function storePendingRetirement(uint amountToStore, address addressToStore) public onlyManager;
+function storePendingRetirement(uint256 amountToStore, address addressToStore) public onlyManager;
 ```
 
 ### replaceAddressInPendingRetirement
@@ -153,7 +153,7 @@ fallback() external payable;
 ### intervalUpdated
 
 ```solidity
-event intervalUpdated(uint newInterval);
+event intervalUpdated(uint256 newInterval);
 ```
 
 ### aggregatorAddressUpdated
@@ -165,7 +165,7 @@ event aggregatorAddressUpdated(address newAddress);
 ### newPendingRetirement
 
 ```solidity
-event newPendingRetirement(address retiree, uint amount);
+event newPendingRetirement(address retiree, uint256 amount);
 ```
 
 ### newCarbonTokenUpdated

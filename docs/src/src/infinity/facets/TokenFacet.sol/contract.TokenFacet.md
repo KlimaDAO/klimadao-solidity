@@ -1,5 +1,5 @@
 # TokenFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/infinity/facets/TokenFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/infinity/facets/TokenFacet.sol)
 
 **Author:**
 Publius
@@ -14,9 +14,13 @@ Transfer
 
 
 ```solidity
-function transferToken(IERC20 token, address recipient, uint amount, LibTransfer.From fromMode, LibTransfer.To toMode)
-    external
-    payable;
+function transferToken(
+    IERC20 token,
+    address recipient,
+    uint256 amount,
+    LibTransfer.From fromMode,
+    LibTransfer.To toMode
+) external payable;
 ```
 
 ### wrapMatic
@@ -25,14 +29,14 @@ Weth
 
 
 ```solidity
-function wrapMatic(uint amount, LibTransfer.To mode) external payable;
+function wrapMatic(uint256 amount, LibTransfer.To mode) external payable;
 ```
 
 ### unwrapMatic
 
 
 ```solidity
-function unwrapMatic(uint amount, LibTransfer.From mode) external payable;
+function unwrapMatic(uint256 amount, LibTransfer.From mode) external payable;
 ```
 
 ### getInternalBalance
@@ -41,42 +45,48 @@ Getters
 
 
 ```solidity
-function getInternalBalance(address account, IERC20 token) public view returns (uint balance);
+function getInternalBalance(address account, IERC20 token) public view returns (uint256 balance);
 ```
 
 ### getInternalBalances
 
 
 ```solidity
-function getInternalBalances(address account, IERC20[] memory tokens) external view returns (uint[] memory balances);
+function getInternalBalances(address account, IERC20[] memory tokens)
+    external
+    view
+    returns (uint256[] memory balances);
 ```
 
 ### getExternalBalance
 
 
 ```solidity
-function getExternalBalance(address account, IERC20 token) public view returns (uint balance);
+function getExternalBalance(address account, IERC20 token) public view returns (uint256 balance);
 ```
 
 ### getExternalBalances
 
 
 ```solidity
-function getExternalBalances(address account, IERC20[] memory tokens) external view returns (uint[] memory balances);
+function getExternalBalances(address account, IERC20[] memory tokens)
+    external
+    view
+    returns (uint256[] memory balances);
 ```
 
 ### getBalance
 
 
 ```solidity
-function getBalance(address account, IERC20 token) public view returns (uint balance);
+function getBalance(address account, IERC20 token) public view returns (uint256 balance);
 ```
 
 ### getBalances
 
 
 ```solidity
-function getBalances(address account, IERC20[] memory tokens) external view returns (uint[] memory balances);
+function getBalances(address account, IERC20[] memory tokens) external view returns (uint256[] memory balances);
 ```
 
 ### getAllBalance
@@ -97,7 +107,7 @@ function getAllBalances(address account, IERC20[] memory tokens) external view r
 ### InternalBalanceChanged
 
 ```solidity
-event InternalBalanceChanged(address indexed user, IERC20 indexed token, int delta);
+event InternalBalanceChanged(address indexed user, IERC20 indexed token, int256 delta);
 ```
 
 ## Structs
@@ -105,9 +115,9 @@ event InternalBalanceChanged(address indexed user, IERC20 indexed token, int del
 
 ```solidity
 struct Balance {
-    uint internalBalance;
-    uint externalBalance;
-    uint totalBalance;
+    uint256 internalBalance;
+    uint256 externalBalance;
+    uint256 totalBalance;
 }
 ```
 

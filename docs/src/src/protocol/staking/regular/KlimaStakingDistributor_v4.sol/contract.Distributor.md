@@ -1,5 +1,5 @@
 # Distributor
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b98fc1e8b7dcf2a7b80bbaba384c8c84431739fc/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/29fd912e7e35bfd36ad9c6e57c2a312d3aed3640/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol)
 
 **Inherits:**
 [Policy](/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol/contract.Policy.md)
@@ -23,21 +23,21 @@ address public immutable treasury;
 ### epochLength
 
 ```solidity
-uint public immutable epochLength;
+uint256 public immutable epochLength;
 ```
 
 
 ### nextEpochBlock
 
 ```solidity
-uint public nextEpochBlock;
+uint256 public nextEpochBlock;
 ```
 
 
 ### adjustments
 
 ```solidity
-mapping(uint => Adjust) public adjustments;
+mapping(uint256 => Adjust) public adjustments;
 ```
 
 
@@ -53,7 +53,7 @@ Info[] public info;
 
 
 ```solidity
-constructor(address _treasury, address _klima, uint _epochLength, uint _nextEpochBlock);
+constructor(address _treasury, address _klima, uint256 _epochLength, uint256 _nextEpochBlock);
 ```
 
 ### distribute
@@ -71,7 +71,7 @@ increment reward rate for collector
 
 
 ```solidity
-function adjust(uint _index) internal;
+function adjust(uint256 _index) internal;
 ```
 
 ### nextRewardAt
@@ -80,7 +80,7 @@ view function for next reward at given rate
 
 
 ```solidity
-function nextRewardAt(uint _rate) public view returns (uint);
+function nextRewardAt(uint256 _rate) public view returns (uint256);
 ```
 **Parameters**
 
@@ -101,7 +101,7 @@ view function for next reward for specified address
 
 
 ```solidity
-function nextRewardFor(address _recipient) public view returns (uint);
+function nextRewardFor(address _recipient) public view returns (uint256);
 ```
 **Parameters**
 
@@ -122,7 +122,7 @@ adds recipient for distributions
 
 
 ```solidity
-function addRecipient(address _recipient, uint _rewardRate) external onlyPolicy;
+function addRecipient(address _recipient, uint256 _rewardRate) external onlyPolicy;
 ```
 **Parameters**
 
@@ -138,7 +138,7 @@ removes recipient for distributions
 
 
 ```solidity
-function removeRecipient(uint _index, address _recipient) external onlyPolicy;
+function removeRecipient(uint256 _index, address _recipient) external onlyPolicy;
 ```
 **Parameters**
 
@@ -154,7 +154,7 @@ set adjustment info for a collector's reward rate
 
 
 ```solidity
-function setAdjustment(uint _index, bool _add, uint _rate, uint _target) external onlyPolicy;
+function setAdjustment(uint256 _index, bool _add, uint256 _rate, uint256 _target) external onlyPolicy;
 ```
 **Parameters**
 
@@ -171,7 +171,7 @@ function setAdjustment(uint _index, bool _add, uint _rate, uint _target) externa
 
 ```solidity
 struct Info {
-    uint rate;
+    uint256 rate;
     address recipient;
 }
 ```
@@ -181,8 +181,8 @@ struct Info {
 ```solidity
 struct Adjust {
     bool add;
-    uint rate;
-    uint target;
+    uint256 rate;
+    uint256 target;
 }
 ```
 
