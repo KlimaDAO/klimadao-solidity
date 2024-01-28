@@ -37,9 +37,9 @@ contract RetireCarbonmarkFacet is ReentrancyGuard {
     ) external payable nonReentrant returns (uint256 retirementIndex) {
         require(retireAmount > 0, "Cannot retire zero tonnes");
 
-        LibTransfer.receiveToken(IERC20(C.usdc()), maxAmountIn, msg.sender, fromMode);
+        LibTransfer.receiveToken(IERC20(C.usdc_bridged()), maxAmountIn, msg.sender, fromMode);
 
-        LibApprove.approveToken(IERC20(C.usdc()), C.carbonmark(), maxAmountIn);
+        LibApprove.approveToken(IERC20(C.usdc_bridged()), C.carbonmark(), maxAmountIn);
 
         ICarbonmark(C.carbonmark()).fillListing(
             listing.id, listing.account, listing.token, listing.unitPrice, retireAmount, maxAmountIn
