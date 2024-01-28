@@ -11,6 +11,7 @@ import "../LibAppStorage.sol";
 import "../LibKlima.sol";
 import "../Token/LibTransfer.sol";
 import "./LibUniswapV2Swap.sol";
+import "./LibUniswapV3Swap.sol";
 import "./LibTridentSwap.sol";
 import "./LibTreasurySwap.sol";
 
@@ -128,7 +129,10 @@ library LibSwap {
             path[1] = C.usdc_bridged();
 
             amount = _performExactSourceSwap(
-                s.swap[carbonToken][C.usdc_bridged()].swapDexes[0], s.swap[carbonToken][C.usdc_bridged()].ammRouters[0], path, amount
+                s.swap[carbonToken][C.usdc_bridged()].swapDexes[0],
+                s.swap[carbonToken][C.usdc_bridged()].ammRouters[0],
+                path,
+                amount
             );
             // Now that we have USDC, set the sourceToken to USDC and proceed as normal.
             sourceToken = C.usdc_bridged();
@@ -168,7 +172,7 @@ library LibSwap {
         address dustToken = sourceToken;
         if (sourceToken == C.wsKlima() || sourceToken == C.sKlima()) {
             dustToken = C.klima();
-        } else if (s.swap[poolToken][sourceToken].swapDexes.length == 0) {
+        } else if (s.swap[poolToken][sourceToken].swapDexes.length == 0 && sourceToken != C.usdc()) {
             dustToken = C.usdc_bridged();
             sourceToken = C.usdc_bridged();
         }
@@ -197,6 +201,23 @@ library LibSwap {
         path[1] = C.klima();
 
         return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
+    }
+
+    /**
+     * @notice                  Swaps a given amount of Native USDC for KLIMA using UniswapV3
+     * @param sourceAmount      Amount of USDC to swap
+     * @param klimaAmount       Amount of KLIMA to swap for
+     * @return klimaReceived    Amount of KLIMA received
+     */
+    function swapToKlimaFromNativeUsdc(uint256 sourceAmount, uint256 klimaAmount)
+        internal
+        returns (uint256 klimaReceived)
+    {
+        address[] memory path = new address[](2);
+        path[0] = C.usdc();
+        path[1] = C.klima();
+
+        return _performToExactSwap(2, C.uniswapV3Router(), path, sourceAmount, klimaAmount);
     }
 
     /**
@@ -241,6 +262,9 @@ library LibSwap {
 
         if (sourceToken == C.usdc_bridged()) {
             sourceAmount = swapToKlimaFromUsdc(sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
+        } else if (sourceToken == C.usdc()) {
+            sourceAmount =
+                swapToKlimaFromNativeUsdc(sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
         } else {
             sourceAmount =
                 swapToKlimaFromOther(sourceToken, sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
@@ -438,6 +462,9 @@ library LibSwap {
                 LibTridentSwap.getAmountIn(LibTridentSwap.getTridentPool(path[0], path[1]), path[0], path[1], amount),
                 amount
             );
+        }
+        if (dex == 2) {
+            amountOut = LibUniswapV3Swap.exactOutputSingle(router, path[0], path[1], amount, maxAmountIn);
         }
 
         return amountOut;

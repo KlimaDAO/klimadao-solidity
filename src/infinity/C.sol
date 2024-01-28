@@ -27,6 +27,7 @@ library C {
     address private constant QUICKSWAP_POLYGON = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff;
     address private constant SUSHI_BENTO = 0x0319000133d3AdA02600f0875d2cf03D442C3367;
     address private constant SUSHI_TRIDENT_POLYGON = 0xc5017BE80b4446988e8686168396289a9A62668E;
+    address private constant UNISWAP_V3 = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
 
     // Marketplace contracts
     address private constant CARBONMARK = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821;
@@ -118,6 +119,10 @@ library C {
 
     function quickswapRouter() internal pure returns (address) {
         return QUICKSWAP_POLYGON;
+    }
+
+    function uniswapV3Router() internal pure returns (address) {
+        return UNISWAP_V3;
     }
 
     function sushiTridentRouter() internal pure returns (address) {
