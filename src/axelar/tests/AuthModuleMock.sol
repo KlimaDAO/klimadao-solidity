@@ -9,7 +9,5 @@ contract AuthModuleMock is Ownable, IAxelarAuth {
         return true;
     }
 
-    function transferOperatorship(bytes calldata params) external {
-
-    }
+    function transferOperatorship(bytes calldata params) external {}
 }
