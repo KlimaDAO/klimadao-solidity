@@ -49,7 +49,7 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -64,51 +64,50 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactCarbonSpecific_UBO_UBO(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_UBO(uint256 retireAmount) public {
         retireExactC3(UBO, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_UBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_USDC(uint256 retireAmount) public {
         retireExactC3(USDC, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_UBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_KLIMA(uint256 retireAmount) public {
         retireExactC3(KLIMA, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_UBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_SKLIMA(uint256 retireAmount) public {
         retireExactC3(SKLIMA, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_UBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_UBO_WSKLIMA(uint256 retireAmount) public {
         retireExactC3(WSKLIMA, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NBO_NBO(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_NBO(uint256 retireAmount) public {
         retireExactC3(NBO, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_USDC(uint256 retireAmount) public {
         retireExactC3(USDC, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_KLIMA(uint256 retireAmount) public {
         retireExactC3(KLIMA, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_SKLIMA(uint256 retireAmount) public {
         retireExactC3(SKLIMA, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonSpecific_NBO_WSKLIMA(uint256 retireAmount) public {
         retireExactC3(WSKLIMA, NBO, retireAmount);
     }
 
-    function getSourceTokens(
-        address sourceToken,
-        address poolToken,
-        uint retireAmount
-    ) internal returns (uint sourceAmount) {
+    function getSourceTokens(address sourceToken, address poolToken, uint256 retireAmount)
+        internal
+        returns (uint256 sourceAmount)
+    {
         sourceAmount = quoterFacet.getSourceAmountSpecificRetirement(sourceToken, poolToken, retireAmount);
 
         address sourceTarget;
@@ -123,17 +122,16 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function retireExactC3(address sourceToken, address poolToken, uint retireAmount) public {
+    function retireExactC3(address sourceToken, address poolToken, uint256 retireAmount) public {
         vm.assume(retireAmount < (IERC20(poolToken).balanceOf(SUSHI_BENTO) * 90) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, poolToken, retireAmount);
+        uint256 sourceAmount = getSourceTokens(sourceToken, poolToken, retireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        address projectToken = poolToken == UBO
-            ? projectsUBO[randomish(projectsUBO.length)]
-            : projectsNBO[randomish(projectsNBO.length)];
-        uint poolBalance = IERC20(projectToken).balanceOf(poolToken);
+        address projectToken =
+            poolToken == UBO ? projectsUBO[randomish(projectsUBO.length)] : projectsNBO[randomish(projectsNBO.length)];
+        uint256 poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
         if (retireAmount > poolBalance || retireAmount == 0) {
             vm.expectRevert();

@@ -42,7 +42,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -55,27 +55,27 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingNCT_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingNCT_fuzz(uint256 redeemAmount) public {
         redeemNCT(NCT, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemNCT(USDC, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNCT(KLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNCT(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNCT(WSKLIMA, redeemAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
+    function getSourceTokens(address sourceToken, uint256 redeemAmount) internal returns (uint256 sourceAmount) {
         /// @dev getting trade amount on zero output will revert
         if (redeemAmount == 0 && sourceToken != NCT) vm.expectRevert();
         sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, NCT, redeemAmount);
@@ -92,32 +92,22 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function redeemNCT(address sourceToken, uint redeemAmount) internal {
+    function redeemNCT(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 10) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
-        uint bondBalance = IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND);
+        uint256 sourceAmount = getSourceTokens(sourceToken, redeemAmount);
+        uint256 bondBalance = IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount == 0) {
             vm.expectRevert();
 
             redeemToucanPoolFacet.toucanRedeemExactCarbonPoolDefault(
-                sourceToken,
-                NCT,
-                redeemAmount,
-                sourceAmount,
-                LibTransfer.From.EXTERNAL,
-                LibTransfer.To.EXTERNAL
+                sourceToken, NCT, redeemAmount, sourceAmount, LibTransfer.From.EXTERNAL, LibTransfer.To.EXTERNAL
             );
         } else {
-            (address[] memory projectTokens, uint[] memory amounts) = redeemToucanPoolFacet
+            (address[] memory projectTokens, uint256[] memory amounts) = redeemToucanPoolFacet
                 .toucanRedeemExactCarbonPoolDefault(
-                    sourceToken,
-                    NCT,
-                    redeemAmount,
-                    sourceAmount,
-                    LibTransfer.From.EXTERNAL,
-                    LibTransfer.To.EXTERNAL
-                );
+                sourceToken, NCT, redeemAmount, sourceAmount, LibTransfer.From.EXTERNAL, LibTransfer.To.EXTERNAL
+            );
 
             // No tokens left in contract
             assertZeroTokenBalance(DEFAULT_PROJECT, diamond);

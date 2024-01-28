@@ -50,7 +50,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -65,55 +65,57 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactSourceSpecific_BCT_BCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_BCT(uint256 retireAmount) public {
         retireExactSource(BCT, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_BCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_BCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_BCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_BCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_BCT_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, BCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_NCT_NCT(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_NCT(uint256 retireAmount) public {
         retireExactSource(NCT, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_NCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_NCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_NCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, NCT, retireAmount);
     }
 
-    function test_infinity_retireExactSourceSpecific_NCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceSpecific_NCT_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, NCT, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint sourceAmount) internal {
+    function getSourceTokens(address sourceToken, uint256 sourceAmount) internal {
         address sourceTarget;
 
         /// @dev Setting minimum amount assumptions due to issues with Trident performing swaps with zero output tokens.
         vm.assume(sourceAmount > 1e4);
 
-        if (sourceToken == BCT || sourceToken == NCT || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) {
+        if (sourceToken == BCT || sourceToken == NCT || sourceToken == USDC) {
+            sourceTarget = KLIMA_TREASURY;
+        } else if (sourceToken == KLIMA || sourceToken == SKLIMA) {
+            sourceTarget = STAKING;
+        } else if (sourceToken == WSKLIMA) {
             vm.assume(sourceAmount > LibKlima.toWrappedAmount(1e6));
             sourceTarget = WSKLIMA_HOLDER;
         }
@@ -124,18 +126,17 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function retireExactSource(address sourceToken, address poolToken, uint sourceAmount) public {
+    function retireExactSource(address sourceToken, address poolToken, uint256 sourceAmount) public {
         getSourceTokens(sourceToken, sourceAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        address projectToken = poolToken == BCT
-            ? projectsBCT[randomish(projectsBCT.length)]
-            : projectsNCT[randomish(projectsNCT.length)];
+        address projectToken =
+            poolToken == BCT ? projectsBCT[randomish(projectsBCT.length)] : projectsNCT[randomish(projectsNCT.length)];
 
-        uint retireAmount = quoterFacet.getRetireAmountSourceSpecific(sourceToken, poolToken, sourceAmount);
-        uint poolAmount = IERC20(projectToken).balanceOf(poolToken);
+        uint256 retireAmount = quoterFacet.getRetireAmountSourceSpecific(sourceToken, poolToken, sourceAmount);
+        uint256 poolAmount = IERC20(projectToken).balanceOf(poolToken);
 
         if (retireAmount > poolAmount || sourceAmount == 0) {
             vm.expectRevert();
@@ -176,9 +177,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
 
             // Since the output from Trident isn't deterministic until the swap happens, check an approximation.
             assertApproxEqRel(
-                LibRetire.getTotalCarbonRetired(beneficiaryAddress),
-                currentTotalCarbon + retireAmount,
-                1e16
+                LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount, 1e16
             );
         }
     }

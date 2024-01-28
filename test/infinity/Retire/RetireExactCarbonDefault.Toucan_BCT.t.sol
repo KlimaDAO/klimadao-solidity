@@ -47,7 +47,7 @@ contract RetireExactCarbonDefaultToucanBCT is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -60,27 +60,27 @@ contract RetireExactCarbonDefaultToucanBCT is TestHelper, AssertionHelper {
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactCarbonDefault_BCT_BCT(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_BCT(uint256 retireAmount) public {
         retireExactBCT(BCT, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonDefault_BCT_USDC(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_USDC(uint256 retireAmount) public {
         retireExactBCT(USDC, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonDefault_BCT_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_KLIMA(uint256 retireAmount) public {
         retireExactBCT(KLIMA, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonDefault_BCT_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_SKLIMA(uint256 retireAmount) public {
         retireExactBCT(SKLIMA, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonDefault_BCT_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactCarbonDefault_BCT_WSKLIMA(uint256 retireAmount) public {
         retireExactBCT(WSKLIMA, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint retireAmount) internal returns (uint sourceAmount) {
+    function getSourceTokens(address sourceToken, uint256 retireAmount) internal returns (uint256 sourceAmount) {
         /// @dev getting trade amount on zero output will revert
         if (retireAmount == 0 && sourceToken != BCT) vm.expectRevert();
 
@@ -98,14 +98,14 @@ contract RetireExactCarbonDefaultToucanBCT is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function retireExactBCT(address sourceToken, uint retireAmount) public {
+    function retireExactBCT(address sourceToken, uint256 retireAmount) public {
         vm.assume(retireAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
         vm.assume(retireAmount <= IERC20(DEFAULT_PROJECT).balanceOf(BCT));
 
-        uint sourceAmount = getSourceTokens(sourceToken, retireAmount);
+        uint256 sourceAmount = getSourceTokens(sourceToken, retireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         if (retireAmount == 0) {
             vm.expectRevert();

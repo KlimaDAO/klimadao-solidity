@@ -33,7 +33,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
     address DEFAULT_PROJECT;
     address KLIMA_RETIREMENT_BOND;
 
-    uint defaultCarbonRetireAmount = 100 * 1e18;
+    uint256 defaultCarbonRetireAmount = 100 * 1e18;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -44,7 +44,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -57,27 +57,27 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUBO_fuzz(uint256 redeemAmount) public {
         redeemUBO(UBO, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemUBO(USDC, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemUBO(KLIMA, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemUBO(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemUBO(WSKLIMA, redeemAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
+    function getSourceTokens(address sourceToken, uint256 redeemAmount) internal returns (uint256 sourceAmount) {
         sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, UBO, redeemAmount);
 
         address sourceTarget;
@@ -92,34 +92,23 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function redeemUBO(address sourceToken, uint redeemAmount) internal {
+    function redeemUBO(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(UBO).balanceOf(SUSHI_BENTO) * 90) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
+        uint256 sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.ubo());
-        uint bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);
-
+        uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.ubo());
+        uint256 bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 
             redeemC3PoolFacet.c3RedeemPoolDefault(
-                sourceToken,
-                UBO,
-                redeemAmount,
-                sourceAmount,
-                LibTransfer.From.EXTERNAL,
-                LibTransfer.To.EXTERNAL
+                sourceToken, UBO, redeemAmount, sourceAmount, LibTransfer.From.EXTERNAL, LibTransfer.To.EXTERNAL
             );
         } else {
-            (address[] memory projectTokens, uint[] memory amounts) = redeemC3PoolFacet.c3RedeemPoolDefault(
-                sourceToken,
-                UBO,
-                redeemAmount,
-                sourceAmount,
-                LibTransfer.From.EXTERNAL,
-                LibTransfer.To.EXTERNAL
+            (address[] memory projectTokens, uint256[] memory amounts) = redeemC3PoolFacet.c3RedeemPoolDefault(
+                sourceToken, UBO, redeemAmount, sourceAmount, LibTransfer.From.EXTERNAL, LibTransfer.To.EXTERNAL
             );
 
             // Update redeemedAmount if source was not UBO, since you can't swap to an exact amount in Trident.

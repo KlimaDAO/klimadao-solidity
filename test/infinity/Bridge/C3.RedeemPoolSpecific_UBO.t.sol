@@ -33,7 +33,7 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
     address[] projects;
     address KLIMA_RETIREMENT_BOND;
 
-    uint defaultCarbonRetireAmount = 100 * 1e18;
+    uint256 defaultCarbonRetireAmount = 100 * 1e18;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -44,7 +44,7 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -57,28 +57,28 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUBO_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUBO_fuzz(uint256 redeemAmount) public {
         redeemUBO(UBO, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemUBO(USDC, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemUBO(KLIMA, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemUBO(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemUBO(WSKLIMA, redeemAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-        uint[] memory amounts = new uint[](1);
+    function getSourceTokens(address sourceToken, uint256 redeemAmount) internal returns (uint256 sourceAmount) {
+        uint256[] memory amounts = new uint[](1);
         amounts[0] = redeemAmount;
         sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, UBO, amounts);
 
@@ -94,22 +94,22 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function redeemUBO(address sourceToken, uint redeemAmount) internal {
+    function redeemUBO(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(UBO).balanceOf(SUSHI_BENTO) * 90) / 100);
 
-        uint projectIndex = randomish(projects.length);
+        uint256 projectIndex = randomish(projects.length);
         address specificProject = projects[projectIndex];
 
         address[] memory projectRedeem = new address[](1);
-        uint[] memory amountRedeem = new uint[](1);
+        uint256[] memory amountRedeem = new uint[](1);
 
         projectRedeem[0] = specificProject;
         amountRedeem[0] = redeemAmount;
 
-        uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
+        uint256 sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint poolBalance = IERC20(specificProject).balanceOf(constantsFacet.ubo());
-        uint bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);
+        uint256 poolBalance = IERC20(specificProject).balanceOf(constantsFacet.ubo());
+        uint256 bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
@@ -125,7 +125,7 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
                 LibTransfer.To.EXTERNAL
             );
         } else {
-            uint[] memory amounts = redeemC3PoolFacet.c3RedeemPoolSpecific(
+            uint256[] memory amounts = redeemC3PoolFacet.c3RedeemPoolSpecific(
                 sourceToken,
                 UBO,
                 sourceAmount,

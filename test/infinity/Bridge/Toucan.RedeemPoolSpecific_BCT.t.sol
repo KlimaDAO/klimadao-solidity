@@ -42,7 +42,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -55,31 +55,31 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingBCT_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingBCT_fuzz(uint256 redeemAmount) public {
         redeemBCT(BCT, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemBCT(USDC, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemBCT(KLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemBCT(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolSpecific_redeemBCT_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemBCT(WSKLIMA, redeemAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
+    function getSourceTokens(address sourceToken, uint256 redeemAmount) internal returns (uint256 sourceAmount) {
         /// @dev getting trade amount on zero output will revert
         if (redeemAmount == 0 && sourceToken != BCT) vm.expectRevert();
 
-        uint[] memory amounts = new uint[](1);
+        uint256[] memory amounts = new uint[](1);
         amounts[0] = redeemAmount;
 
         sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, BCT, amounts);
@@ -96,21 +96,21 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function redeemBCT(address sourceToken, uint redeemAmount) internal {
+    function redeemBCT(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 60) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
+        uint256 sourceAmount = getSourceTokens(sourceToken, redeemAmount);
 
-        uint projectIndex = randomish(projects.length);
+        uint256 projectIndex = randomish(projects.length);
         address specificProject = projects[projectIndex];
 
         address[] memory projectRedeem = new address[](1);
-        uint[] memory amountRedeem = new uint[](1);
+        uint256[] memory amountRedeem = new uint[](1);
 
         projectRedeem[0] = specificProject;
         amountRedeem[0] = redeemAmount;
 
-        uint poolBalance = IERC20(specificProject).balanceOf(BCT);
-        uint bondBalance = IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND);
+        uint256 poolBalance = IERC20(specificProject).balanceOf(BCT);
+        uint256 bondBalance = IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount > poolBalance || redeemAmount == 0) {
             vm.expectRevert();
@@ -125,7 +125,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
                 LibTransfer.To.EXTERNAL
             );
         } else {
-            uint[] memory amounts = redeemToucanPoolFacet.toucanRedeemExactCarbonPoolSpecific(
+            uint256[] memory amounts = redeemToucanPoolFacet.toucanRedeemExactCarbonPoolSpecific(
                 sourceToken,
                 BCT,
                 sourceAmount,
