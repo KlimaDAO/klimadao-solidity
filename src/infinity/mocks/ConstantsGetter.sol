@@ -41,6 +41,10 @@ contract ConstantsGetter {
         return C.wsKlima();
     }
 
+    function usdc_bridged() external pure returns (address) {
+        return C.usdc_bridged();
+    }
+
     function usdc() external pure returns (address) {
         return C.usdc();
     }

@@ -37,7 +37,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         quoterFacet = RetirementQuoter(diamond);
         constantsFacet = ConstantsGetter(diamond);
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         BCT = constantsFacet.bct();
 
