@@ -8,7 +8,8 @@
     "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 -m test_infinity",
     "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 -m test_protocol",
     "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
-    "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi"
+    "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi",
+    "vercel-build": "node build.js"
   },
   "repository": {
     "type": "git",
