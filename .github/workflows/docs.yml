@@ -1,0 +1,40 @@
+name: Build and Deploy Forge Docs
+
+on:
+  push:
+    branches: ["forge-docs"]
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Build and deploy forge docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      - name: Run Forge doc
+        run: |
+          forge doc --build
+        id: doc
+
+      - name: Deploy GitHub Pages site
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/book
+          publish_branch: gh-pages
