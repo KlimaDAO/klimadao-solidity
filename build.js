@@ -8,7 +8,7 @@ exec('curl -L https://foundry.paradigm.xyz | bash', (error, stdout, stderr) => {
     console.log(`stdout: ${stdout}`);
     console.error(`stderr: ${stderr}`);
 
-    exec('foundryup', (error, stdout, stderr) => {
+    exec('source ~/.bashrc && foundryup', (error, stdout, stderr) => {
         if (error) {
             console.error(`exec error: ${error}`);
             return;
