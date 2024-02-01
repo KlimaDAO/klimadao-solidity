@@ -1,4 +1,4 @@
-name: Build and Deploy Forge Docs
+name: Build and Compare Forge Docs
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: Build and deploy forge docs
+    name: Build and compare forge docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,9 +32,6 @@ jobs:
           forge doc --build
         id: doc
 
-      - name: Deploy GitHub Pages site
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/book
-          publish_branch: gh-pages
+      - name: Compare docs
+        run: |
+          git diff --quiet || (echo "Docs were not built before commit" && exit 1)
