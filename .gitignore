@@ -30,5 +30,5 @@ node_modules
 .DS_Store
 
 # docs
-docs/*
-!docs/preprocess_summary.py
+# docs/*
+# !docs/preprocess_summary.py
