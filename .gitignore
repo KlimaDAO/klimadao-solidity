@@ -32,3 +32,4 @@ node_modules
 # docs
 # docs/*
 # !docs/preprocess_summary.py
+docs/.gitignore

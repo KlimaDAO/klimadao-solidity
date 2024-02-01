@@ -1,8 +1,8 @@
 # ERC20Permit
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/KlimaToken.sol)
 
 **Inherits:**
-[ERC20](/src/protocol/tokens/regular/wsKLIMA.sol/contract.ERC20.md), [IERC2612Permit](/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC2612Permit.md)
+[ERC20](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20.md), [IERC2612Permit](/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC2612Permit.md)
 
 
 ## State Variables

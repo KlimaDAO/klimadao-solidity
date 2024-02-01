@@ -1,5 +1,5 @@
 # LibToucanCarbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/infinity/libraries/Bridges/LibToucanCarbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/libraries/Bridges/LibToucanCarbon.sol)
 
 **Author:**
 Cujo
@@ -178,7 +178,7 @@ function redeemPoolAuto(address poolToken, uint256 amount, LibTransfer.To toMode
 |----|----|-----------|
 |`poolToken`|`address`|            Pool token to redeem|
 |`amount`|`uint256`|               Amount of tokens being redeemed|
-|`toMode`|`To.LibTransfer`|               Where to send TCO2 tokens|
+|`toMode`|`LibTransfer.To`|               Where to send TCO2 tokens|
 
 **Returns**
 
@@ -208,7 +208,7 @@ function redeemPoolSpecific(
 |`poolToken`|`address`|            Pool token to redeem|
 |`projectTokens`|`address[]`|        Project tokens to redeem|
 |`amounts`|`uint256[]`|              Token amounts to redeem|
-|`toMode`|`To.LibTransfer`|               Where to send TCO2 tokens|
+|`toMode`|`LibTransfer.To`|               Where to send TCO2 tokens|
 
 **Returns**
 

@@ -1,5 +1,5 @@
 # RedeemC3PoolFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol)
 
 **Inherits:**
 [ReentrancyGuard](/src/infinity/ReentrancyGuard.sol/abstract.ReentrancyGuard.md)
@@ -29,8 +29,8 @@ function c3RedeemPoolDefault(
 |`poolToken`|`address`|       Pool token to redeem|
 |`amount`|`uint256`|          Amount to redeem|
 |`maxAmountIn`|`uint256`|     Max amount of source token to spend|
-|`fromMode`|`From.LibTransfer`|        From Mode for transfering tokens|
-|`toMode`|`To.LibTransfer`|          To Mode for where undlerying tokens are sent|
+|`fromMode`|`LibTransfer.From`|        From Mode for transfering tokens|
+|`toMode`|`LibTransfer.To`|          To Mode for where undlerying tokens are sent|
 
 **Returns**
 
@@ -65,8 +65,8 @@ function c3RedeemPoolSpecific(
 |`maxAmountIn`|`uint256`|         Max amount of source token to spend|
 |`projectTokens`|`address[]`|       Underlying tokens to redeem|
 |`amounts`|`uint256[]`|             Amounts of underlying tokens to redeem|
-|`fromMode`|`From.LibTransfer`|            From Mode for transfering tokens|
-|`toMode`|`To.LibTransfer`|              To Mode for where undlerying tokens are sent|
+|`fromMode`|`LibTransfer.From`|            From Mode for transfering tokens|
+|`toMode`|`LibTransfer.To`|              To Mode for where undlerying tokens are sent|
 
 **Returns**
 

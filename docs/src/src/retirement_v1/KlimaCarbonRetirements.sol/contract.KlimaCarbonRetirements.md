@@ -1,8 +1,8 @@
 # KlimaCarbonRetirements
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/retirement_v1/KlimaCarbonRetirements.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/retirement_v1/KlimaCarbonRetirements.sol)
 
 **Inherits:**
-[Ownable](/src/protocol/tokens/regular/sKlimaToken_v2.sol/contract.Ownable.md)
+[Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
 
 This is used to store any offset retirements made through Klima retirement helper contracts.
 

@@ -60,3 +60,13 @@ in `metatx/ERC2771ContextUpgradeable.sol` from a private to a public address.
 There is another issue related to the `_trustedForwarder` in that contract that has not yet been resolved.
 
 Since `aKLIMA` was a prelaunch coupon and the existing deployed versino of the redemption contract works as expected, this contract is no longer needed.
+
+## Documentation
+
+This repo is configured with [Foundry](https://book.getfoundry.sh/) to generate documentation for the solidity source files with the [forge doc](https://book.getfoundry.sh/reference/forge/forge-doc) command. If you have not installed Foundry, follow the guide above.
+
+**Please follow these rules:**
+- Annonate your code with [proper NatSpec comments](https://docs.soliditylang.org/en/latest/natspec-format.html)
+- Before committing code, run the `force doc --build` in order to build the doc/book
+
+You can run a local version of the documentation by running `forge doc --serve`

@@ -1,5 +1,5 @@
 # RetireSourceFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/36109e4551048e978d232da5905a9cf6eaf3e3e2/src/infinity/facets/Retire/RetireSourceFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/facets/Retire/RetireSourceFacet.sol)
 
 **Inherits:**
 [ReentrancyGuard](/src/infinity/ReentrancyGuard.sol/abstract.ReentrancyGuard.md)
@@ -34,7 +34,7 @@ function retireExactSourceDefault(
 |`beneficiaryAddress`|`address`|  0x address for the beneficiary|
 |`beneficiaryString`|`string`|   String description of the beneficiary|
 |`retirementMessage`|`string`|   String message for this specific retirement|
-|`fromMode`|`From.LibTransfer`|            From Mode for transfering tokens|
+|`fromMode`|`LibTransfer.From`|            From Mode for transfering tokens|
 
 **Returns**
 
@@ -75,7 +75,7 @@ function retireExactSourceSpecific(
 |`beneficiaryAddress`|`address`|  0x address for the beneficiary|
 |`beneficiaryString`|`string`|   String description of the beneficiary|
 |`retirementMessage`|`string`|   String message for this specific retirement|
-|`fromMode`|`From.LibTransfer`|            From Mode for transfering tokens|
+|`fromMode`|`LibTransfer.From`|            From Mode for transfering tokens|
 
 **Returns**
 
