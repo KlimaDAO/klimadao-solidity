@@ -71,6 +71,6 @@ Foundry forge doc generates and builds an mdbook from the natspec comments conta
 
 **Please follow these rules:**
 - Annonate your code with [proper NatSpec comments](https://docs.soliditylang.org/en/latest/natspec-format.html)
-- Before committing code, run the `force doc --build` in order to build the doc/book
+- Before committing code, run the `forge doc --build` in order to build the doc/book
 
 You can run a local version of the documentation by running `forge doc --serve`
