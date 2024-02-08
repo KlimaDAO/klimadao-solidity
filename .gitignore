@@ -28,3 +28,8 @@ node_modules
 .cache
 .local
 .DS_Store
+
+# docs
+# docs/*
+# !docs/preprocess_summary.py
+docs/.gitignore
