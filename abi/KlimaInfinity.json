@@ -1397,6 +1397,209 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRetireAmountSourceDefault",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRetireAmountSourceSpecific",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "redeemAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "getSourceAmountDefaultRedeem",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "retireAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "getSourceAmountDefaultRetirement",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "redeemAmounts",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "getSourceAmountSpecificRedeem",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "retireAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "getSourceAmountSpecificRetirement",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sourceToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "carbonToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountOut",
+                "type": "uint256"
+            }
+        ],
+        "name": "getSourceAmountSwapOnly",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountIn",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
