@@ -2,7 +2,6 @@
 const fs = require("fs");
 
 require("@nomicfoundation/hardhat-foundry");
-require("hardhat-diamond-abi");
 
 task('diamondABI', 'Generates ABI file for diamond, includes all ABIs of facets and subdirectories', async () => {
   var walk = function (dir) {
@@ -27,7 +26,7 @@ task('diamondABI', 'Generates ABI file for diamond, includes all ABIs of facets 
   let abi = []
   for (var file of files) {
     var jsonFile
-    if (file.includes('Facet')) {
+    if (file.includes('Facet') || file.includes('Quoter')) {
       var baseName = /[^/]*$/.exec(file)[0];
       jsonFile = baseName.replace('sol', 'json');
       let json = fs.readFileSync(`./artifacts${file}/${jsonFile}`)
