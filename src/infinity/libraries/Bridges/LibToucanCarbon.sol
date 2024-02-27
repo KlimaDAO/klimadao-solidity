@@ -28,6 +28,19 @@ library LibToucanCarbon {
         uint256 retiredAmount
     );
 
+    event CarbonRetired(
+        LibRetire.CarbonBridge carbonBridge,
+        address indexed retiringAddress,
+        string retiringEntityString,
+        address indexed beneficiaryAddress,
+        string beneficiaryString,
+        string retirementMessage,
+        address indexed carbonPool,
+        address carbonToken,
+        uint256 tokenId,
+        uint256 retiredAmount
+    );
+
     /**
      * @notice                      Redeems Toucan pool tokens using default redemtion and retires the TCO2
      * @param poolToken             Pool token to use for this retirement
@@ -161,6 +174,55 @@ library LibToucanCarbon {
     }
 
     /**
+     * @notice                      Creates a Retirement Request for Toucan Puro TCO2s
+     * @param tokenId               Credit token ID to be retired
+     * @param projectToken          Project token to use for this retirement
+     * @param amount                Amount of the project token to retire
+     * @param retiringAddress       Address initiating this retirement
+     * @param retiringEntityString  String description of the retiring entity
+     * @param beneficiaryAddress    0x address for the beneficiary
+     * @param beneficiaryString     String description of the beneficiary
+     * @param retirementMessage     String message for this specific retirement
+     */
+    function retirePuroTCO2(
+        uint256 tokenId,
+        address projectToken,
+        uint256 amount,
+        address retiringAddress,
+        string memory retiringEntityString,
+        address beneficiaryAddress,
+        string memory beneficiaryString,
+        string memory retirementMessage
+    ) internal {
+        uint256 _tokenId = tokenId;
+        address _projectToken = projectToken;
+        uint256 _amount = amount;
+
+        _retirePuro(
+            _tokenId,
+            _projectToken,
+            _amount,
+            retiringEntityString,
+            beneficiaryAddress,
+            beneficiaryString,
+            retirementMessage
+        );
+
+        emit CarbonRetired(
+            LibRetire.CarbonBridge.TOUCAN,
+            retiringAddress,
+            retiringEntityString,
+            beneficiaryAddress,
+            beneficiaryString,
+            retirementMessage,
+            address(0),
+            _projectToken,
+            _tokenId,
+            _amount
+        );
+    }
+
+    /**
      * @notice                      Send the ERC-721 retirement certificate received to a beneficiary
      * @param _beneficiary          Beneficiary to send the certificate to
      */
@@ -264,5 +326,38 @@ library LibToucanCarbon {
 
     function isValid(address token) internal returns (bool) {
         return IToucanContractRegistry(C.toucanRegistry()).isValidERC20(token);
+    }
+
+    function _retirePuro(
+        uint256 tokenId,
+        address projectToken,
+        uint256 amount,
+        string memory retiringEntityString,
+        address beneficiaryAddress,
+        string memory beneficiaryString,
+        string memory retirementMessage
+    ) private {
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+
+        IToucanPuroCarbonOffsets.CreateRetirementRequestParams memory params = IToucanPuroCarbonOffsets
+            .CreateRetirementRequestParams({
+            tokenIds: tokenIds,
+            amount: amount,
+            retiringEntityString: retiringEntityString,
+            beneficiary: beneficiaryAddress,
+            beneficiaryString: beneficiaryString,
+            retirementMessage: retirementMessage,
+            beneficiaryLocation: "",
+            consumptionCountryCode: "",
+            consumptionPeriodStart: 0,
+            consumptionPeriodEnd: 0
+        });
+
+        IToucanPuroCarbonOffsets(projectToken).requestRetirement(params);
+
+        LibRetire.saveRetirementDetails(
+            address(0), projectToken, amount, beneficiaryAddress, beneficiaryString, retirementMessage
+        );
     }
 }

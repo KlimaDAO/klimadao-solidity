@@ -39,3 +39,20 @@ interface IToucanCarbonOffsets {
 interface IToucanContractRegistry {
     function isValidERC20(address erc20) external returns (bool);
 }
+
+interface IToucanPuroCarbonOffsets {
+    struct CreateRetirementRequestParams {
+        uint256[] tokenIds;
+        uint256 amount;
+        string retiringEntityString;
+        address beneficiary;
+        string beneficiaryString;
+        string retirementMessage;
+        string beneficiaryLocation;
+        string consumptionCountryCode;
+        uint256 consumptionPeriodStart;
+        uint256 consumptionPeriodEnd;
+    }
+
+    function requestRetirement(CreateRetirementRequestParams calldata params) external returns (uint256 requestId);
+}

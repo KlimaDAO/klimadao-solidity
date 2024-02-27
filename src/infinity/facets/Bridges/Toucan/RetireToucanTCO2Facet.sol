@@ -101,4 +101,42 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
 
         return LibRetire.getTotalRetirements(beneficiaryAddress);
     }
+
+    /**
+     * @notice                     Retires Puro TCO2 directly
+     * @param projectToken         Puro token to retire
+     * @param tokenId              Token ID being retired
+     * @param amount               Amounts of underlying tokens to redeem
+     * @param retiringEntityString String description of the retiring entity
+     * @param beneficiaryAddress   0x address for the beneficiary
+     * @param beneficiaryString    String description of the beneficiary
+     * @param retirementMessage    String message for this specific retirement
+     * @param fromMode             From Mode for transfering tokens
+     * @return retirementIndex     The latest retirement index for the beneficiary address
+     */
+    function toucanRetireExactPuroTCO2(
+        address projectToken,
+        uint256 tokenId,
+        uint256 amount,
+        string memory retiringEntityString,
+        address beneficiaryAddress,
+        string memory beneficiaryString,
+        string memory retirementMessage,
+        LibTransfer.From fromMode
+    ) external nonReentrant returns (uint256 retirementIndex) {
+        LibTransfer.receiveToken(IERC20(projectToken), amount, msg.sender, fromMode);
+
+        LibToucanCarbon.retirePuroTCO2(
+            tokenId,
+            projectToken,
+            amount,
+            msg.sender,
+            retiringEntityString,
+            beneficiaryAddress,
+            beneficiaryString,
+            retirementMessage
+        );
+
+        return LibRetire.getTotalRetirements(beneficiaryAddress);
+    }
 }
