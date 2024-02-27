@@ -16,7 +16,7 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /**
@@ -36,12 +36,12 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
      */
     function toucanRetireExactTCO2(
         address carbonToken,
-        uint amount,
+        uint256 amount,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external nonReentrant returns (uint retirementIndex) {
+    ) external nonReentrant returns (uint256 retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific TCO2 tokens
         // No fee is charged
 
@@ -75,13 +75,13 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
      */
     function toucanRetireExactTCO2WithEntity(
         address carbonToken,
-        uint amount,
+        uint256 amount,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external nonReentrant returns (uint retirementIndex) {
+    ) external nonReentrant returns (uint256 retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific TCO2 tokens
         // No fee is charged
 
