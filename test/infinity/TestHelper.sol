@@ -3,7 +3,7 @@ pragma solidity ^0.8.16;
 
 import {Test, console, stdError} from "forge-std/Test.sol";
 import {stdMath} from "forge-std/StdMath.sol";
-import {Strings} from "oz/utils/Strings.sol";
+import {Strings} from "oz-4-8-3/utils/Strings.sol";
 
 import {Users} from "test/helpers/Users.sol";
 

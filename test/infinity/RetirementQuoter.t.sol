@@ -11,7 +11,7 @@ import {IToucanPool} from "../../src/infinity/interfaces/IToucan.sol";
 import "./TestHelper.sol";
 import "../helpers/AssertionHelper.sol";
 
-import {console2} from "../../lib/forge-std/src/console2.sol";
+import {console2} from "forge-std/console2.sol";
 
 contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
     RetirementQuoter quoterFacet;

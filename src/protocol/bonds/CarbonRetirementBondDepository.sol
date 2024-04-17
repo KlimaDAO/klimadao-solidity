@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import "oz/access/Ownable2Step.sol";
+import "oz-4-8-3/access/Ownable2Step.sol";
 
 import "src/protocol/interfaces/IKlimaInfinity.sol";
 import {IKlima, SafeERC20} from "src/protocol/interfaces/IKLIMA.sol";

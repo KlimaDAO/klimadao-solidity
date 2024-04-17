@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.16;
 
-import "oz/token/ERC20/utils/SafeERC20.sol";
+import "oz-4-8-3/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @author publius

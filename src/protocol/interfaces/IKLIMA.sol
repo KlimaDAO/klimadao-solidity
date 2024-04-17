@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "oz/token/ERC20/utils/SafeERC20.sol";
+import "oz-4-8-3/token/ERC20/utils/SafeERC20.sol";
 
 interface IKlima is IERC20 {
     function mint(address account_, uint256 amount_) external;
