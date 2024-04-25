@@ -14,7 +14,6 @@ import "../LibMeta.sol";
  * @title LibToucanCarbon
  * Handles interactions with Toucan Protocol carbon
  */
-
 library LibToucanCarbon {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
@@ -178,47 +177,57 @@ library LibToucanCarbon {
      * @param tokenId               Credit token ID to be retired
      * @param projectToken          Project token to use for this retirement
      * @param amount                Amount of the project token to retire
-     * @param retiringAddress       Address initiating this retirement
-     * @param retiringEntityString  String description of the retiring entity
-     * @param beneficiaryAddress    0x address for the beneficiary
-     * @param beneficiaryString     String description of the beneficiary
-     * @param retirementMessage     String message for this specific retirement
      */
     function retirePuroTCO2(
         uint256 tokenId,
         address projectToken,
         uint256 amount,
-        address retiringAddress,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage
+        LibRetire.RetireDetails memory details
     ) internal {
-        uint256 _tokenId = tokenId;
-        address _projectToken = projectToken;
-        uint256 _amount = amount;
+        require(bytes(details.beneficiaryLocation).length > 0, "No Beneficiary Location");
+        require(bytes(details.consumptionCountryCode).length > 0, "No Country Code");
+        require(details.consumptionPeriodStart > 0, "No Period Start");
+        require(details.consumptionPeriodEnd > 0, "No Period End");
 
-        _retirePuro(
-            _tokenId,
-            _projectToken,
-            _amount,
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+
+        IToucanPuroCarbonOffsets.CreateRetirementRequestParams memory params = IToucanPuroCarbonOffsets
+            .CreateRetirementRequestParams({
+            tokenIds: tokenIds,
+            amount: amount,
+            retiringEntityString: details.retiringEntityString,
+            beneficiary: details.beneficiaryAddress,
+            beneficiaryString: details.beneficiaryString,
+            retirementMessage: details.retirementMessage,
+            beneficiaryLocation: details.beneficiaryLocation,
+            consumptionCountryCode: details.consumptionCountryCode,
+            consumptionPeriodStart: details.consumptionPeriodStart,
+            consumptionPeriodEnd: details.consumptionPeriodEnd
+        });
+
+        IToucanPuroCarbonOffsets(projectToken).requestRetirement(params);
+
+        LibRetire.saveRetirementDetails(
+            address(0),
+            projectToken,
+            amount,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage
         );
 
         emit CarbonRetired(
             LibRetire.CarbonBridge.TOUCAN,
-            retiringAddress,
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage,
+            details.retiringAddress,
+            details.retiringEntityString,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage,
             address(0),
-            _projectToken,
-            _tokenId,
-            _amount
+            projectToken,
+            tokenId,
+            amount
         );
     }
 

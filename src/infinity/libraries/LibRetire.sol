@@ -5,7 +5,6 @@ pragma solidity ^0.8.16;
  * @author Cujo
  * @title LibRetire
  */
-
 import "../C.sol";
 import "./LibAppStorage.sol";
 import {LibMeta} from "./LibMeta.sol";
@@ -36,6 +35,10 @@ library LibRetire {
         address beneficiaryAddress;
         string beneficiaryString;
         string retirementMessage;
+        string beneficiaryLocation;
+        string consumptionCountryCode;
+        uint256 consumptionPeriodStart;
+        uint256 consumptionPeriodEnd;
     }
 
     /* ========== Default Redemption Retirements ========== */

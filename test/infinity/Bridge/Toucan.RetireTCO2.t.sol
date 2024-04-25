@@ -22,14 +22,27 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
+    );
+
+    event CarbonRetired(
+        LibRetire.CarbonBridge carbonBridge,
+        address indexed retiringAddress,
+        string retiringEntityString,
+        address indexed beneficiaryAddress,
+        string beneficiaryString,
+        string retirementMessage,
+        address indexed carbonPool,
+        address carbonToken,
+        uint256 tokenId,
+        uint256 retiredAmount
     );
 
     RetireToucanTCO2Facet retireToucanTCO2Facet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
 
-    uint defaultCarbonRetireAmount = 69 * 1e18;
+    uint256 defaultCarbonRetireAmount = 69 * 1e18;
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
     string entity = "Test Entity";
@@ -40,9 +53,12 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address BCT;
     address DEFAULT_PROJECT;
+    address PURO_PROJECT = 0x42F37CD772E3Dd2686a34f7BbbBaC710f497920a;
+    uint256 PURO_TOKEN_ID = 1715;
 
     function setUp() public {
         addConstantsGetter(diamond);
+        upgradeCurrentDiamond(diamond);
         constantsFacet = ConstantsGetter(diamond);
         retireToucanTCO2Facet = RetireToucanTCO2Facet(diamond);
         quoterFacet = RetirementQuoter(diamond);
@@ -57,11 +73,11 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, BCT, address(this));
         IERC20(sourceToken).approve(diamond, defaultCarbonRetireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        uint expectedRetirements = currentRetirements + 1;
-        uint expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+        uint256 expectedRetirements = currentRetirements + 1;
+        uint256 expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
 
         // Set up expectEmit
         vm.expectEmit(true, true, true, true);
@@ -79,13 +95,8 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
-        uint retirementIndex = retireToucanTCO2Facet.toucanRetireExactTCO2(
-            carbonToken,
-            defaultCarbonRetireAmount,
-            beneficiaryAddress,
-            beneficiary,
-            message,
-            LibTransfer.From.EXTERNAL
+        uint256 retirementIndex = retireToucanTCO2Facet.toucanRetireExactTCO2(
+            carbonToken, defaultCarbonRetireAmount, beneficiaryAddress, beneficiary, message, LibTransfer.From.EXTERNAL
         );
 
         // No tokens left in contract
@@ -103,11 +114,11 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, BCT, address(this));
         IERC20(sourceToken).approve(diamond, defaultCarbonRetireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        uint expectedRetirements = currentRetirements + 1;
-        uint expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+        uint256 expectedRetirements = currentRetirements + 1;
+        uint256 expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
 
         // Set up expectEmit
         vm.expectEmit(true, true, true, true);
@@ -125,7 +136,7 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
-        uint retirementIndex = retireToucanTCO2Facet.toucanRetireExactTCO2WithEntity(
+        uint256 retirementIndex = retireToucanTCO2Facet.toucanRetireExactTCO2WithEntity(
             carbonToken,
             defaultCarbonRetireAmount,
             entity,
@@ -138,6 +149,60 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         // No tokens left in contract
         assertZeroTokenBalance(carbonToken, diamond);
         assertZeroTokenBalance(DEFAULT_PROJECT, diamond);
+
+        // Account state values updated
+        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), expectedRetirements);
+        assertEq(retirementIndex, expectedRetirements);
+        assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
+    }
+
+    function test_infinity_toucanRetirePuroTCO2() public {
+        address sourceToken = PURO_PROJECT;
+        address carbonToken = PURO_PROJECT;
+        defaultCarbonRetireAmount = 5e18;
+
+        swipeERC20Tokens(
+            PURO_PROJECT, defaultCarbonRetireAmount, 0x46f1430f5B7224699F0A2E33584Be6517c7bc9A0, address(this)
+        );
+        IERC20(sourceToken).approve(diamond, defaultCarbonRetireAmount);
+
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+
+        uint256 expectedRetirements = currentRetirements + 1;
+        uint256 expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+
+        // Set up expectEmit
+        vm.expectEmit(true, true, true, true);
+
+        // Emit expected CarbonRetired event
+        emit CarbonRetired(
+            LibRetire.CarbonBridge.TOUCAN,
+            address(this),
+            entity,
+            beneficiaryAddress,
+            beneficiary,
+            message,
+            address(0),
+            PURO_PROJECT,
+            PURO_TOKEN_ID,
+            defaultCarbonRetireAmount
+        );
+
+        uint256 retirementIndex = retireToucanTCO2Facet.toucanRetireExactPuroTCO2(
+            carbonToken,
+            PURO_TOKEN_ID,
+            defaultCarbonRetireAmount,
+            entity,
+            beneficiaryAddress,
+            beneficiary,
+            message,
+            LibTransfer.From.EXTERNAL
+        );
+
+        // No tokens left in contract
+        assertZeroTokenBalance(carbonToken, diamond);
+        assertZeroTokenBalance(PURO_PROJECT, diamond);
 
         // Account state values updated
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), expectedRetirements);
