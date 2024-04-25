@@ -215,7 +215,7 @@ abstract contract TestHelper is Test, HelperContract {
 
         replace[0] = 0x1fd1a6ac;
         replace[1] = 0x01e85bd2;
-        add[0] = 0xed0b9320;
+        add[0] = 0xdadd9192;
 
         cut[0] = (
             IDiamondCut.FacetCut({

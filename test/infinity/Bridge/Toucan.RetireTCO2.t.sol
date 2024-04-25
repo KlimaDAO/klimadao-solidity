@@ -53,8 +53,8 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address BCT;
     address DEFAULT_PROJECT;
-    address PURO_PROJECT = 0x42F37CD772E3Dd2686a34f7BbbBaC710f497920a;
-    uint256 PURO_TOKEN_ID = 1715;
+    address PURO_PROJECT = 0x6960cE1d21f63C4971324B5b611c4De29aCF980C;
+    uint256 PURO_TOKEN_ID = 1713;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -161,9 +161,8 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         address carbonToken = PURO_PROJECT;
         defaultCarbonRetireAmount = 5e18;
 
-        swipeERC20Tokens(
-            PURO_PROJECT, defaultCarbonRetireAmount, 0x46f1430f5B7224699F0A2E33584Be6517c7bc9A0, address(this)
-        );
+        swipeERC20Tokens(PURO_PROJECT, 3e18, 0x89DCA1d490aa6e4e7404dC7a55408519858895FE, address(this));
+        swipeERC20Tokens(PURO_PROJECT, 2e18, 0xE32bb999851587b53d170C0A130cCE7f542c754d, address(this));
         IERC20(sourceToken).approve(diamond, defaultCarbonRetireAmount);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
@@ -189,15 +188,20 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
+        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
+            retiringAddress: address(this),
+            retiringEntityString: entity,
+            beneficiaryAddress: beneficiaryAddress,
+            beneficiaryString: beneficiary,
+            retirementMessage: message,
+            beneficiaryLocation: "Germany",
+            consumptionCountryCode: "DE",
+            consumptionPeriodStart: 1_672_552_800,
+            consumptionPeriodEnd: 1_704_088_799
+        });
+
         uint256 retirementIndex = retireToucanTCO2Facet.toucanRetireExactPuroTCO2(
-            carbonToken,
-            PURO_TOKEN_ID,
-            defaultCarbonRetireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message,
-            LibTransfer.From.EXTERNAL
+            carbonToken, PURO_TOKEN_ID, defaultCarbonRetireAmount, details, LibTransfer.From.EXTERNAL
         );
 
         // No tokens left in contract
