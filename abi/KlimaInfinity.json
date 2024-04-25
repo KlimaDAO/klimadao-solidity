@@ -407,6 +407,92 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "projectToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "retiringAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "retiringEntityString",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "beneficiaryAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "beneficiaryString",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "retirementMessage",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "beneficiaryLocation",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "consumptionCountryCode",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "consumptionPeriodStart",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "consumptionPeriodEnd",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct LibRetire.RetireDetails",
+                "name": "details",
+                "type": "tuple"
+            },
+            {
+                "internalType": "enum LibTransfer.From",
+                "name": "fromMode",
+                "type": "uint8"
+            }
+        ],
+        "name": "toucanRetireExactPuroTCO2",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "retirementIndex",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "carbonToken",
                 "type": "address"
             },
