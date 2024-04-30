@@ -1179,24 +1179,56 @@
                 "type": "uint256"
             },
             {
-                "internalType": "string",
-                "name": "retiringEntityString",
-                "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "beneficiaryAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "beneficiaryString",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "retirementMessage",
-                "type": "string"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "retiringAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "retiringEntityString",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "beneficiaryAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "beneficiaryString",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "retirementMessage",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "beneficiaryLocation",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "consumptionCountryCode",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "consumptionPeriodStart",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "consumptionPeriodEnd",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct LibRetire.RetireDetails",
+                "name": "details",
+                "type": "tuple"
             },
             {
                 "internalType": "enum LibTransfer.From",
