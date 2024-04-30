@@ -218,6 +218,26 @@ library LibRetire {
     }
 
     /**
+     * @notice                     Retire received carbon based on the bridge of the provided pool tokens using default redemption
+     * @param creditToken          Credit token used to retire
+     * @param tokenId              Token Id for the credit (if applicable)
+     * @param amount               The amount of carbon to retire
+     * @param details              Encoded struct of retirement details needed for the retirement
+     */
+    function retireReceivedCreditToken(
+        address creditToken,
+        uint256 tokenId,
+        uint256 amount,
+        RetireDetails memory details
+    ) internal {
+        if (LibToucanCarbon.isValid(creditToken) && LibToucanCarbon.isPuro(creditToken)) {
+            LibToucanCarbon.retirePuroTCO2(tokenId, creditToken, amount, details);
+        } else {
+            revert("Only Toucan Puro allowed");
+        }
+    }
+
+    /**
      * @notice                     Additional function to handle the differences in wanting to fully retire x pool tokens specifically
      * @param poolToken            Pool token used to retire
      * @param projectToken         Project token being retired

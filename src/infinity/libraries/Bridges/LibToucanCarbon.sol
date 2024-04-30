@@ -337,36 +337,7 @@ library LibToucanCarbon {
         return IToucanContractRegistry(C.toucanRegistry()).isValidERC20(token);
     }
 
-    function _retirePuro(
-        uint256 tokenId,
-        address projectToken,
-        uint256 amount,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage
-    ) private {
-        uint256[] memory tokenIds = new uint256[](1);
-        tokenIds[0] = tokenId;
-
-        IToucanPuroCarbonOffsets.CreateRetirementRequestParams memory params = IToucanPuroCarbonOffsets
-            .CreateRetirementRequestParams({
-            tokenIds: tokenIds,
-            amount: amount,
-            retiringEntityString: retiringEntityString,
-            beneficiary: beneficiaryAddress,
-            beneficiaryString: beneficiaryString,
-            retirementMessage: retirementMessage,
-            beneficiaryLocation: "",
-            consumptionCountryCode: "",
-            consumptionPeriodStart: 0,
-            consumptionPeriodEnd: 0
-        });
-
-        IToucanPuroCarbonOffsets(projectToken).requestRetirement(params);
-
-        LibRetire.saveRetirementDetails(
-            address(0), projectToken, amount, beneficiaryAddress, beneficiaryString, retirementMessage
-        );
+    function isPuro(address token) internal returns (bool) {
+        return keccak256(bytes(IToucanCarbonOffsets(token).standardRegistry())) == keccak256(bytes("puro"));
     }
 }

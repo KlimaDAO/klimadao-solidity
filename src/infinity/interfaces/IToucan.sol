@@ -34,6 +34,8 @@ interface IToucanCarbonOffsets {
         string calldata retirementMessage,
         uint256 amount
     ) external;
+
+    function standardRegistry() external returns (string memory registry);
 }
 
 interface IToucanContractRegistry {

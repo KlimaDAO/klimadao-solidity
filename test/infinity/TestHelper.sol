@@ -200,13 +200,13 @@ abstract contract TestHelper is Test, HelperContract {
         // retirementQuoterF = new RetirementQuoter();
         // retireCarbonF = new RetireCarbonFacet();
         // retireSourceF = new RetireSourceFacet();
-        // retireCarbonmarkF = new RetireCarbonmarkFacet();
+        retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
         toucanRetireF = new RetireToucanTCO2Facet();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
 
         // // Klima Infinity specific facets
 
@@ -230,6 +230,14 @@ abstract contract TestHelper is Test, HelperContract {
                 facetAddress: address(toucanRetireF),
                 action: IDiamondCut.FacetCutAction.Add,
                 functionSelectors: add
+            })
+        );
+
+        cut[2] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireCarbonmarkF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
             })
         );
 
