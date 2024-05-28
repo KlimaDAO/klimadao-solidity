@@ -16,7 +16,7 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /**
@@ -36,12 +36,12 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
      */
     function toucanRetireExactTCO2(
         address carbonToken,
-        uint amount,
+        uint256 amount,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external nonReentrant returns (uint retirementIndex) {
+    ) external nonReentrant returns (uint256 retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific TCO2 tokens
         // No fee is charged
 
@@ -75,13 +75,13 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
      */
     function toucanRetireExactTCO2WithEntity(
         address carbonToken,
-        uint amount,
+        uint256 amount,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external nonReentrant returns (uint retirementIndex) {
+    ) external nonReentrant returns (uint256 retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific TCO2 tokens
         // No fee is charged
 
@@ -100,5 +100,30 @@ contract RetireToucanTCO2Facet is ReentrancyGuard {
         );
 
         return LibRetire.getTotalRetirements(beneficiaryAddress);
+    }
+
+    /**
+     * @notice                     Retires Puro TCO2 directly
+     * @param projectToken         Puro token to retire
+     * @param tokenId              Token ID being retired
+     * @param amount               Amounts of underlying tokens to redeem
+     * @param details              Encoded struct of retirement details needed for the request
+     * @param fromMode             From Mode for transfering tokens
+     * @return retirementIndex     The latest retirement index for the beneficiary address
+     */
+    function toucanRetireExactPuroTCO2(
+        address projectToken,
+        uint256 tokenId,
+        uint256 amount,
+        LibRetire.RetireDetails memory details,
+        LibTransfer.From fromMode
+    ) external nonReentrant returns (uint256 retirementIndex) {
+        LibTransfer.receiveToken(IERC20(projectToken), amount, msg.sender, fromMode);
+
+        if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
+
+        LibToucanCarbon.retirePuroTCO2(tokenId, projectToken, amount, details);
+
+        return LibRetire.getTotalRetirements(details.beneficiaryAddress);
     }
 }

@@ -5,7 +5,6 @@ pragma solidity ^0.8.16;
  * @author Cujo
  * @title LibRetire
  */
-
 import "../C.sol";
 import "./LibAppStorage.sol";
 import {LibMeta} from "./LibMeta.sol";
@@ -36,6 +35,10 @@ library LibRetire {
         address beneficiaryAddress;
         string beneficiaryString;
         string retirementMessage;
+        string beneficiaryLocation;
+        string consumptionCountryCode;
+        uint256 consumptionPeriodStart;
+        uint256 consumptionPeriodEnd;
     }
 
     /* ========== Default Redemption Retirements ========== */
@@ -211,6 +214,26 @@ library LibRetire {
                 amount,
                 details
             );
+        }
+    }
+
+    /**
+     * @notice                     Retire received carbon based on the bridge of the provided pool tokens using default redemption
+     * @param creditToken          Credit token used to retire
+     * @param tokenId              Token Id for the credit (if applicable)
+     * @param amount               The amount of carbon to retire
+     * @param details              Encoded struct of retirement details needed for the retirement
+     */
+    function retireReceivedCreditToken(
+        address creditToken,
+        uint256 tokenId,
+        uint256 amount,
+        RetireDetails memory details
+    ) internal {
+        if (LibToucanCarbon.isValid(creditToken) && LibToucanCarbon.isPuro(creditToken)) {
+            LibToucanCarbon.retirePuroTCO2(tokenId, creditToken, amount, details);
+        } else {
+            revert("Only Toucan Puro allowed");
         }
     }
 

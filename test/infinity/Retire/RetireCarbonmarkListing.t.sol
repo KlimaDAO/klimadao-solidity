@@ -18,6 +18,19 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
 
+    event CarbonRetired(
+        LibRetire.CarbonBridge carbonBridge,
+        address indexed retiringAddress,
+        string retiringEntityString,
+        address indexed beneficiaryAddress,
+        string beneficiaryString,
+        string retirementMessage,
+        address indexed carbonPool,
+        address carbonToken,
+        uint256 tokenId,
+        uint256 retiredAmount
+    );
+
     // Retirement details
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
@@ -40,6 +53,8 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
     address BCT;
     address DEFAULT_PROJECT;
     address CARBONMARK;
+    address PURO_PROJECT = 0x6960cE1d21f63C4971324B5b611c4De29aCF980C;
+    uint256 PURO_TOKEN_ID = 1713;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -81,6 +96,24 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         retireExactBCT(listing, 5e17);
     }
 
+    function test_infinity_retireCarbonmark_Puro() public {
+        uint256 defaultCarbonRetireAmount = 5e18;
+
+        swipeERC20Tokens(PURO_PROJECT, 3e18, 0x89DCA1d490aa6e4e7404dC7a55408519858895FE, address(this));
+        swipeERC20Tokens(PURO_PROJECT, 2e18, 0xE32bb999851587b53d170C0A130cCE7f542c754d, address(this));
+        IERC20(PURO_PROJECT).approve(CARBONMARK, defaultCarbonRetireAmount);
+
+        bytes32 listingId = ICarbonmark(CARBONMARK).createListing(
+            PURO_PROJECT, defaultCarbonRetireAmount, 5_000_000, 5e17, block.timestamp + 3600
+        );
+
+        ICarbonmark.CreditListing memory listing = ICarbonmark.CreditListing(
+            listingId, address(this), PURO_PROJECT, PURO_TOKEN_ID, defaultCarbonRetireAmount, 5_000_000
+        );
+
+        retireExactPuro(listing, defaultCarbonRetireAmount);
+    }
+
     function getSourceTokens(bytes32 listingId, uint256 retireAmount) internal returns (uint256 sourceAmount) {
         vm.assume(retireAmount <= ICarbonmark(CARBONMARK).getRemainingAmount(listingId));
 
@@ -92,24 +125,80 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         IERC20(USDC).approve(diamond, sourceAmount);
     }
 
+    function retireExactPuro(ICarbonmark.CreditListing memory listing, uint256 retireAmount) public {
+        uint256 sourceAmount = getSourceTokens(listing.id, retireAmount);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+
+        uint256 expectedRetirements = currentRetirements + 1;
+        uint256 expectedCarbonRetired = currentTotalCarbon + retireAmount;
+
+        // Set up expectEmit
+        vm.expectEmit(true, true, true, true);
+
+        // Emit expected CarbonRetired event
+        emit CarbonRetired(
+            LibRetire.CarbonBridge.TOUCAN,
+            address(this),
+            entity,
+            beneficiaryAddress,
+            beneficiary,
+            message,
+            address(0),
+            PURO_PROJECT,
+            PURO_TOKEN_ID,
+            retireAmount
+        );
+
+        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
+            retiringAddress: address(this),
+            retiringEntityString: entity,
+            beneficiaryAddress: beneficiaryAddress,
+            beneficiaryString: beneficiary,
+            retirementMessage: message,
+            beneficiaryLocation: "Germany",
+            consumptionCountryCode: "DE",
+            consumptionPeriodStart: 1_672_552_800,
+            consumptionPeriodEnd: 1_704_088_799
+        });
+
+        uint256 retirementIndex = retireCarbonmarkFacet.retireCarbonmarkListing(
+            listing, sourceAmount, retireAmount, details, LibTransfer.From.EXTERNAL
+        );
+
+        // No tokens left in contract
+        assertZeroTokenBalance(USDC, diamond);
+        assertZeroTokenBalance(PURO_PROJECT, diamond);
+
+        // Account state values updated
+        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), expectedRetirements);
+        assertEq(retirementIndex, expectedRetirements);
+        assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
+    }
+
     function retireExactBCT(ICarbonmark.CreditListing memory listing, uint256 retireAmount) public {
         uint256 sourceAmount = getSourceTokens(listing.id, retireAmount);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
+        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
+            retiringAddress: address(this),
+            retiringEntityString: entity,
+            beneficiaryAddress: beneficiaryAddress,
+            beneficiaryString: beneficiary,
+            retirementMessage: message,
+            beneficiaryLocation: "",
+            consumptionCountryCode: "",
+            consumptionPeriodStart: 0,
+            consumptionPeriodEnd: 0
+        });
+
         if (retireAmount == 0) {
             vm.expectRevert();
 
             retireCarbonmarkFacet.retireCarbonmarkListing(
-                listing,
-                sourceAmount,
-                retireAmount,
-                entity,
-                beneficiaryAddress,
-                beneficiary,
-                message,
-                LibTransfer.From.EXTERNAL
+                listing, sourceAmount, retireAmount, details, LibTransfer.From.EXTERNAL
             );
         } else {
             // Set up expectEmit
@@ -129,20 +218,12 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
             );
 
             uint256 retirementIndex = retireCarbonmarkFacet.retireCarbonmarkListing(
-                listing,
-                sourceAmount,
-                retireAmount,
-                entity,
-                beneficiaryAddress,
-                beneficiary,
-                message,
-                LibTransfer.From.EXTERNAL
+                listing, sourceAmount, retireAmount, details, LibTransfer.From.EXTERNAL
             );
 
             // No tokens left in contract
             assertZeroTokenBalance(USDC, diamond);
             assertZeroTokenBalance(BCT, diamond);
-            assertZeroTokenBalance(DEFAULT_PROJECT, diamond);
 
             // Return value matches
             assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), retirementIndex);

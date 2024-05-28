@@ -24,10 +24,7 @@ contract RetireCarbonmarkFacet is ReentrancyGuard {
      * @notice                     Retires an exact amount of carbon using default redemption
      * @param maxAmountIn          Maximum amount of USDC tokens to spend for this retirement
      * @param retireAmount         The amount of carbon to retire
-     * @param retiringEntityString String description of the retiring entity
-     * @param beneficiaryAddress   0x address for the beneficiary
-     * @param beneficiaryString    String description of the beneficiary
-     * @param retirementMessage    String message for this specific retirement
+     * @param details              Encoded struct of retirement details needed for the retirement
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
@@ -35,10 +32,7 @@ contract RetireCarbonmarkFacet is ReentrancyGuard {
         ICarbonmark.CreditListing memory listing,
         uint256 maxAmountIn,
         uint256 retireAmount,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage,
+        LibRetire.RetireDetails memory details,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint256 retirementIndex) {
         require(retireAmount > 0, "Cannot retire zero tonnes");
@@ -51,17 +45,10 @@ contract RetireCarbonmarkFacet is ReentrancyGuard {
             listing.id, listing.account, listing.token, listing.unitPrice, retireAmount, maxAmountIn
         );
 
-        LibRetire.retireReceivedCreditToken(
-            listing.token,
-            listing.tokenId,
-            retireAmount,
-            msg.sender,
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
-        );
+        if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
 
-        return LibRetire.getTotalRetirements(beneficiaryAddress);
+        LibRetire.retireReceivedCreditToken(listing.token, listing.tokenId, retireAmount, details);
+
+        return LibRetire.getTotalRetirements(details.beneficiaryAddress);
     }
 }

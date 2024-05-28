@@ -200,28 +200,44 @@ abstract contract TestHelper is Test, HelperContract {
         // retirementQuoterF = new RetirementQuoter();
         // retireCarbonF = new RetireCarbonFacet();
         // retireSourceF = new RetireSourceFacet();
-        // retireCarbonmarkF = new RetireCarbonmarkFacet();
-        retireICRF = new RetireICRFacet();
-        erc1155ReceiverF = new ERC1155ReceiverFacet();
+        retireCarbonmarkF = new RetireCarbonmarkFacet();
+        // retireICRF = new RetireICRFacet();
+        // erc1155ReceiverF = new ERC1155ReceiverFacet();
+        toucanRetireF = new RetireToucanTCO2Facet();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
 
         // // Klima Infinity specific facets
 
+        bytes4[] memory replace = new bytes4[](2);
+        bytes4[] memory add = new bytes4[](1);
+
+        replace[0] = 0x1fd1a6ac;
+        replace[1] = 0x01e85bd2;
+        add[0] = 0xdadd9192;
+
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(retireICRF),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("RetireICRFacet")
+                facetAddress: address(toucanRetireF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: replace
             })
         );
 
         cut[1] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(erc1155ReceiverF),
+                facetAddress: address(toucanRetireF),
                 action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("ERC1155ReceiverFacet")
+                functionSelectors: add
+            })
+        );
+
+        cut[2] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireCarbonmarkF),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
             })
         );
 

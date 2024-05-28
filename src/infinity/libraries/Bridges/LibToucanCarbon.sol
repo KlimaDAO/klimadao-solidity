@@ -14,7 +14,6 @@ import "../LibMeta.sol";
  * @title LibToucanCarbon
  * Handles interactions with Toucan Protocol carbon
  */
-
 library LibToucanCarbon {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
@@ -25,7 +24,20 @@ library LibToucanCarbon {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
+    );
+
+    event CarbonRetired(
+        LibRetire.CarbonBridge carbonBridge,
+        address indexed retiringAddress,
+        string retiringEntityString,
+        address indexed beneficiaryAddress,
+        string beneficiaryString,
+        string retirementMessage,
+        address indexed carbonPool,
+        address carbonToken,
+        uint256 tokenId,
+        uint256 retiredAmount
     );
 
     /**
@@ -40,7 +52,7 @@ library LibToucanCarbon {
      */
     function redeemAutoAndRetire(
         address poolToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
@@ -48,10 +60,10 @@ library LibToucanCarbon {
         string memory retirementMessage
     ) internal {
         // Redeem pool tokens
-        (address[] memory listTCO2, uint[] memory amounts) = IToucanPool(poolToken).redeemAuto2(amount);
+        (address[] memory listTCO2, uint256[] memory amounts) = IToucanPool(poolToken).redeemAuto2(amount);
 
         // Retire TCO2
-        for (uint i = 0; i < listTCO2.length; i++) {
+        for (uint256 i = 0; i < listTCO2.length; i++) {
             if (amounts[i] == 0) continue;
 
             retireTCO2(
@@ -82,23 +94,23 @@ library LibToucanCarbon {
     function redeemSpecificAndRetire(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage
-    ) internal returns (uint retiredAmount) {
+    ) internal returns (uint256 retiredAmount) {
         // Redeem pool tokens
         // Put redemption address into arrays for calling the redeem.
         address[] memory projectTokens = new address[](1);
         projectTokens[0] = projectToken;
 
-        uint[] memory amounts = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
         amounts[0] = amount;
 
         // Fetch balances, redeem, and update for net amount of TCO2 received from redemption.
-        uint beforeBalance = IERC20(projectToken).balanceOf(address(this));
+        uint256 beforeBalance = IERC20(projectToken).balanceOf(address(this));
         IToucanPool(poolToken).redeemMany(projectTokens, amounts);
         amount = IERC20(projectToken).balanceOf(address(this)) - beforeBalance;
 
@@ -130,7 +142,7 @@ library LibToucanCarbon {
     function retireTCO2(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
@@ -138,20 +150,11 @@ library LibToucanCarbon {
         string memory retirementMessage
     ) internal {
         IToucanCarbonOffsets(projectToken).retireAndMintCertificate(
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage,
-            amount
+            retiringEntityString, beneficiaryAddress, beneficiaryString, retirementMessage, amount
         );
 
         LibRetire.saveRetirementDetails(
-            poolToken,
-            projectToken,
-            amount,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
+            poolToken, projectToken, amount, beneficiaryAddress, beneficiaryString, retirementMessage
         );
 
         emit CarbonRetired(
@@ -170,6 +173,65 @@ library LibToucanCarbon {
     }
 
     /**
+     * @notice                      Creates a Retirement Request for Toucan Puro TCO2s
+     * @param tokenId               Credit token ID to be retired
+     * @param projectToken          Project token to use for this retirement
+     * @param amount                Amount of the project token to retire
+     */
+    function retirePuroTCO2(
+        uint256 tokenId,
+        address projectToken,
+        uint256 amount,
+        LibRetire.RetireDetails memory details
+    ) internal {
+        require(bytes(details.beneficiaryLocation).length > 0, "No Beneficiary Location");
+        require(bytes(details.consumptionCountryCode).length > 0, "No Country Code");
+        require(details.consumptionPeriodStart > 0, "No Period Start");
+        require(details.consumptionPeriodEnd > 0, "No Period End");
+
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+
+        IToucanPuroCarbonOffsets.CreateRetirementRequestParams memory params = IToucanPuroCarbonOffsets
+            .CreateRetirementRequestParams({
+            tokenIds: tokenIds,
+            amount: amount,
+            retiringEntityString: details.retiringEntityString,
+            beneficiary: details.beneficiaryAddress,
+            beneficiaryString: details.beneficiaryString,
+            retirementMessage: details.retirementMessage,
+            beneficiaryLocation: details.beneficiaryLocation,
+            consumptionCountryCode: details.consumptionCountryCode,
+            consumptionPeriodStart: details.consumptionPeriodStart,
+            consumptionPeriodEnd: details.consumptionPeriodEnd
+        });
+
+        IToucanPuroCarbonOffsets(projectToken).requestRetirement(params);
+
+        LibRetire.saveRetirementDetails(
+            address(0),
+            projectToken,
+            amount,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage
+        );
+
+        emit CarbonRetired(
+            LibRetire.CarbonBridge.TOUCAN,
+            details.retiringAddress,
+            details.retiringEntityString,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage,
+            address(0),
+            projectToken,
+            tokenId,
+            amount
+        );
+    }
+
+    /**
      * @notice                      Send the ERC-721 retirement certificate received to a beneficiary
      * @param _beneficiary          Beneficiary to send the certificate to
      */
@@ -185,7 +247,7 @@ library LibToucanCarbon {
      * @param amount                Amount of TCO2 needed
      * @return poolFeeAmount        Number of additional pool tokens needed
      */
-    function getSpecificRedeemFee(address poolToken, uint amount) internal view returns (uint poolFeeAmount) {
+    function getSpecificRedeemFee(address poolToken, uint256 amount) internal view returns (uint256 poolFeeAmount) {
         bool feeExempt;
 
         try IToucanPool(poolToken).redeemFeeExemptedAddresses(address(this)) returns (bool result) {
@@ -197,8 +259,8 @@ library LibToucanCarbon {
         if (feeExempt) {
             poolFeeAmount = 0;
         } else {
-            uint feeRedeemBp = IToucanPool(poolToken).feeRedeemPercentageInBase();
-            uint feeRedeemDivider = IToucanPool(poolToken).feeRedeemDivider();
+            uint256 feeRedeemBp = IToucanPool(poolToken).feeRedeemPercentageInBase();
+            uint256 feeRedeemDivider = IToucanPool(poolToken).feeRedeemDivider();
             poolFeeAmount = ((amount * feeRedeemDivider) / (feeRedeemDivider - feeRedeemBp)) - amount;
         }
     }
@@ -209,7 +271,7 @@ library LibToucanCarbon {
      * @param amount                Amount of pool tokens redeemed
      * @return retireAmount        Number TCO2s that can be retired.
      */
-    function getSpecificRetireAmount(address poolToken, uint amount) internal view returns (uint retireAmount) {
+    function getSpecificRetireAmount(address poolToken, uint256 amount) internal view returns (uint256 retireAmount) {
         bool feeExempt;
 
         try IToucanPool(poolToken).redeemFeeExemptedAddresses(address(this)) returns (bool result) {
@@ -221,8 +283,8 @@ library LibToucanCarbon {
         if (feeExempt) {
             retireAmount = amount;
         } else {
-            uint feeRedeemBp = IToucanPool(poolToken).feeRedeemPercentageInBase();
-            uint feeRedeemDivider = IToucanPool(poolToken).feeRedeemDivider();
+            uint256 feeRedeemBp = IToucanPool(poolToken).feeRedeemPercentageInBase();
+            uint256 feeRedeemDivider = IToucanPool(poolToken).feeRedeemDivider();
             retireAmount = (amount * (feeRedeemDivider - feeRedeemBp)) / feeRedeemDivider;
         }
     }
@@ -235,13 +297,12 @@ library LibToucanCarbon {
      * @return projectTokens        TCO2 token addresses redeemed
      * @return amounts              TCO2 token amounts redeemed
      */
-    function redeemPoolAuto(
-        address poolToken,
-        uint amount,
-        LibTransfer.To toMode
-    ) internal returns (address[] memory projectTokens, uint[] memory amounts) {
+    function redeemPoolAuto(address poolToken, uint256 amount, LibTransfer.To toMode)
+        internal
+        returns (address[] memory projectTokens, uint256[] memory amounts)
+    {
         (projectTokens, amounts) = IToucanPool(poolToken).redeemAuto2(amount);
-        for (uint i; i < projectTokens.length; i++) {
+        for (uint256 i; i < projectTokens.length; i++) {
             LibTransfer.sendToken(IERC20(projectTokens[i]), amounts[i], msg.sender, toMode);
         }
     }
@@ -257,15 +318,15 @@ library LibToucanCarbon {
     function redeemPoolSpecific(
         address poolToken,
         address[] memory projectTokens,
-        uint[] memory amounts,
+        uint256[] memory amounts,
         LibTransfer.To toMode
-    ) internal returns (uint[] memory) {
-        uint[] memory beforeBalances = new uint256[](projectTokens.length);
-        uint[] memory redeemedAmounts = new uint256[](projectTokens.length);
+    ) internal returns (uint256[] memory) {
+        uint256[] memory beforeBalances = new uint256[](projectTokens.length);
+        uint256[] memory redeemedAmounts = new uint256[](projectTokens.length);
 
         IToucanPool(poolToken).redeemMany(projectTokens, amounts);
 
-        for (uint i; i < projectTokens.length; i++) {
+        for (uint256 i; i < projectTokens.length; i++) {
             redeemedAmounts[i] = IERC20(projectTokens[i]).balanceOf(address(this)) - beforeBalances[i];
             LibTransfer.sendToken(IERC20(projectTokens[i]), redeemedAmounts[i], msg.sender, toMode);
         }
@@ -274,5 +335,9 @@ library LibToucanCarbon {
 
     function isValid(address token) internal returns (bool) {
         return IToucanContractRegistry(C.toucanRegistry()).isValidERC20(token);
+    }
+
+    function isPuro(address token) internal returns (bool) {
+        return keccak256(bytes(IToucanCarbonOffsets(token).standardRegistry())) == keccak256(bytes("puro"));
     }
 }
