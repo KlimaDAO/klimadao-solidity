@@ -3,9 +3,9 @@
 
 pragma solidity ^0.8.16;
 
-import "oz/token/ERC20/utils/SafeERC20.sol";
-import "oz/utils/math/Math.sol";
-import {SafeCast} from "oz/utils/math/SafeCast.sol";
+import "oz-4-8-3/token/ERC20/utils/SafeERC20.sol";
+import "oz-4-8-3/utils/math/Math.sol";
+import {SafeCast} from "oz-4-8-3/utils/math/SafeCast.sol";
 import "../LibAppStorage.sol";
 
 /**

@@ -1,0 +1,22 @@
+[compiler.solc]
+ignore_paths = ["node_modules", ".woke-build", "venv", "lib"]
+include_paths = ["node_modules"]
+
+[compiler.solc.optimizer]
+enabled = true
+
+[detectors]
+exclude = []
+ignore_paths = ["node_modules", ".woke-build", "venv", "lib"]
+
+[testing]
+cmd = "anvil"
+
+[testing.anvil]
+cmd_args = "--prune-history 100 --steps-tracing --silent"
+
+[testing.ganache]
+cmd_args = "-k istanbul -q"
+
+[testing.hardhat]
+cmd_args = ""

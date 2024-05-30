@@ -5,7 +5,7 @@ import {RetireICRFacet} from "../../../src/infinity/facets/Bridges/ICR/RetireICR
 import {RetirementQuoter} from "../../../src/infinity/facets/RetirementQuoter.sol";
 import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
 import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
-import {IERC1155} from "oz/token/ERC1155/IERC1155.sol";
+import {IERC1155} from "oz-4-8-3/token/ERC1155/IERC1155.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
