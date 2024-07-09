@@ -1,4 +1,5 @@
 oz/=lib/openzeppelin-contracts/contracts/
+oz-4-8-3/=lib/openzeppelin-contracts-4-8-3/contracts/
 oz-4-5-0/=lib/openzeppelin-contracts-4-5-0/contracts/
 ozu/=lib/openzeppelin-contracts-upgradeable/contracts
 ozu-4-5-1/=lib/openzeppelin-contracts-upgradeable-4-5-1/contracts
