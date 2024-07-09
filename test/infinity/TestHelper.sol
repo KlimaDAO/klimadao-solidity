@@ -249,7 +249,7 @@ abstract contract TestHelper is Test, HelperContract {
             })
         );
 
-        cut[2] = (
+        cut[0] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(retireSourceF),
                 action: IDiamondCut.FacetCutAction.Replace,
