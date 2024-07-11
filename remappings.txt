@@ -7,3 +7,4 @@ ozu-4-5-1/=lib/openzeppelin-contracts-upgradeable-4-5-1/contracts
 @axelar-network/axelar-cgp-solidity=lib/axelar-cgp-solidity/
 axelar-gmp=lib/axelar-gmp-sdk-solidity/contracts
 axelar-cgp=lib/axelar-cgp-solidity/contracts
+axelar-its=lib/axelar-its/contracts

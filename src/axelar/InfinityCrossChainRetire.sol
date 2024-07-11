@@ -22,12 +22,71 @@ contract InfinityCrossChainRetire is InterchainTokenExecutable, Ownable {
     address public constant INFINITY = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8;
     IERC20 public constant KLIMA = IERC20(0x4e78011Ce80ee02d2c3e649Fb657E45898257815);
 
+    struct PendingRetire {
+        bytes32 commandId;
+        bytes retireData;
+        uint256 klimaAmount;
+        address refundAddress;
+    }
+
+    PendingRetire[] public pendingRetires;
+
     event RetireSuccess(bytes32 indexed commandId, uint256 klimaAmount);
 
-    event RetireFailed(bytes32 indexed commandId, uint256 amount, address refundAddress);
+    event RetirePending(bytes32 indexed commandId, uint256 klimaAmount, address refundAddress);
+
+    event RetireFailed(bytes32 indexed commandId, uint256 klimaAmount, address refundAddress);
 
     constructor(address gateway_, address gasReceiver_) InterchainTokenExecutable(gateway_) Ownable(msg.sender) {
         gasReceiver = IAxelarGasService(gasReceiver_);
+    }
+
+    function processAllPending() external {
+        for (uint256 i = pendingRetires.length - 1; i >= 0; i--) {
+            (bool retireSuccess,) = INFINITY.call(pendingRetires[i].retireData);
+
+            if (!retireSuccess) {
+                return
+                    _refund(pendingRetires[i].commandId, pendingRetires[i].klimaAmount, pendingRetires[i].refundAddress);
+            }
+
+            emit RetireSuccess(pendingRetires[i].commandId, pendingRetires[i].klimaAmount);
+
+            pendingRetires.pop();
+        }
+
+        uint256 remainingKlima = KLIMA.balanceOf(address(this));
+
+        if (remainingKlima > 0) KLIMA.safeTransfer(DAO, remainingKlima);
+    }
+
+    function processLastPending() external {
+        uint256 i = pendingRetires.length - 1;
+        (bool retireSuccess,) = INFINITY.call(pendingRetires[i].retireData);
+
+        if (!retireSuccess) {
+            _refund(pendingRetires[i].commandId, pendingRetires[i].klimaAmount, pendingRetires[i].refundAddress);
+            pendingRetires.pop();
+            return;
+        }
+
+        emit RetireSuccess(pendingRetires[i].commandId, pendingRetires[i].klimaAmount);
+
+        pendingRetires.pop();
+    }
+
+    function _pendingRetire(bytes32 commandId, bytes memory retireData, uint256 amount, address refundAddress)
+        internal
+    {
+        pendingRetires.push(
+            PendingRetire({
+                commandId: commandId,
+                retireData: retireData,
+                klimaAmount: amount,
+                refundAddress: refundAddress
+            })
+        );
+        emit RetirePending(commandId, amount, refundAddress);
     }
 
     function _refund(bytes32 commandId, uint256 amount, address recipient) internal {
@@ -53,7 +112,7 @@ contract InfinityCrossChainRetire is InterchainTokenExecutable, Ownable {
         (bool retireSuccess,) = INFINITY.call(retireData);
 
         if (!retireSuccess) {
-            return _refund(commandId, klimaAmount, fallbackRecipient);
+            return _pendingRetire(commandId, retireData, amount, fallbackRecipient);
         }
 
         uint256 remainingKlima = KLIMA.balanceOf(address(this));
@@ -66,76 +125,4 @@ contract InfinityCrossChainRetire is InterchainTokenExecutable, Ownable {
     function emergencyWithdrawal(address token) external onlyOwner {
         IERC20(token).transfer(msg.sender, IERC20(token).balanceOf(address(this)));
     }
-
-    // function defaultRetirementWithKlima(
-    //     string memory destinationChain,
-    //     uint256 klimaAmount,
-    //     uint256 retireAmount,
-    //     bytes memory retirementData,
-    //     bytes32 traceId,
-    //     address fallbackRecipient
-    // ) external payable isValidChain(destinationChain) {
-    //     string memory symbol = "KLIMA";
-    //     address tokenAddress = gateway.tokenAddresses(symbol);
-
-    //     // Check that the sender has enough balance and has allowed the contract to spend the amount.
-    //     // require(IERC20(tokenAddress).balanceOf(msg.sender) >= klimaAmount, "Insufficient balance");
-    //     // require(IERC20(tokenAddress).allowance(msg.sender, address(this)) >= klimaAmount, "Insufficient allowance");
-
-    //     klima.transferFrom(msg.sender, address(this), klimaAmount);
-    //     klima.approve(address(gateway), klimaAmount);
-
-    //     bytes memory payload = abi.encode(retirementData, klimaAmount, retireAmount, traceId, fallbackRecipient);
-
-    //     // (bytes memory retireData,,,,) = abi.decode(payload, (bytes, uint256, uint256, bytes32, address));
-
-    //     _payGasAndCallContractWithToken(destinationChain, payload, msg.value, symbol, klimaAmount);
-
-    //     emit RetirePending(traceId, keccak256(payload), destinationChain, payload);
-    // }
-
-    // function _payGasAndCallContractWithToken(
-    //     string memory destinationChain,
-    //     bytes memory payload,
-    //     uint256 fee,
-    //     string memory symbol,
-    //     uint256 amount
-    // ) private {
-    //     gasReceiver.payNativeGasForContractCallWithToken{value: fee}(
-    //         msg.sender,
-    //         destinationChain,
-    //         AddressToString.toString(this.siblings(destinationChain)),
-    //         payload,
-    //         symbol,
-    //         amount,
-    //         msg.sender
-    //     );
-
-    //     gateway.callContractWithToken(
-    //         destinationChain, AddressToString.toString(this.siblings(destinationChain)), payload, symbol, amount
-    //     );
-    // }
-
-    // function _executeWithToken(string calldata sourceChain, string calldata sourceAddress, bytes calldata payload)
-    //     internal
-    //     virtual
-    // {
-    //     // Decode payload
-    //     (bytes memory retireData, uint256 klimaAmount, uint256 retireAmount, bytes32 traceId, address fallbackRecipient)
-    //     = abi.decode(payload, (bytes, uint256, uint256, bytes32, address));
-
-    //     klima.safeIncreaseAllowance(INFINITY, klimaAmount);
-
-    //     (bool retireSuccess,) = INFINITY.call(retireData);
-
-    //     if (!retireSuccess) {
-    //         return _refund(traceId, klimaAmount, fallbackRecipient);
-    //     }
-
-    //     uint256 remainingKlima = klima.balanceOf(address(this));
-
-    //     if (remainingKlima > 0) klima.safeTransfer(DAO, remainingKlima);
-
-    //     emit RetireSuccess(traceId, klimaAmount, retireAmount);
-    // }
 }
