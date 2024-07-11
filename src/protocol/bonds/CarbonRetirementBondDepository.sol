@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import "oz/access/Ownable2Step.sol";
+import "oz-4-8-3/access/Ownable2Step.sol";
 
 import "src/protocol/interfaces/IKlimaInfinity.sol";
 import {IKlima, SafeERC20} from "src/protocol/interfaces/IKLIMA.sol";
@@ -13,7 +13,6 @@ import "src/protocol/interfaces/IUniswapV2Pair.sol";
  * @notice A smart contract that handles the distribution of carbon in exchange for KLIMA tokens.
  * Bond depositors can only use this to retire carbon by providing KLIMA tokens.
  */
-
 contract CarbonRetirementBondDepository is Ownable2Step {
     using SafeERC20 for IKlima;
 
@@ -102,11 +101,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
         require(retireAmount > 0, "Cannot retire zero tokens");
 
         // Get the current amount of total pool tokens needed including any applicable fees
-        uint256 poolNeeded = IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(
-            poolToken,
-            poolToken,
-            retireAmount
-        );
+        uint256 poolNeeded =
+            IKlimaInfinity(INFINITY).getSourceAmountDefaultRetirement(poolToken, poolToken, retireAmount);
 
         require(poolNeeded <= IKlima(poolToken).balanceOf(address(this)), "Not enough pool tokens to retire");
 
@@ -120,18 +116,17 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
         emit CarbonBonded(poolToken, poolNeeded);
 
-        return
-            IKlimaInfinity(INFINITY).retireExactCarbonDefault(
-                poolToken,
-                poolToken,
-                poolNeeded,
-                retireAmount,
-                retiringEntityString,
-                beneficiaryAddress,
-                beneficiaryString,
-                retirementMessage,
-                0
-            );
+        return IKlimaInfinity(INFINITY).retireExactCarbonDefault(
+            poolToken,
+            poolToken,
+            poolNeeded,
+            retireAmount,
+            retiringEntityString,
+            beneficiaryAddress,
+            beneficiaryString,
+            retirementMessage,
+            0
+        );
     }
 
     /**
@@ -159,11 +154,8 @@ contract CarbonRetirementBondDepository is Ownable2Step {
         require(retireAmount > 0, "Cannot retire zero tokens");
 
         // Get the current amount of total pool tokens needed including any applicable fees
-        uint256 poolNeeded = IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(
-            poolToken,
-            poolToken,
-            retireAmount
-        );
+        uint256 poolNeeded =
+            IKlimaInfinity(INFINITY).getSourceAmountSpecificRetirement(poolToken, poolToken, retireAmount);
 
         require(poolNeeded <= IKlima(poolToken).balanceOf(address(this)), "Not enough pool tokens to retire");
 
@@ -177,19 +169,18 @@ contract CarbonRetirementBondDepository is Ownable2Step {
 
         emit CarbonBonded(poolToken, poolNeeded);
 
-        return
-            IKlimaInfinity(INFINITY).retireExactCarbonSpecific(
-                poolToken,
-                poolToken,
-                projectToken,
-                poolNeeded,
-                retireAmount,
-                retiringEntityString,
-                beneficiaryAddress,
-                beneficiaryString,
-                retirementMessage,
-                0
-            );
+        return IKlimaInfinity(INFINITY).retireExactCarbonSpecific(
+            poolToken,
+            poolToken,
+            projectToken,
+            poolNeeded,
+            retireAmount,
+            retiringEntityString,
+            beneficiaryAddress,
+            beneficiaryString,
+            retirementMessage,
+            0
+        );
     }
 
     /**
@@ -275,10 +266,12 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      */
     function getKlimaAmount(uint256 poolAmount, address poolToken) public view returns (uint256 klimaNeeded) {
         /// @dev On extremely small quote amounts this can result in zero
-        uint256 maxKlima = (getMarketQuote(
-            poolToken,
-            (FEE_DIVISOR + maxSlippage[poolToken]) * 1e14 // Get market quote for 1 pool token + slippage percent.
-        ) * poolAmount) / 1e18;
+        uint256 maxKlima = (
+            getMarketQuote(
+                poolToken,
+                (FEE_DIVISOR + maxSlippage[poolToken]) * 1e14 // Get market quote for 1 pool token + slippage percent.
+            ) * poolAmount
+        ) / 1e18;
 
         // Check inputs through KI due to differences in DEX locations for pools
         klimaNeeded = IKlimaInfinity(INFINITY).getSourceAmountSwapOnly(KLIMA, poolToken, poolAmount);
@@ -314,7 +307,7 @@ contract CarbonRetirementBondDepository is Ownable2Step {
      * @return currentPrice The current market price of the pool token in terms of KLIMA tokens.
      */
     function getMarketQuote(address poolToken, uint256 amountOut) internal view returns (uint256 currentPrice) {
-        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(poolReference[poolToken]).getReserves();
+        (uint256 reserve0, uint256 reserve1,) = IUniswapV2Pair(poolReference[poolToken]).getReserves();
 
         currentPrice = referenceKlimaPosition[poolToken] == 0
             ? (amountOut * (reserve0)) / reserve1

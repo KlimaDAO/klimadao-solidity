@@ -2,7 +2,7 @@
 pragma solidity ^0.8.16;
 
 import "../../C.sol";
-import "oz/token/ERC721/IERC721.sol";
+import "oz-4-8-3/token/ERC721/IERC721.sol";
 import "../../interfaces/IToucan.sol";
 import "../LibAppStorage.sol";
 import "../LibRetire.sol";

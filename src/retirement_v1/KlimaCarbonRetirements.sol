@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.10;
 
-import "oz/access/Ownable.sol";
+import "oz-4-8-3/access/Ownable.sol";
 
 /**
     @title Klima Retirement Storage
