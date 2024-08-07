@@ -41,7 +41,9 @@ contract Storage {
         uint8[] swapDexes;
         address[] ammRouters;
         mapping(uint8 => address[]) swapPaths;
+        bool transferFee;
     }
+
     /**
      * @title Token1155Settings
      * @notice Stores the transient details of 1155 tokens received.
