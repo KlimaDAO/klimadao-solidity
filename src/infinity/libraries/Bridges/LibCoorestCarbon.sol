@@ -15,9 +15,14 @@ import "../LibMeta.sol";
 /**
  * @author must-be-carbon
  * @title  LibCoorestCarbon
- * @notice Handles interaction with the Coorest Registry/Pool and child tokens ( CCO2, POCC )
+ * @notice Handles interaction with the Coorest Pool and child tokens ( CCO2, POCC )
  */
 library LibCoorestCarbon {
+    struct FeeParams {
+        uint256 feeRetireBp;
+        uint256 feeRetireDivider;
+    }
+
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
         address indexed retiringAddress,
@@ -30,27 +35,46 @@ library LibCoorestCarbon {
         uint256 retiredAmount
     );
 
+    error FeePercentageGreaterThanDivider();
+    error FeeRetireDividerIsZero();
+
     /**
      * @notice Retires CCO2
      * @dev Use this function to retire CCO2.
-     * @param carbonToken The pool token to retire.
-     * @param amount The amount of underlying tokens to retire.
-     * @return The total retirement amount including the Coorest fee.
+     * @dev This function assumes that checks to carbonToken are make higher up in call stack.
+     * @dev It's important to know that Coorest transfers fee portion to it's account & rest amount is burned
+     * @param carbonToken CCO2 token address.
+     * @param retireAmount The amount of underlying tokens to retire.
+     * @return poccId POCC Certificate Id.
      */
     function retireCarbonToken(
         address carbonToken,
-        uint256 _retireAmount,
+        uint256 retireAmount,
         LibRetire.RetireDetails memory details
-    ) external nonReentrant {
-        // Once the CCO2 is burnt, the Coorest contract will mint a POCC Cert to msg.sender
-        // It makes sense for the RA to transfer the PoCC to the beneficiary
-        uint256 poccId = ICoorest(C.coorestPool()).mintPOCC(
-            _retireAmount,
+    ) internal returns (uint256 poccId) {
+        require(details.beneficiaryAddress != address(0), "Beneficiary Address can't be 0");
+
+        IERC20(carbonToken).approve(C.coorestPool(), retireAmount);
+
+        // Transfer PoCC to beneficiary that's minted in favor RA
+        // when Coorest retires CCO2
+        poccId = ICoorest(C.coorestPool()).mintPOCC(
+            retireAmount,
             details.retirementMessage,
-            details.beneficiaryAddress
+            // Coorest expects owner as a string as it's to added to pocc token
+            LibMeta.addressToString(details.beneficiaryAddress)
         );
 
         IERC721(C.coorestPoCCToken()).safeTransferFrom(address(this), details.beneficiaryAddress, poccId);
+
+        LibRetire.saveRetirementDetails(
+            carbonToken,
+            address(0),
+            retireAmount,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage
+        );
 
         emit CarbonRetired(
             LibRetire.CarbonBridge.COOREST,
@@ -59,51 +83,48 @@ library LibCoorestCarbon {
             details.beneficiaryAddress,
             details.beneficiaryString,
             details.retirementMessage,
-            C.coorestPool(),
             carbonToken,
-            _retireAmount
+            address(0),
+            retireAmount
         );
     }
 
-    // TODO  [ REVIEW ] : GET INSIGHT: There's no straight forward read function to get fee amount.. ( bad interface )
     /**
      * @notice Calculates the Coorest fee that needs to be added to desired retire amount
-     * @dev Use this function to compute the Coorest fee
-     * @param carbonToken The pool token to retire.
-     * @param amount The amount of underlying tokens to retire.
-     * @return The total retirement amount including the Coorest fee.
+     * @dev Use this function to compute the Coorest fee.
+     * @dev This function assumes that checks to carbonToken are make higher up in call stack
+     * @param carbonToken     CCO2 token address
+     * @param amount          The amount of underlying tokens to retire.
+     * @return feeAmount      Fee charged by Coorest.
      */
-    function getSpecificRetirementFee(
-        address carbonToken,
-        uint256 amount
-    ) external view nonReentrant returns (uint256 feeAmount) {
-        require(amount > 0, "Retire amount > 0");
-
+    function getSpecificRetirementFee(address carbonToken, uint256 amount) external view returns (uint256 feeAmount) {
         uint256 retireAmount = amount;
-        uint256 feeRetireBp = ICCO2(carbonToken).burningPercentage();
-        uint256 feeRetireDivider = ICCO2(carbonToken).decimalRatio();
+        require(retireAmount > 0, "Retire amount should be greater than 0");
 
-        // TODO[Review] : Do we need this check ?? ( Most likely not )
-        require(feeRetireBp <= feeRetireDivider, "Burn percentage should be greater than decimalRatio");
+        FeeParams memory feeParams = getFeePercent(carbonToken);
 
-        feeAmount = ((retireAmount * feeRetireDivider) / (feeRetireDivider - feeRetireBp)) - retireAmount;
+        feeAmount =
+            ((retireAmount * feeParams.feeRetireDivider) / (feeParams.feeRetireDivider - feeParams.feeRetireBp)) -
+            retireAmount;
     }
 
     /**
-     * @notice Calculates the retirement amount factoring in the fee.
-     * @dev Use this function to compute the Coorest fee
-     * @param carbonToken The pool token to retire.
-     * @param amount The amount of underlying tokens to retire.
-     * @return The total retirement amount including the Coorest fee.
+     * @dev This function fetches fee percent & divider from CCO2 token contract.
+     * @param carbonToken CCO2 token address.
+     * @return feeParams Fee percentage & the fee divider.
      */
-    function getSpecificRetireAmount(address carbonToken, uint256 amount) internal view returns (uint256 retireAmount) {
-        retireAmount = amount;
-        uint256 feeRedeemBp = ICCO2(carbonToken).burningPercentage();
-        uint256 feeRedeemDivider = ICCO2(carbonToken).decimalRatio();
+    function getFeePercent(address carbonToken) private view returns (FeeParams memory feeParams) {
+        uint256 feeRetireBp = ICCO2(carbonToken).burningPercentage();
+        uint256 feeRetireDivider = ICCO2(carbonToken).decimalRatio();
 
-        // TODO[Review] : Do we need this check ?? ( Most likely not )
-        require(feeRetireBp <= feeRetireDivider, "Burn percentage should be greater than decimalRatio");
+        if (feeRetireBp < feeRetireDivider) {
+            revert FeePercentageGreaterThanDivider();
+        }
 
-        retireAmount = (amount * (feeRedeemDivider - feeRedeemBp)) / feeRedeemDivider;
+        if (feeRetireDivider == 0) {
+            revert FeeRetireDividerIsZero();
+        }
+
+        return FeeParams({feeRetireBp: feeRetireBp, feeRetireDivider: feeRetireDivider});
     }
 }
