@@ -56,7 +56,6 @@ library LibCoorestCarbon {
 
         IERC20(carbonToken).approve(C.coorestPool(), retireAmount);
 
-        // Transfer PoCC to beneficiary that's minted in favor RA
         // when Coorest retires CCO2
         poccId = ICoorest(C.coorestPool()).mintPOCC(
             retireAmount,
@@ -65,6 +64,7 @@ library LibCoorestCarbon {
             LibMeta.addressToString(details.beneficiaryAddress)
         );
 
+        // Transfer PoCC to beneficiary that's minted in favor RA
         IERC721(C.coorestPoCCToken()).safeTransferFrom(address(this), details.beneficiaryAddress, poccId);
 
         LibRetire.saveRetirementDetails(
