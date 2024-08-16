@@ -20,31 +20,17 @@ library LibUniswapV2Swap {
         AppStorage storage s = LibAppStorage.diamondStorage();
         LibApprove.approveToken(IERC20(path[0]), router, amountIn);
 
-        if (s.swap[path[path.length - 1]][path[0]].transferFee) {
-            IUniswapV2Router02(router).swapExactTokensForTokensSupportingFeeOnTransferTokens(
-                amountIn,
-                amountOut,
-                path,
-                address(this),
-                block.timestamp
-            );
+        uint[] memory amountsOut;
 
-            // Given it's an exact token swap, amountOut is returned.
-            // Though actual amount swapped maybe greater
-            return amountOut;
-        } else {
-            uint[] memory amountsOut;
+        amountsOut = IUniswapV2Router02(router).swapTokensForExactTokens(
+            amountOut,
+            amountIn,
+            path,
+            address(this),
+            block.timestamp
+        );
 
-            amountsOut = IUniswapV2Router02(router).swapTokensForExactTokens(
-                amountOut,
-                amountIn,
-                path,
-                address(this),
-                block.timestamp
-            );
-
-            return amountsOut[path.length - 1];
-        }
+        return amountsOut[path.length - 1];
     }
 
     function swapExactTokensForTokens(address router, address[] memory path, uint amount) internal returns (uint) {
