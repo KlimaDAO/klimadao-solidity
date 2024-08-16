@@ -117,7 +117,7 @@ library LibCoorestCarbon {
         uint256 feeRetireBp = ICCO2(carbonToken).burningPercentage();
         uint256 feeRetireDivider = ICCO2(carbonToken).decimalRatio();
 
-        if (feeRetireBp < feeRetireDivider) {
+        if (feeRetireBp > feeRetireDivider) {
             revert FeePercentageGreaterThanDivider();
         }
 

@@ -92,4 +92,12 @@ contract ConstantsGetter {
     function carbonmark() external pure returns (address) {
         return C.carbonmark();
     }
+
+    function coorestPool() external pure returns (address) {
+        return C.coorestPool();
+    }
+
+    function coorestPoCCToken() external pure returns (address) {
+        return C.coorestPoCCToken();
+    }
 }
