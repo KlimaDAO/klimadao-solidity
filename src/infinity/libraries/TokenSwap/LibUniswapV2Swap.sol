@@ -20,9 +20,7 @@ library LibUniswapV2Swap {
         AppStorage storage s = LibAppStorage.diamondStorage();
         LibApprove.approveToken(IERC20(path[0]), router, amountIn);
 
-        uint[] memory amountsOut;
-
-        amountsOut = IUniswapV2Router02(router).swapTokensForExactTokens(
+        uint[] memory amountsOut = IUniswapV2Router02(router).swapTokensForExactTokens(
             amountOut,
             amountIn,
             path,
