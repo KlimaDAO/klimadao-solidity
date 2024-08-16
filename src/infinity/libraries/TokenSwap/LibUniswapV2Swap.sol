@@ -8,7 +8,6 @@ pragma solidity ^0.8.16;
 
 import "../../interfaces/IUniswapV2Router02.sol";
 import "../Token/LibApprove.sol";
-import "../LibAppStorage.sol";
 
 library LibUniswapV2Swap {
     function swapTokensForExactTokens(
@@ -17,7 +16,6 @@ library LibUniswapV2Swap {
         uint amountIn,
         uint amountOut
     ) internal returns (uint) {
-        AppStorage storage s = LibAppStorage.diamondStorage();
         LibApprove.approveToken(IERC20(path[0]), router, amountIn);
 
         uint[] memory amountsOut = IUniswapV2Router02(router).swapTokensForExactTokens(
