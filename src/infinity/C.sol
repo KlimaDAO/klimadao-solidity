@@ -53,6 +53,7 @@ library C {
 
     address constant COOREST_POOL = 0x363ae9B7Dbf55c0956A74C3be4ed0996d277A8BE;
     address constant COOREST_POCC_TOKEN = 0x51cF819352FC536aD8A84214922615C160BB497D;
+    address constant COOREST_CCO2_TOKEN = 0x82B37070e43C1BA0EA9e2283285b674eF7f1D4E2;
 
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;
@@ -156,5 +157,9 @@ library C {
 
     function coorestPoCCToken() internal pure returns (address) {
         return COOREST_POCC_TOKEN;
+    }
+
+    function coorestCCO2Token() internal pure returns (address) {
+        return COOREST_CCO2_TOKEN;
     }
 }

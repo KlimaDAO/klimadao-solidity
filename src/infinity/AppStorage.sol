@@ -41,7 +41,6 @@ contract Storage {
         uint8[] swapDexes;
         address[] ammRouters;
         mapping(uint8 => address[]) swapPaths;
-        bool transferFee;
     }
 
     /**
