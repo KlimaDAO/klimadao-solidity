@@ -78,9 +78,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 10) / 100);
 
         if (redeemAmount == 0 && sourceToken != NCT) vm.expectRevert();
-        uint256 sourceAmount = getSourceTokens(
-            TransactionType.DEFAULT_REDEEM, address(redeemToucanPoolFacet), sourceToken, NCT, redeemAmount
-        );
+        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_REDEEM, diamond, sourceToken, NCT, redeemAmount);
 
         uint256 bondBalance = IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND);
 

@@ -34,12 +34,14 @@ import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "sr
 import {ICRProject} from "./interfaces/ICR.sol";
 import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
 import {IToucanPool} from "src/infinity/interfaces/IToucan.sol";
+import {IwsKLIMA} from "src/infinity/interfaces/IKlima.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
     using Strings for uint256;
 
     enum TransactionType {
+        EXACT_SOURCE,
         DEFAULT_REDEEM,
         SPECIFIC_REDEEM,
         DEFAULT_RETIRE,
@@ -397,8 +399,9 @@ abstract contract TestHelper is Test, HelperContract {
         address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
 
         RetirementQuoter quoterFacet = RetirementQuoter(diamond);
-
-        if (txType == TransactionType.DEFAULT_REDEEM) {
+        if (txType == TransactionType.EXACT_SOURCE) {
+            sourceAmount = amountOut;
+        } else if (txType == TransactionType.DEFAULT_REDEEM) {
             sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, pool, amountOut);
         } else if (txType == TransactionType.SPECIFIC_REDEEM) {
             uint256[] memory amounts = new uint256[](1);
@@ -416,6 +419,10 @@ abstract contract TestHelper is Test, HelperContract {
             sourceTarget = USDC_NATIVE_HOLDER;
         } else if (sourceToken == constantsFacet.klima() || sourceToken == constantsFacet.sKlima()) {
             sourceTarget = constantsFacet.staking();
+
+            // Ensure that any sKLIMA pulled can succesfully be unstaked
+            uint256 stakingBalance = IERC20(constantsFacet.klima()).balanceOf(constantsFacet.sKlima());
+            vm.assume(sourceAmount < stakingBalance / 2);
         } else if (sourceToken == constantsFacet.wsKlima()) {
             sourceTarget = WSKLIMA_HOLDER;
         } else {
@@ -452,7 +459,7 @@ abstract contract TestHelper is Test, HelperContract {
 
         // address minter = project.owner();
 
-        vm.prank(0x333D9A49b6418e5dC188989614f07c89d8389CC8);
+        vm.prank(0xA0022c05501007281acAE55B94AdE4Fc3dd59ec3);
         project.verifyAndMintExPost(recipient, tokenId, amount, 0, 3_124_224_000, 3_124_224_000, "testing");
     }
 

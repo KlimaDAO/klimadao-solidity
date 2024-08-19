@@ -80,8 +80,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_LP) * 90) / 100);
         if (redeemAmount == 0 && sourceToken != NBO) vm.expectRevert();
 
-        uint256 sourceAmount =
-            getSourceTokens(TransactionType.DEFAULT_REDEEM, address(redeemC3PoolFacet), sourceToken, NBO, redeemAmount);
+        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_REDEEM, diamond, sourceToken, NBO, redeemAmount);
 
         uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.nbo());
         uint256 bondBalance = IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND);

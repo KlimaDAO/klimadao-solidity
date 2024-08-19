@@ -26,8 +26,8 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
-    address SUSHI_BENTO = vm.envAddress("SUSHI_BENTO");
+    address SUSHI_BCT_LP = vm.envAddress("SUSHI_BCT_LP");
+    address SUSHI_NCT_LP = vm.envAddress("SUSHI_NCT_LP");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
@@ -57,12 +57,11 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         BCT = constantsFacet.bct();
         NCT = constantsFacet.nct();
 
-        DEFAULT_PROJECT_BCT = IToucanPool(BCT).getScoredTCO2s()[0];
-        DEFAULT_PROJECT_NCT = IToucanPool(NCT).getScoredTCO2s()[0];
+        DEFAULT_PROJECT_BCT = getDefaultToucanProject(BCT);
+        DEFAULT_PROJECT_NCT = getDefaultToucanProject(NCT);
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_infinity_retireExactSourceDefault_BCT_BCT(uint256 retireAmount) public {
@@ -105,42 +104,28 @@ contract retireExactSourceDefaultToucan is TestHelper, AssertionHelper {
         retireExactSource(WSKLIMA, NCT, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint256 sourceAmount) internal {
-        address sourceTarget;
-
-        /// @dev Setting minimum amount assumptions due to issues with Trident performing swaps with zero output tokens.
-        vm.assume(sourceAmount > 1e4);
-
-        if (sourceToken == BCT || sourceToken == NCT || sourceToken == USDC) {
-            sourceTarget = KLIMA_TREASURY;
-        } else if (sourceToken == KLIMA || sourceToken == SKLIMA) {
-            sourceTarget = STAKING;
-        } else if (sourceToken == WSKLIMA) {
-            vm.assume(sourceAmount > LibKlima.toWrappedAmount(1e6));
-            sourceTarget = WSKLIMA_HOLDER;
-        }
-        if (sourceToken == SKLIMA) vm.assume(sourceAmount <= IERC20(KLIMA).balanceOf(STAKING));
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
-    }
-
     function retireExactSource(address sourceToken, address poolToken, uint256 sourceAmount) public {
-        getSourceTokens(sourceToken, sourceAmount);
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, sourceToken, poolToken, sourceAmount);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         address projectToken = poolToken == BCT ? DEFAULT_PROJECT_BCT : DEFAULT_PROJECT_NCT;
-
-        uint256 retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
-        uint256 poolAmount = poolToken == BCT
+        uint256 poolBalance = poolToken == BCT
             ? IERC20(DEFAULT_PROJECT_BCT).balanceOf(poolToken)
             : IERC20(DEFAULT_PROJECT_NCT).balanceOf(poolToken);
-        vm.assume(retireAmount <= poolAmount);
 
-        if (sourceAmount == 0) {
+        uint256 unwrappedAmount = 1;
+
+        if (sourceToken == WSKLIMA) {
+            unwrappedAmount = IwsKLIMA(WSKLIMA).wKLIMATosKLIMA(sourceAmount);
+        }
+
+        if ((sourceAmount == 0 && sourceToken != poolToken) || unwrappedAmount == 0) vm.expectRevert();
+        uint256 retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
+        vm.assume(retireAmount <= poolBalance);
+
+        if ((sourceToken != poolToken && retireAmount > poolBalance) || sourceAmount == 0 || unwrappedAmount == 0) {
             vm.expectRevert();
             retireSourceFacet.retireExactSourceDefault(
                 sourceToken,

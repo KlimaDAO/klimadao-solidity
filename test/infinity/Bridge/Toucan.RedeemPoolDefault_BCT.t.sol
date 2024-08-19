@@ -78,9 +78,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 60) / 100);
 
         if (redeemAmount == 0 && sourceToken != BCT) vm.expectRevert();
-        uint256 sourceAmount = getSourceTokens(
-            TransactionType.DEFAULT_REDEEM, address(redeemToucanPoolFacet), sourceToken, BCT, redeemAmount
-        );
+        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_REDEEM, diamond, sourceToken, BCT, redeemAmount);
 
         uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.bct());
         uint256 bondBalance = IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND);

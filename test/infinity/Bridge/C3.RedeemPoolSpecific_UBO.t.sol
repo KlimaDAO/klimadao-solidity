@@ -89,8 +89,7 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         amountRedeem[0] = redeemAmount;
 
         if (redeemAmount == 0 && sourceToken != UBO) vm.expectRevert();
-        uint256 sourceAmount =
-            getSourceTokens(TransactionType.SPECIFIC_REDEEM, address(redeemC3PoolFacet), sourceToken, UBO, redeemAmount);
+        uint256 sourceAmount = getSourceTokens(TransactionType.SPECIFIC_REDEEM, diamond, sourceToken, UBO, redeemAmount);
 
         uint256 poolBalance = IERC20(specificProject).balanceOf(constantsFacet.ubo());
         uint256 bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);

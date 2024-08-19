@@ -27,8 +27,6 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
-    address SUSHI_BENTO = vm.envAddress("SUSHI_BENTO");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
@@ -63,80 +61,68 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactSourceDefault_UBO_UBO(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_UBO_UBO(uint256 retireAmount) public {
         retireExactSource(UBO, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_UBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_UBO_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_UBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_UBO_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_UBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_UBO_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_UBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_UBO_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, UBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NBO_NBO(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NBO_NBO(uint256 retireAmount) public {
         retireExactSource(NBO, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NBO_USDC(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NBO_USDC(uint256 retireAmount) public {
         retireExactSource(USDC, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NBO_KLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NBO_KLIMA(uint256 retireAmount) public {
         retireExactSource(KLIMA, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NBO_SKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NBO_SKLIMA(uint256 retireAmount) public {
         retireExactSource(SKLIMA, NBO, retireAmount);
     }
 
-    function test_infinity_retireExactSourceDefault_NBO_WSKLIMA(uint retireAmount) public {
+    function test_infinity_retireExactSourceDefault_NBO_WSKLIMA(uint256 retireAmount) public {
         retireExactSource(WSKLIMA, NBO, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint sourceAmount) internal {
-        address sourceTarget;
+    function retireExactSource(address sourceToken, address poolToken, uint256 sourceAmount) public {
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, sourceToken, poolToken, sourceAmount);
 
-        /// @dev Setting minimum amount assumptions due to issues with Trident performing swaps with zero output tokens.
-        vm.assume(sourceAmount > 1e4);
-
-        if (sourceToken == UBO || sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) {
-            vm.assume(sourceAmount > LibKlima.toWrappedAmount(1e6));
-            sourceTarget = WSKLIMA_HOLDER;
-        }
-
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
-    }
-
-    function retireExactSource(address sourceToken, address poolToken, uint sourceAmount) public {
-        getSourceTokens(sourceToken, sourceAmount);
-
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         address projectToken = poolToken == UBO ? DEFAULT_PROJECT_UBO : DEFAULT_PROJECT_NBO;
-        uint poolBalance = IERC20(projectToken).balanceOf(poolToken);
+        uint256 poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
-        uint retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
+        uint256 unwrappedAmount = 1;
 
-        if (retireAmount > poolBalance || sourceAmount == 0) {
+        if (sourceToken == WSKLIMA) {
+            unwrappedAmount = IwsKLIMA(WSKLIMA).wKLIMATosKLIMA(sourceAmount);
+        }
+
+        if ((sourceAmount == 0 && sourceToken != poolToken) || unwrappedAmount == 0) vm.expectRevert();
+        uint256 retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
+        vm.assume(retireAmount <= poolBalance);
+
+        if (retireAmount > poolBalance || sourceAmount == 0 || unwrappedAmount == 0) {
             vm.expectRevert();
             retireSourceFacet.retireExactSourceDefault(
                 sourceToken,
@@ -173,9 +159,7 @@ contract retireExactSourceDefaultC3 is TestHelper, AssertionHelper {
 
             // Since the output from Trident isn't deterministic until the swap happens, check an approximation.
             assertApproxEqRel(
-                LibRetire.getTotalCarbonRetired(beneficiaryAddress),
-                currentTotalCarbon + retireAmount,
-                1e16
+                LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount, 1e16
             );
         }
     }

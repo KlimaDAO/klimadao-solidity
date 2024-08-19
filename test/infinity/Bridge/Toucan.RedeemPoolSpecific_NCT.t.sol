@@ -11,7 +11,7 @@ import "../../helpers/AssertionHelper.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
-contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
+contract RedeemToucanPoolSpecificNCT is TestHelper, AssertionHelper {
     RedeemToucanPoolFacet redeemToucanPoolFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
@@ -78,9 +78,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 10) / 100);
 
         if (redeemAmount == 0 && sourceToken != NCT) vm.expectRevert();
-        uint256 sourceAmount = getSourceTokens(
-            TransactionType.SPECIFIC_REDEEM, address(redeemToucanPoolFacet), sourceToken, NCT, redeemAmount
-        );
+        uint256 sourceAmount = getSourceTokens(TransactionType.SPECIFIC_REDEEM, diamond, sourceToken, NCT, redeemAmount);
 
         uint256 projectIndex = randomish(projects.length);
         address specificProject = projects[projectIndex];

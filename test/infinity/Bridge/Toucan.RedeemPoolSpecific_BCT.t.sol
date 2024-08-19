@@ -11,7 +11,7 @@ import "../../helpers/AssertionHelper.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
-contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
+contract RedeemToucanPoolSpecificBCT is TestHelper, AssertionHelper {
     RedeemToucanPoolFacet redeemToucanPoolFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
@@ -78,9 +78,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 60) / 100);
 
         if (redeemAmount == 0 && sourceToken != BCT) vm.expectRevert();
-        uint256 sourceAmount = getSourceTokens(
-            TransactionType.SPECIFIC_REDEEM, address(redeemToucanPoolFacet), sourceToken, BCT, redeemAmount
-        );
+        uint256 sourceAmount = getSourceTokens(TransactionType.SPECIFIC_REDEEM, diamond, sourceToken, BCT, redeemAmount);
 
         uint256 projectIndex = randomish(projects.length);
         address specificProject = projects[projectIndex];

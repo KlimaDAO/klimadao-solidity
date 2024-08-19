@@ -80,8 +80,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         vm.assume(redeemAmount < (IERC20(UBO).balanceOf(SUSHI_LP) * 90) / 100);
         if (redeemAmount == 0 && sourceToken != UBO) vm.expectRevert();
 
-        uint256 sourceAmount =
-            getSourceTokens(TransactionType.DEFAULT_REDEEM, address(redeemC3PoolFacet), sourceToken, UBO, redeemAmount);
+        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_REDEEM, diamond, sourceToken, UBO, redeemAmount);
 
         uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.ubo());
         uint256 bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);

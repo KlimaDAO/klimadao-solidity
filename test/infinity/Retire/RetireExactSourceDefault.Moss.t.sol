@@ -24,7 +24,6 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
     address QUICKSWAP_LP = vm.envAddress("MCO2_QUICKSWAP");
 
     // Addresses pulled from current diamond constants
@@ -53,54 +52,46 @@ contract RetireExactSourceDefaultMoss is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_infinity_retireExactSourceDefault_MCO2_MCO2(uint256 retireAmount) public {
-        retireExactMoss(MCO2, retireAmount);
+        retireExactSource(MCO2, MCO2, retireAmount);
     }
 
     function test_infinity_retireExactSourceDefault_MCO2_USDC(uint256 retireAmount) public {
-        retireExactMoss(USDC, retireAmount);
+        retireExactSource(USDC, MCO2, retireAmount);
     }
 
     function test_infinity_retireExactSourceDefault_MCO2_KLIMA(uint256 retireAmount) public {
-        retireExactMoss(KLIMA, retireAmount);
+        retireExactSource(KLIMA, MCO2, retireAmount);
     }
 
     function test_infinity_retireExactSourceDefault_MCO2_SKLIMA(uint256 retireAmount) public {
-        retireExactMoss(SKLIMA, retireAmount);
+        retireExactSource(SKLIMA, MCO2, retireAmount);
     }
 
     function test_infinity_retireExactSourceDefault_MCO2_WSKLIMA(uint256 retireAmount) public {
-        retireExactMoss(WSKLIMA, retireAmount);
+        retireExactSource(WSKLIMA, MCO2, retireAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint256 retireAmount) internal returns (uint256 sourceAmount) {
-        /// @dev getting trade amount on zero output will revert
-        if (retireAmount == 0 && sourceToken != MCO2) vm.expectRevert();
-        sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, MCO2, retireAmount);
+    function retireExactSource(address sourceToken, address poolToken, uint256 sourceAmount) public {
+        vm.assume(sourceAmount < (IERC20(MCO2).balanceOf(QUICKSWAP_LP) * 90) / 100);
 
-        address sourceTarget;
-
-        if (sourceToken == MCO2 || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
-
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
-    }
-
-    function retireExactMoss(address sourceToken, uint256 retireAmount) public {
-        vm.assume(retireAmount < (IERC20(MCO2).balanceOf(QUICKSWAP_LP) * 90) / 100);
-        uint256 sourceAmount = getSourceTokens(sourceToken, retireAmount);
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, sourceToken, poolToken, sourceAmount);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        if (retireAmount == 0) {
+        uint256 unwrappedAmount = 1;
+
+        if (sourceToken == WSKLIMA) {
+            unwrappedAmount = IwsKLIMA(WSKLIMA).wKLIMATosKLIMA(sourceAmount);
+        }
+
+        if ((sourceAmount == 0 && sourceToken != poolToken) || unwrappedAmount == 0) vm.expectRevert();
+        uint256 retireAmount = quoterFacet.getRetireAmountSourceDefault(sourceToken, poolToken, sourceAmount);
+
+        if (sourceAmount == 0 || unwrappedAmount == 0) {
             vm.expectRevert();
 
             retireSourceFacet.retireExactSourceDefault(
