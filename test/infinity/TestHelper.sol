@@ -33,6 +33,7 @@ import {C3SushiInit} from "src/infinity/init/C3SushiInit.sol";
 import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
 import {ICRProject} from "./interfaces/ICR.sol";
 import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
+import {IToucanPool} from "src/infinity/interfaces/IToucan.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
@@ -384,10 +385,13 @@ abstract contract TestHelper is Test, HelperContract {
         maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
 
-    function getSourceTokens(TransactionType txType, address diamond, address sourceToken, address pool, uint256 amount)
-        internal
-        returns (uint256 sourceAmount)
-    {
+    function getSourceTokens(
+        TransactionType txType,
+        address diamond,
+        address sourceToken,
+        address pool,
+        uint256 amountOut
+    ) internal returns (uint256 sourceAmount) {
         ConstantsGetter constantsFacet = ConstantsGetter(diamond);
         address USDC_NATIVE_HOLDER = vm.envAddress("USDC_NATIVE_HOLDER");
         address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
@@ -395,11 +399,15 @@ abstract contract TestHelper is Test, HelperContract {
         RetirementQuoter quoterFacet = RetirementQuoter(diamond);
 
         if (txType == TransactionType.DEFAULT_REDEEM) {
-            sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, pool, amount);
+            sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, pool, amountOut);
         } else if (txType == TransactionType.SPECIFIC_REDEEM) {
             uint256[] memory amounts = new uint256[](1);
-            amounts[0] = amount;
+            amounts[0] = amountOut;
             sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, pool, amounts);
+        } else if (txType == TransactionType.DEFAULT_RETIRE) {
+            sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, pool, amountOut);
+        } else if (txType == TransactionType.SPECIFIC_RETIRE) {
+            sourceAmount = quoterFacet.getSourceAmountSpecificRetirement(sourceToken, pool, amountOut);
         }
 
         address sourceTarget;
@@ -450,6 +458,15 @@ abstract contract TestHelper is Test, HelperContract {
 
     function getDefaultC3Project(address pool) internal view returns (address) {
         address[] memory projects = IC3Pool(pool).getFreeRedeemAddresses();
+
+        for (uint256 i; i < projects.length; ++i) {
+            uint256 balance = IERC20(projects[i]).balanceOf(pool);
+            if (balance > 0) return projects[i];
+        }
+    }
+
+    function getDefaultToucanProject(address pool) internal view returns (address) {
+        address[] memory projects = IToucanPool(pool).getScoredTCO2s();
 
         for (uint256 i; i < projects.length; ++i) {
             uint256 balance = IERC20(projects[i]).balanceOf(pool);
