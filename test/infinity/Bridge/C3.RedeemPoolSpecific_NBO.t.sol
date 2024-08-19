@@ -19,8 +19,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
-    address SUSHI_BENTO = vm.envAddress("SUSHI_BENTO");
+    address SUSHI_LP = vm.envAddress("SUSHI_NBO_LP");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
@@ -33,7 +32,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
     address[] projects;
     address KLIMA_RETIREMENT_BOND;
 
-    uint defaultCarbonRetireAmount = 100 * 1e18;
+    uint256 defaultCarbonRetireAmount = 100 * 1e18;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -57,61 +56,63 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingNBO_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingNBO_fuzz(uint256 redeemAmount) public {
         redeemNBO(NBO, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemNBO(USDC, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNBO(KLIMA, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNBO(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNBO(WSKLIMA, redeemAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-        uint[] memory amounts = new uint[](1);
-        amounts[0] = redeemAmount;
-        sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, NBO, amounts);
+    // function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
+    //     uint[] memory amounts = new uint[](1);
+    //     amounts[0] = redeemAmount;
+    //     sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, NBO, amounts);
 
-        address sourceTarget;
+    //     address sourceTarget;
 
-        if (sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
+    //     if (sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
+    //     else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
+    //     else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
 
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
+    //     vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
 
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
-    }
+    //     swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
+    //     IERC20(sourceToken).approve(diamond, sourceAmount);
+    // }
 
-    function redeemNBO(address sourceToken, uint redeemAmount) internal {
-        vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_BENTO) * 90) / 100);
+    function redeemNBO(address sourceToken, uint256 redeemAmount) internal {
+        vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_LP) * 90) / 100);
+        vm.assume(redeemAmount > 0);
 
-        uint projectIndex = randomish(projects.length);
+        uint256 projectIndex = randomish(projects.length);
         address specificProject = projects[projectIndex];
 
         address[] memory projectRedeem = new address[](1);
-        uint[] memory amountRedeem = new uint[](1);
+        uint256[] memory amountRedeem = new uint256[](1);
 
         projectRedeem[0] = specificProject;
         amountRedeem[0] = redeemAmount;
 
-        uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
+        uint256 sourceAmount =
+            getSourceTokens(TransactionType.SPECIFIC_REDEEM, address(redeemC3PoolFacet), sourceToken, NBO, redeemAmount);
 
-        uint poolBalance = IERC20(specificProject).balanceOf(constantsFacet.nbo());
-        uint bondBalance = IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND);
+        uint256 poolBalance = IERC20(specificProject).balanceOf(constantsFacet.nbo());
+        uint256 bondBalance = IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
-        if (redeemAmount > poolBalance || redeemAmount == 0) {
+        if (redeemAmount > poolBalance) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 
@@ -125,7 +126,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
                 LibTransfer.To.EXTERNAL
             );
         } else {
-            uint[] memory amounts = redeemC3PoolFacet.c3RedeemPoolSpecific(
+            uint256[] memory amounts = redeemC3PoolFacet.c3RedeemPoolSpecific(
                 sourceToken,
                 NBO,
                 sourceAmount,
@@ -135,16 +136,13 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
                 LibTransfer.To.EXTERNAL
             );
 
-            // Update redeemedAmount if source was not NBO, since you can't swap to an exact amount in Trident.
-            if (sourceToken != NBO) redeemAmount = amounts[0];
-
             // No tokens left in contract
             assertZeroTokenBalance(specificProject, diamond);
             assertZeroTokenBalance(NBO, diamond);
 
             // Retirement bonds were not used
             assertEq(bondBalance, IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND));
-            
+
             // Caller has default project tokens
             assertEq(redeemAmount, amounts[0]);
             assertEq(IERC20(specificProject).balanceOf(address(this)), amounts[0]);
