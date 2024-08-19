@@ -78,7 +78,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
 
     function redeemNBO(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_LP) * 90) / 100);
-        vm.assume(redeemAmount > 0);
+        if (redeemAmount == 0 && sourceToken != NBO) vm.expectRevert();
 
         uint256 sourceAmount =
             getSourceTokens(TransactionType.DEFAULT_REDEEM, address(redeemC3PoolFacet), sourceToken, NBO, redeemAmount);
@@ -86,7 +86,7 @@ contract RedeemNBODefaultTest is TestHelper, AssertionHelper {
         uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.nbo());
         uint256 bondBalance = IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
-        if (redeemAmount > poolBalance) {
+        if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 

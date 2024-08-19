@@ -106,13 +106,14 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         projectRedeem[0] = specificProject;
         amountRedeem[0] = redeemAmount;
 
+        if (redeemAmount == 0 && sourceToken != NBO) vm.expectRevert();
         uint256 sourceAmount =
             getSourceTokens(TransactionType.SPECIFIC_REDEEM, address(redeemC3PoolFacet), sourceToken, NBO, redeemAmount);
 
         uint256 poolBalance = IERC20(specificProject).balanceOf(constantsFacet.nbo());
         uint256 bondBalance = IERC20(NBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
-        if (redeemAmount > poolBalance) {
+        if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 

@@ -78,7 +78,6 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
 
     function redeemUBO(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(UBO).balanceOf(SUSHI_LP) * 90) / 100);
-        vm.assume(redeemAmount > 0);
 
         uint256 projectIndex = randomish(projects.length);
         address specificProject = projects[projectIndex];
@@ -89,13 +88,14 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         projectRedeem[0] = specificProject;
         amountRedeem[0] = redeemAmount;
 
+        if (redeemAmount == 0 && sourceToken != UBO) vm.expectRevert();
         uint256 sourceAmount =
             getSourceTokens(TransactionType.SPECIFIC_REDEEM, address(redeemC3PoolFacet), sourceToken, UBO, redeemAmount);
 
         uint256 poolBalance = IERC20(specificProject).balanceOf(constantsFacet.ubo());
         uint256 bondBalance = IERC20(UBO).balanceOf(KLIMA_RETIREMENT_BOND);
 
-        if (redeemAmount > poolBalance) {
+        if (redeemAmount > poolBalance || redeemAmount == 0) {
             console.log("Balance greater than pool");
             vm.expectRevert();
 
