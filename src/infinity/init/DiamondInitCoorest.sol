@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
+import {LibRetire} from "../libraries/LibRetire.sol";
 import {LibDiamond} from "../libraries/LibDiamond.sol";
-import {IERC173} from "../interfaces/IERC173.sol";
-import {LibMeta} from "../libraries/LibMeta.sol";
 import {LibApprove} from "../libraries/Token/LibApprove.sol";
-
+import {IERC173} from "../interfaces/IERC173.sol";
 import "../AppStorage.sol";
 import "../C.sol";
 
@@ -13,9 +12,6 @@ contract DiamondInitCoorest {
     AppStorage internal s;
 
     function init() external {
-        // Do we want to update the version?
-        s.domainSeparator = LibMeta.domainSeparator("KlimaInfinityDiamond", "V1");
-        
         s.bridges[0].name = "Coorest";
         s.poolBridge[C.coorestCCO2Token()] = LibRetire.CarbonBridge.COOREST;
         s.isPoolToken[C.coorestCCO2Token()] = true;
@@ -24,5 +20,9 @@ contract DiamondInitCoorest {
         s.swap[C.coorestCCO2Token()][C.usdc()].swapDexes = [0];
         s.swap[C.coorestCCO2Token()][C.usdc()].ammRouters = [C.sushiRouter()];
         s.swap[C.coorestCCO2Token()][C.usdc()].swapPaths[0] = [C.usdc(), C.klima(), C.coorestCCO2Token()];
+
+        s.swap[C.coorestCCO2Token()][C.klima()].swapDexes = [0];
+        s.swap[C.coorestCCO2Token()][C.klima()].ammRouters = [C.sushiRouter()];
+        s.swap[C.coorestCCO2Token()][C.klima()].swapPaths[0] = [C.klima(), C.coorestCCO2Token()];
     }
 }
