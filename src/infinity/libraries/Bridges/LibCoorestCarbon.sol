@@ -23,6 +23,10 @@ library LibCoorestCarbon {
         uint256 feeRetireDivider;
     }
 
+    error FeePercentageGreaterThanDivider();
+    error FeeRetireDividerIsZero();
+    error RetireAmountIsZero();
+
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
         address indexed retiringAddress,
@@ -35,9 +39,6 @@ library LibCoorestCarbon {
         uint256 retiredAmount
     );
 
-    error FeePercentageGreaterThanDivider();
-    error FeeRetireDividerIsZero();
-
     /**
      * @notice Retires CCO2
      * @dev Use this function to retire CCO2.
@@ -45,20 +46,22 @@ library LibCoorestCarbon {
      * @dev It's important to know that Coorest transfers fee portion to it's account & rest amount is burned
      * @param carbonToken CCO2 token address.
      * @param retireAmount The amount of underlying tokens to retire.
+     * @param retireAmount The amount of underlying tokens to retire with Coorest Fee
      * @return poccId POCC Certificate Id.
      */
     function retireCarbonToken(
         address carbonToken,
         uint256 retireAmount,
+        uint256 retireAmountWithFee,
         LibRetire.RetireDetails memory details
     ) internal returns (uint256 poccId) {
         require(details.beneficiaryAddress != address(0), "Beneficiary Address can't be 0");
 
-        IERC20(carbonToken).approve(C.coorestPool(), retireAmount);
+        IERC20(carbonToken).approve(C.coorestPool(), retireAmountWithFee);
 
-        // when Coorest retires CCO2
+        // Retiring CCO2
         poccId = ICoorest(C.coorestPool()).mintPOCC(
-            retireAmount,
+            retireAmountWithFee, // desired retirement amount + coorest fee
             details.retirementMessage,
             // Coorest expects owner as a string as it's to added to pocc token
             LibMeta.addressToString(details.beneficiaryAddress)
@@ -70,7 +73,7 @@ library LibCoorestCarbon {
         LibRetire.saveRetirementDetails(
             carbonToken,
             address(0),
-            retireAmount,
+            retireAmount, // desiredAmount is stored
             details.beneficiaryAddress,
             details.beneficiaryString,
             details.retirementMessage
@@ -85,7 +88,7 @@ library LibCoorestCarbon {
             details.retirementMessage,
             carbonToken,
             address(0),
-            retireAmount
+            retireAmount 
         );
     }
 
@@ -97,10 +100,12 @@ library LibCoorestCarbon {
      * @param amount          The amount of underlying tokens to retire.
      * @return feeAmount      Fee charged by Coorest.
      */
-    function getSpecificRetirementFee(address carbonToken, uint256 amount) external view returns (uint256 feeAmount) {
-        uint256 retireAmount = amount;
-        require(retireAmount > 0, "Retire amount should be greater than 0");
+    function getSpecificRetirementFee(address carbonToken, uint256 amount) public view returns (uint256 feeAmount) {
+        if (amount == 0) {
+            revert RetireAmountIsZero();
+        }
 
+        uint256 retireAmount = amount;
         FeeParams memory feeParams = getFeePercent(carbonToken);
 
         feeAmount =
