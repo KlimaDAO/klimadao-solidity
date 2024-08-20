@@ -159,6 +159,7 @@ library LibRetire {
             LibCoorestCarbon.retireCarbonToken(
                 poolToken,
                 amount,
+                redeemedAmount, 
                 LibRetire.RetireDetails({
                     retiringAddress: retiringAddress,
                     retiringEntityString: retiringEntityString,
