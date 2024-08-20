@@ -100,4 +100,8 @@ contract ConstantsGetter {
     function coorestPoCCToken() external pure returns (address) {
         return C.coorestPoCCToken();
     }
+
+    function coorestCCO2Token() external pure returns (address) {
+        return C.coorestCCO2Token();
+    }
 }
