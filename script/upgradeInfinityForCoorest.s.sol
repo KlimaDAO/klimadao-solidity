@@ -25,12 +25,12 @@ import "../test/infinity/HelperContract.sol";
 contract UpgradeInfinityForCoorest is Script, HelperContract {
     function run() external {
         //read env variables and choose EOA for transaction signing
-        // uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address diamond = vm.envAddress("INFINITY_ADDRESS");
 
         OwnershipFacet ownerF = OwnershipFacet(diamond);
 
-        vm.startPrank(ownerF.owner());
+        vm.startBroadcast(deployerPrivateKey);
 
         //deploy updated facets and init contract
         RetireCarbonFacet retireCarbonF = new RetireCarbonFacet();
@@ -68,7 +68,6 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
         // deploy diamond and perform diamondCut
         IDiamondCut(address(diamond)).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
 
-        vm.stopPrank();
-        // vm.stopBroadcast();
+        vm.stopBroadcast();
     }
 }
