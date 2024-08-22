@@ -1,5 +1,5 @@
 # LibMeta
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/libraries/LibMeta.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/libraries/LibMeta.sol)
 
 
 ## State Variables
@@ -32,4 +32,25 @@ function getChainID() internal view returns (uint256 id);
 ```solidity
 function msgSender() internal view returns (address sender_);
 ```
+
+### addressToString
+
+*Converts an  address to a string representation.*
+
+
+```solidity
+function addressToString(address _address) internal pure returns (string memory);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`_address`|`address`|The address to convert.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`string`|The string representation of the address.|
+
 

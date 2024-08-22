@@ -1,5 +1,5 @@
 # EnumerableSet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/regular/KlimaToken.sol)
 
 
 ## Functions
@@ -49,7 +49,7 @@ function _length(Set storage set) private view returns (uint256);
 Note that there are no guarantees on the ordering of values inside the
 array, and it may change when more values are added or removed.
 Requirements:
-- `index` must be strictly less than {length}.*
+- `index` must be strictly less than [length](/src/protocol/tokens/regular/KlimaToken.sol/library.EnumerableSet.md#length).*
 
 
 ```solidity
@@ -118,7 +118,7 @@ function length(Bytes4Set storage set) internal view returns (uint256);
 Note that there are no guarantees on the ordering of values inside the
 array, and it may change when more values are added or removed.
 Requirements:
-- `index` must be strictly less than {length}.*
+- `index` must be strictly less than [length](/src/protocol/tokens/regular/KlimaToken.sol/library.EnumerableSet.md#length).*
 
 
 ```solidity
@@ -185,7 +185,7 @@ function length(Bytes32Set storage set) internal view returns (uint256);
 Note that there are no guarantees on the ordering of values inside the
 array, and it may change when more values are added or removed.
 Requirements:
-- `index` must be strictly less than {length}.*
+- `index` must be strictly less than [length](/src/protocol/tokens/regular/KlimaToken.sol/library.EnumerableSet.md#length).*
 
 
 ```solidity
@@ -252,7 +252,7 @@ function length(AddressSet storage set) internal view returns (uint256);
 Note that there are no guarantees on the ordering of values inside the
 array, and it may change when more values are added or removed.
 Requirements:
-- `index` must be strictly less than {length}.*
+- `index` must be strictly less than [length](/src/protocol/tokens/regular/KlimaToken.sol/library.EnumerableSet.md#length).*
 
 
 ```solidity
@@ -322,7 +322,7 @@ function length(UintSet storage set) internal view returns (uint256);
 Note that there are no guarantees on the ordering of values inside the
 array, and it may change when more values are added or removed.
 Requirements:
-- `index` must be strictly less than {length}.*
+- `index` must be strictly less than [length](/src/protocol/tokens/regular/KlimaToken.sol/library.EnumerableSet.md#length).*
 
 
 ```solidity
@@ -375,7 +375,7 @@ function length(UInt256Set storage set) internal view returns (uint256);
 Note that there are no guarantees on the ordering of values inside the
 array, and it may change when more values are added or removed.
 Requirements:
-- `index` must be strictly less than {length}.*
+- `index` must be strictly less than [length](/src/protocol/tokens/regular/KlimaToken.sol/library.EnumerableSet.md#length).*
 
 
 ```solidity

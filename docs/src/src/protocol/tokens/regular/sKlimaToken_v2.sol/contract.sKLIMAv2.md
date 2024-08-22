@@ -1,8 +1,8 @@
 # sKLIMAv2
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 **Inherits:**
-[ERC20Permit](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20Permit.md), [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
+[ERC20Permit](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20Permit.md), [Ownable](/src/protocol/staking/utils/KlimaTreasury.sol/contract.Ownable.md)
 
 
 ## State Variables
@@ -95,7 +95,7 @@ modifier onlyStakingContract();
 
 
 ```solidity
-constructor() ERC20("Staked Klima", "sKLIMA", 9) ERC20Permit;
+constructor() ERC20("Staked Klima", "sKLIMA", 9) ERC20Permit();
 ```
 
 ### initialize

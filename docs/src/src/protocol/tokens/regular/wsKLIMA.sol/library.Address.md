@@ -1,5 +1,5 @@
 # Address
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/wsKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/regular/wsKLIMA.sol)
 
 *Collection of functions related to the address type*
 
@@ -32,7 +32,7 @@ function isContract(address account) internal view returns (bool);
 https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
 of certain opcodes, possibly making contracts go over the 2300 gas limit
 imposed by `transfer`, making them unable to receive funds via
-`transfer`. {sendValue} removes this limitation.
+`transfer`. [sendValue](/src/protocol/tokens/regular/wsKLIMA.sol/library.Address.md#sendvalue) removes this limitation.
 https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
 IMPORTANT: because control is transferred to `recipient`, care must be
 taken to not create reentrancy vulnerabilities. Consider using
@@ -65,7 +65,7 @@ function functionCall(address target, bytes memory data) internal returns (bytes
 
 ### functionCall
 
-*Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+*Same as [`functionCall`](/src/protocol/tokens/regular/sKlimaToken.sol/library.Address.md#functioncall), but with
 `errorMessage` as a fallback revert reason when `target` reverts.
 _Available since v3.1._*
 
@@ -76,7 +76,7 @@ function functionCall(address target, bytes memory data, string memory errorMess
 
 ### functionCallWithValue
 
-*Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+*Same as [`functionCall`](/src/protocol/tokens/regular/sKlimaToken.sol/library.Address.md#functioncall),
 but also transferring `value` wei to `target`.
 Requirements:
 - the calling contract must have an ETH balance of at least `value`.
@@ -90,7 +90,7 @@ function functionCallWithValue(address target, bytes memory data, uint256 value)
 
 ### functionCallWithValue
 
-*Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+*Same as [`functionCallWithValue`](/src/protocol/tokens/regular/sKlimaToken.sol/library.Address.md#functioncallwithvalue), but
 with `errorMessage` as a fallback revert reason when `target` reverts.
 _Available since v3.1._*
 

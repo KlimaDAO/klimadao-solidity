@@ -1,5 +1,5 @@
 # ICarbonmark
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/interfaces/ICarbonmark.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/interfaces/ICarbonmark.sol)
 
 
 ## Functions
@@ -100,4 +100,15 @@ struct CreditListing {
     uint256 unitPrice;
 }
 ```
+
+**Properties**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`id`|`bytes32`||
+|`account`|`address`|Ethereum address of the account who owns the listing|
+|`token`|`address`|Ethereum address of the token being listing|
+|`tokenId`|`uint256`||
+|`remainingAmount`|`uint256`|Remaining amount that can be filled on this listing|
+|`unitPrice`|`uint256`|The unit price in USDC of the listing|
 

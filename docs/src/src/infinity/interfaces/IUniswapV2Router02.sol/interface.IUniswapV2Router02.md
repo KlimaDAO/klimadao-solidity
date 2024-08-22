@@ -1,8 +1,8 @@
 # IUniswapV2Router02
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/interfaces/IUniswapV2Router02.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/interfaces/IUniswapV2Router02.sol)
 
 **Inherits:**
-[IUniswapV2Router01](/src/retirement_v1/interfaces/IUniswapV2Router01.sol/interface.IUniswapV2Router01.md)
+[IUniswapV2Router01](/src/integrations/sushixklima/SushiRouterV02.sol/interface.IUniswapV2Router01.md)
 
 
 ## Functions

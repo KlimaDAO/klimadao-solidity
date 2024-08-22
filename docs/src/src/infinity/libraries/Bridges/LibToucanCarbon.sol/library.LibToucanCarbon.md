@@ -1,5 +1,5 @@
 # LibToucanCarbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/libraries/Bridges/LibToucanCarbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/libraries/Bridges/LibToucanCarbon.sol)
 
 **Author:**
 Cujo
@@ -101,6 +101,25 @@ function retireTCO2(
 |`beneficiaryAddress`|`address`|   0x address for the beneficiary|
 |`beneficiaryString`|`string`|    String description of the beneficiary|
 |`retirementMessage`|`string`|    String message for this specific retirement|
+
+
+### retirePuroTCO2
+
+Creates a Retirement Request for Toucan Puro TCO2s
+
+
+```solidity
+function retirePuroTCO2(uint256 tokenId, address projectToken, uint256 amount, LibRetire.RetireDetails memory details)
+    internal;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`tokenId`|`uint256`|              Credit token ID to be retired|
+|`projectToken`|`address`|         Project token to use for this retirement|
+|`amount`|`uint256`|               Amount of the project token to retire|
+|`details`|`LibRetire.RetireDetails`||
 
 
 ### sendRetireCert
@@ -224,6 +243,13 @@ function redeemPoolSpecific(
 function isValid(address token) internal returns (bool);
 ```
 
+### isPuro
+
+
+```solidity
+function isPuro(address token) internal returns (bool);
+```
+
 ## Events
 ### CarbonRetired
 
@@ -237,6 +263,23 @@ event CarbonRetired(
     string retirementMessage,
     address indexed carbonPool,
     address carbonToken,
+    uint256 retiredAmount
+);
+```
+
+### CarbonRetired
+
+```solidity
+event CarbonRetired(
+    LibRetire.CarbonBridge carbonBridge,
+    address indexed retiringAddress,
+    string retiringEntityString,
+    address indexed beneficiaryAddress,
+    string beneficiaryString,
+    string retirementMessage,
+    address indexed carbonPool,
+    address carbonToken,
+    uint256 tokenId,
     uint256 retiredAmount
 );
 ```

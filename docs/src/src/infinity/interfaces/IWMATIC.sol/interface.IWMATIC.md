@@ -1,8 +1,8 @@
 # IWMATIC
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/interfaces/IWMATIC.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/interfaces/IWMATIC.sol)
 
 **Inherits:**
-[IERC20](/src/protocol/staking/regular/KlimaStakingDistributor_v4.sol/interface.IERC20.md)
+[IERC20](/src/protocol/pKLIMA/ExercisepKLIMA.sol/interface.IERC20.md)
 
 **Author:**
 Cujo

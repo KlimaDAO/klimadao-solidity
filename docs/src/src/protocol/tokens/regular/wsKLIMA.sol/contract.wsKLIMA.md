@@ -1,5 +1,5 @@
 # wsKLIMA
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/wsKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/regular/wsKLIMA.sol)
 
 **Inherits:**
 [ERC20](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20.md)

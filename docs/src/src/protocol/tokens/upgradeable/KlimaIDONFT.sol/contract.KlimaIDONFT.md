@@ -1,5 +1,5 @@
 # KlimaIDONFT
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/upgradeable/KlimaIDONFT.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/upgradeable/KlimaIDONFT.sol)
 
 **Inherits:**
 Initializable, ContextUpgradeable, AccessControlEnumerableUpgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, ERC721PausableUpgradeable
@@ -152,7 +152,7 @@ function _beforeTokenTransfer(address from, address to, uint256 tokenId)
 
 ### supportsInterface
 
-*See {IERC165-supportsInterface}.*
+*See [IERC165-supportsInterface](/src/infinity/facets/DiamondLoupeFacet.sol/contract.DiamondLoupeFacet.md#supportsinterface).*
 
 
 ```solidity
