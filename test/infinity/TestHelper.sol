@@ -225,6 +225,7 @@ abstract contract TestHelper is Test, HelperContract {
 
         // // Klima Infinity specific facets
 
+        // For split add/replace selectors
         // bytes4[] memory replace = new bytes4[](2);
         // bytes4[] memory add = new bytes4[](1);
 

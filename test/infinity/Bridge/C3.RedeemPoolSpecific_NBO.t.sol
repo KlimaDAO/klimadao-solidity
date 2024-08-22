@@ -76,23 +76,6 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         redeemNBO(WSKLIMA, redeemAmount);
     }
 
-    // function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-    //     uint[] memory amounts = new uint[](1);
-    //     amounts[0] = redeemAmount;
-    //     sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, NBO, amounts);
-
-    //     address sourceTarget;
-
-    //     if (sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-    //     else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-    //     else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
-
-    //     vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-    //     swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-    //     IERC20(sourceToken).approve(diamond, sourceAmount);
-    // }
-
     function redeemNBO(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_LP) * 90) / 100);
         vm.assume(redeemAmount > 0);
