@@ -17,9 +17,10 @@ contract DiamondInitCoorest {
         s.isPoolToken[C.coorestCCO2Token()] = true;
 
         // Default Coorest CCO2 Swap Setup
-        s.swap[C.coorestCCO2Token()][C.usdc()].swapDexes = [0];
-        s.swap[C.coorestCCO2Token()][C.usdc()].ammRouters = [C.sushiRouter()];
-        s.swap[C.coorestCCO2Token()][C.usdc()].swapPaths[0] = [C.usdc(), C.klima(), C.coorestCCO2Token()];
+        s.swap[C.coorestCCO2Token()][C.usdc_bridged()].swapDexes = [0];
+        s.swap[C.coorestCCO2Token()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
+        s.swap[C.coorestCCO2Token()][C.usdc_bridged()].swapPaths[0] =
+            [C.usdc_bridged(), C.klima(), C.coorestCCO2Token()];
 
         s.swap[C.coorestCCO2Token()][C.klima()].swapDexes = [0];
         s.swap[C.coorestCCO2Token()][C.klima()].ammRouters = [C.sushiRouter()];

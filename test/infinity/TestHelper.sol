@@ -212,7 +212,7 @@ abstract contract TestHelper is Test, HelperContract {
         retirementQuoterF = new RetirementQuoter();
         retireCarbonF = new RetireCarbonFacet();
         retireSourceF = new RetireSourceFacet();
-        // retireCarbonmarkF = new RetireCarbonmarkFacet();
+        retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
         // toucanRetireF = new RetireToucanTCO2Facet();
@@ -249,7 +249,7 @@ abstract contract TestHelper is Test, HelperContract {
             })
         );
 
-        cut[0] = (
+        cut[2] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(retireSourceF),
                 action: IDiamondCut.FacetCutAction.Replace,

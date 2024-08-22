@@ -61,7 +61,6 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_infinity_retireExactCarbonSpecific_UBO_UBO(uint256 retireAmount) public {

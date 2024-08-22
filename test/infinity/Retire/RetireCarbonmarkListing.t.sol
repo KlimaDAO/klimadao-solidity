@@ -46,7 +46,8 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
-    address USDC;
+    address USDC_BRIDGED;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -65,7 +66,8 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -76,12 +78,12 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireCarbonmark_BCT() public {
+    function test_infinity_retireCarbonmark_BCT_USDC_BRIDGED() public {
         address TCO2 = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
         uint256 listingAmount = 1_250_000_000_000_000_000;
+        uint256 retireAmount = 5e17;
         // create listing
         swipeERC20Tokens(TCO2, listingAmount, PUBLIC_KEY, address(this));
 
@@ -93,10 +95,36 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         ICarbonmark.CreditListing memory listing =
             ICarbonmark.CreditListing(listingId, address(this), TCO2, 0, listingAmount, 5_000_000);
 
-        retireExactBCT(listing, 5e17);
+        uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * retireAmount / 1e18;
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, USDC_BRIDGED, USDC_BRIDGED, sourceAmount);
+
+        retireExactBCT(listing, retireAmount, sourceAmount);
+        assertZeroTokenBalance(USDC_BRIDGED, diamond);
     }
 
-    function test_infinity_retireCarbonmark_Puro() public {
+    function test_infinity_retireCarbonmark_BCT_USDC_NATIVE() public {
+        address TCO2 = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
+        uint256 listingAmount = 1_250_000_000_000_000_000;
+        uint256 retireAmount = 5e17;
+        // create listing
+        swipeERC20Tokens(TCO2, listingAmount, PUBLIC_KEY, address(this));
+
+        IERC20(TCO2).approve(CARBONMARK, listingAmount);
+
+        bytes32 listingId =
+            ICarbonmark(CARBONMARK).createListing(TCO2, listingAmount, 5_000_000, 1e17, block.timestamp + 3600);
+
+        ICarbonmark.CreditListing memory listing =
+            ICarbonmark.CreditListing(listingId, address(this), TCO2, 0, listingAmount, 5_000_000);
+
+        uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * retireAmount / 1e18;
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, USDC_NATIVE, USDC_NATIVE, sourceAmount);
+
+        retireExactBCT(listing, retireAmount, sourceAmount);
+        assertZeroTokenBalance(USDC_NATIVE, diamond);
+    }
+
+    function test_infinity_retireCarbonmark_Puro_USDC_BRIDGED() public {
         uint256 defaultCarbonRetireAmount = 5e18;
 
         swipeERC20Tokens(PURO_PROJECT, 3e18, 0x89DCA1d490aa6e4e7404dC7a55408519858895FE, address(this));
@@ -111,13 +139,38 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
             listingId, address(this), PURO_PROJECT, PURO_TOKEN_ID, defaultCarbonRetireAmount, 5_000_000
         );
 
-        retireExactPuro(listing, defaultCarbonRetireAmount);
+        uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * defaultCarbonRetireAmount / 1e18;
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, USDC_BRIDGED, USDC_BRIDGED, sourceAmount);
+
+        retireExactPuro(listing, defaultCarbonRetireAmount, sourceAmount);
+        assertZeroTokenBalance(USDC_BRIDGED, diamond);
     }
 
-    function retireExactPuro(ICarbonmark.CreditListing memory listing, uint256 retireAmount) public {
-        uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * retireAmount / 1e18;
-        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, USDC, USDC, sourceAmount);
+    function test_infinity_retireCarbonmark_Puro_USDC_NATIVE() public {
+        uint256 defaultCarbonRetireAmount = 5e18;
 
+        swipeERC20Tokens(PURO_PROJECT, 3e18, 0x89DCA1d490aa6e4e7404dC7a55408519858895FE, address(this));
+        swipeERC20Tokens(PURO_PROJECT, 2e18, 0xE32bb999851587b53d170C0A130cCE7f542c754d, address(this));
+        IERC20(PURO_PROJECT).approve(CARBONMARK, defaultCarbonRetireAmount);
+
+        bytes32 listingId = ICarbonmark(CARBONMARK).createListing(
+            PURO_PROJECT, defaultCarbonRetireAmount, 5_000_000, 5e17, block.timestamp + 3600
+        );
+
+        ICarbonmark.CreditListing memory listing = ICarbonmark.CreditListing(
+            listingId, address(this), PURO_PROJECT, PURO_TOKEN_ID, defaultCarbonRetireAmount, 5_000_000
+        );
+
+        uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * defaultCarbonRetireAmount / 1e18;
+        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, USDC_NATIVE, USDC_NATIVE, sourceAmount);
+
+        retireExactPuro(listing, defaultCarbonRetireAmount, sourceAmount);
+        assertZeroTokenBalance(USDC_NATIVE, diamond);
+    }
+
+    function retireExactPuro(ICarbonmark.CreditListing memory listing, uint256 retireAmount, uint256 sourceAmount)
+        public
+    {
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
@@ -158,7 +211,6 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         );
 
         // No tokens left in contract
-        assertZeroTokenBalance(USDC, diamond);
         assertZeroTokenBalance(PURO_PROJECT, diamond);
 
         // Account state values updated
@@ -167,10 +219,9 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), expectedCarbonRetired);
     }
 
-    function retireExactBCT(ICarbonmark.CreditListing memory listing, uint256 retireAmount) public {
-        uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * retireAmount / 1e18;
-        getSourceTokens(TransactionType.EXACT_SOURCE, diamond, USDC, USDC, sourceAmount);
-
+    function retireExactBCT(ICarbonmark.CreditListing memory listing, uint256 retireAmount, uint256 sourceAmount)
+        public
+    {
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
@@ -214,7 +265,7 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
             );
 
             // No tokens left in contract
-            assertZeroTokenBalance(USDC, diamond);
+
             assertZeroTokenBalance(BCT, diamond);
 
             // Return value matches
