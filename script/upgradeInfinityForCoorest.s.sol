@@ -9,6 +9,7 @@ import "../src/infinity/facets/DiamondCutFacet.sol";
 import "../src/infinity/facets/DiamondLoupeFacet.sol";
 import "../src/infinity/facets/OwnershipFacet.sol";
 import {RetireCarbonFacet} from "../src/infinity/facets/Retire/RetireCarbonFacet.sol";
+import {RetireSourceFacet} from "../src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "../src/infinity/facets/RetirementQuoter.sol";
 import {DiamondInitCoorest} from "../src/infinity/init/DiamondInitCoorest.sol";
 
@@ -56,8 +57,7 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
                 action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("RetireSourceFacet")
             })
-        );        
-
+        );
 
         // deploy diamond and perform diamondCut
         IDiamondCut(address(diamond)).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
