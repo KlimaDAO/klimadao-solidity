@@ -217,10 +217,12 @@ abstract contract TestHelper is Test, HelperContract {
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
         // toucanRetireF = new RetireToucanTCO2Facet();
 
+        DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
         C3SushiInit init = new C3SushiInit();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](0);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
+        IDiamondCut.FacetCut[] memory emptyCut = new IDiamondCut.FacetCut[](0);
 
         // // Klima Infinity specific facets
 
@@ -231,35 +233,36 @@ abstract contract TestHelper is Test, HelperContract {
         // replace[1] = 0x01e85bd2;
         // add[0] = 0xdadd9192;
 
-        // cut[0] = (
-        //     IDiamondCut.FacetCut({
-        //         facetAddress: address(erc1155ReceiverF),
-        //         action: IDiamondCut.FacetCutAction.Replace,
-        //         functionSelectors: generateSelectors("ERC1155ReceiverFacet")
-        //     })
-        // );
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireCarbonF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireCarbonFacet")
+            })
+        );
 
-        // cut[1] = (
-        //     IDiamondCut.FacetCut({
-        //         facetAddress: address(toucanRetireF),
-        //         action: IDiamondCut.FacetCutAction.Add,
-        //         functionSelectors: add
-        //     })
-        // );
+        cut[1] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retirementQuoterF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetirementQuoter")
+            })
+        );
 
-        // cut[2] = (
-        //     IDiamondCut.FacetCut({
-        //         facetAddress: address(retireCarbonmarkF),
-        //         action: IDiamondCut.FacetCutAction.Add,
-        //         functionSelectors: generateSelectors("RetireCarbonmarkFacet")
-        //     })
-        // );
+        cut[2] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireSourceFacet),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireSourceFacet")
+            })
+        );
 
         // deploy diamond and perform diamondCut
         // IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
 
         // Init Contract Only
-        IDiamondCut(infinityDiamond).diamondCut(cut, address(init), abi.encodeWithSignature("init()"));
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
+        IDiamondCut(infinityDiamond).diamondCut(emptyCut, address(init), abi.encodeWithSignature("init()"));
         vm.stopPrank();
     }
 
