@@ -51,6 +51,10 @@ library C {
     address constant C3_PROJECT_FACTORY = 0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B;
     address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d8A;
 
+    address constant COOREST_POOL = 0x363ae9B7Dbf55c0956A74C3be4ed0996d277A8BE;
+    address constant COOREST_POCC_TOKEN = 0x51cF819352FC536aD8A84214922615C160BB497D;
+    address constant COOREST_CCO2_TOKEN = 0x82B37070e43C1BA0EA9e2283285b674eF7f1D4E2;
+
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;
     }
@@ -145,5 +149,17 @@ library C {
 
     function icrProjectRegistry() internal pure returns (address) {
         return ICR_PROJECT_REGISTRY;
+    }
+
+    function coorestPool() internal pure returns (address) {
+        return COOREST_POOL;
+    }
+
+    function coorestPoCCToken() internal pure returns (address) {
+        return COOREST_POCC_TOKEN;
+    }
+
+    function coorestCCO2Token() internal pure returns (address) {
+        return COOREST_CCO2_TOKEN;
     }
 }
