@@ -88,7 +88,7 @@ library LibCoorestCarbon {
             details.retirementMessage,
             carbonToken,
             address(0),
-            retireAmount 
+            retireAmount
         );
     }
 
@@ -100,7 +100,7 @@ library LibCoorestCarbon {
      * @param amount          The amount of underlying tokens to retire.
      * @return feeAmount      Fee charged by Coorest.
      */
-    function getSpecificRetirementFee(address carbonToken, uint256 amount) public view returns (uint256 feeAmount) {
+    function getSpecificRetirementFee(address carbonToken, uint256 amount) internal view returns (uint256 feeAmount) {
         if (amount == 0) {
             revert RetireAmountIsZero();
         }
@@ -108,9 +108,8 @@ library LibCoorestCarbon {
         uint256 retireAmount = amount;
         FeeParams memory feeParams = getFeePercent(carbonToken);
 
-        feeAmount =
-            ((retireAmount * feeParams.feeRetireDivider) / (feeParams.feeRetireDivider - feeParams.feeRetireBp)) -
-            retireAmount;
+        feeAmount = ((retireAmount * feeParams.feeRetireDivider) / (feeParams.feeRetireDivider - feeParams.feeRetireBp))
+            - retireAmount;
     }
 
     /**
