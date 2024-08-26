@@ -12,7 +12,7 @@ import "../../helpers/AssertionHelper.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
-contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
+contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
     RetireCarbonFacet retireCarbonFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
@@ -25,8 +25,8 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
-    address SUSHI_LP = vm.envAddress("SUSHI_NCT_LP");
+    address SUSHI_BCT_LP = vm.envAddress("SUSHI_BCT_LP");
+    address SUSHI_NCT_LP = vm.envAddress("SUSHI_NCT_LP");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
@@ -35,8 +35,10 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
+    address BCT;
     address NCT;
-    address[] projects;
+    address[] projectsBCT;
+    address[] projectsNCT;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -51,70 +53,77 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
+        BCT = constantsFacet.bct();
         NCT = constantsFacet.nct();
 
-        projects = IToucanPool(NCT).getScoredTCO2s();
+        projectsBCT = IToucanPool(BCT).getScoredTCO2s();
+        projectsNCT = IToucanPool(BCT).getScoredTCO2s();
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_NCT(uint retireAmount) public {
-        retireExactNCT(NCT, retireAmount);
+    function test_infinity_retireExactCarbonSpecific_BCT_BCT(uint256 retireAmount) public {
+        retireExactToucan(BCT, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_USDC(uint retireAmount) public {
-        retireExactNCT(USDC, retireAmount);
+    function test_infinity_retireExactCarbonSpecific_BCT_USDC(uint256 retireAmount) public {
+        retireExactToucan(USDC, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_KLIMA(uint retireAmount) public {
-        retireExactNCT(KLIMA, retireAmount);
+    function test_infinity_retireExactCarbonSpecific_BCT_KLIMA(uint256 retireAmount) public {
+        retireExactToucan(KLIMA, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_SKLIMA(uint retireAmount) public {
-        retireExactNCT(SKLIMA, retireAmount);
+    function test_infinity_retireExactCarbonSpecific_BCT_SKLIMA(uint256 retireAmount) public {
+        retireExactToucan(SKLIMA, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_WSKLIMA(uint retireAmount) public {
-        retireExactNCT(WSKLIMA, retireAmount);
+    function test_infinity_retireExactCarbonSpecific_BCT_WSKLIMA(uint256 retireAmount) public {
+        retireExactToucan(WSKLIMA, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function getSourceTokens(address sourceToken, uint retireAmount) internal returns (uint sourceAmount) {
-        /// @dev getting trade amount on zero output will revert
-        if (retireAmount == 0 && sourceToken != NCT) vm.expectRevert();
-
-        sourceAmount = quoterFacet.getSourceAmountSpecificRetirement(sourceToken, NCT, retireAmount);
-
-        address sourceTarget;
-
-        if (sourceToken == NCT || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
-
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
+    function test_infinity_retireExactCarbonSpecific_NCT_NCT(uint256 retireAmount) public {
+        retireExactToucan(NCT, NCT, retireAmount, SUSHI_NCT_LP);
     }
 
-    function retireExactNCT(address sourceToken, uint retireAmount) public {
-        vm.assume(retireAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 30) / 100);
+    function test_infinity_retireExactCarbonSpecific_NCT_USDC(uint256 retireAmount) public {
+        retireExactToucan(USDC, NCT, retireAmount, SUSHI_NCT_LP);
+    }
 
-        uint sourceAmount = getSourceTokens(sourceToken, retireAmount);
+    function test_infinity_retireExactCarbonSpecific_NCT_KLIMA(uint256 retireAmount) public {
+        retireExactToucan(KLIMA, NCT, retireAmount, SUSHI_NCT_LP);
+    }
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+    function test_infinity_retireExactCarbonSpecific_NCT_SKLIMA(uint256 retireAmount) public {
+        retireExactToucan(SKLIMA, NCT, retireAmount, SUSHI_NCT_LP);
+    }
 
-        address projectToken = projects[randomish(projects.length)];
-        uint poolBalance = IERC20(projectToken).balanceOf(NCT);
+    function test_infinity_retireExactCarbonSpecific_NCT_WSKLIMA(uint256 retireAmount) public {
+        retireExactToucan(WSKLIMA, NCT, retireAmount, SUSHI_NCT_LP);
+    }
+
+    function retireExactToucan(address sourceToken, address poolToken, uint256 retireAmount, address lpPool) public {
+        vm.assume(retireAmount < (IERC20(poolToken).balanceOf(lpPool) * 30) / 100);
+
+        if (retireAmount == 0 && sourceToken != poolToken) vm.expectRevert();
+        uint256 sourceAmount =
+            getSourceTokens(TransactionType.SPECIFIC_RETIRE, diamond, sourceToken, poolToken, retireAmount);
+
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+
+        address projectToken =
+            poolToken == BCT ? projectsBCT[randomish(projectsBCT.length)] : projectsNCT[randomish(projectsNCT.length)];
+        uint256 poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
         if (retireAmount > poolBalance || retireAmount == 0) {
             vm.expectRevert();
 
             retireCarbonFacet.retireExactCarbonSpecific(
                 sourceToken,
-                NCT,
+                poolToken,
                 projectToken,
                 sourceAmount,
                 retireAmount,
@@ -136,14 +145,14 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
                 beneficiaryAddress,
                 beneficiary,
                 message,
-                NCT,
+                poolToken,
                 projectToken,
                 retireAmount
             );
 
             uint256 retirementIndex = retireCarbonFacet.retireExactCarbonSpecific(
                 sourceToken,
-                NCT,
+                poolToken,
                 projectToken,
                 sourceAmount,
                 retireAmount,
@@ -156,7 +165,7 @@ contract RetireExactCarbonSpecificToucanNCT is TestHelper, AssertionHelper {
 
             // No tokens left in contract
             assertZeroTokenBalance(sourceToken, diamond);
-            assertZeroTokenBalance(NCT, diamond);
+            assertZeroTokenBalance(poolToken, diamond);
             assertZeroTokenBalance(projectToken, diamond);
 
             // Return value matches

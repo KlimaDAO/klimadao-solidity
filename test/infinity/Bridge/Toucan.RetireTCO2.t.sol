@@ -64,7 +64,7 @@ contract RetireToucanTCO2FacetTest is TestHelper, AssertionHelper {
         quoterFacet = RetirementQuoter(diamond);
 
         BCT = constantsFacet.bct();
-        DEFAULT_PROJECT = IToucanPool(BCT).getScoredTCO2s()[0];
+        DEFAULT_PROJECT = getDefaultToucanProject(BCT);
     }
 
     function test_infinity_toucanRetireExactTCO2() public {

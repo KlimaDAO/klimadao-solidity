@@ -22,14 +22,14 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     RetireC3C3TFacet retireC3C3TFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
 
-    uint defaultCarbonRetireAmount = 69 * 1e18;
+    uint256 defaultCarbonRetireAmount = 69 * 1e18;
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
     string entity = "Test Entity";
@@ -48,7 +48,7 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
         quoterFacet = RetirementQuoter(diamond);
 
         UBO = constantsFacet.ubo();
-        DEFAULT_PROJECT = IC3Pool(UBO).getFreeRedeemAddresses()[0];
+        DEFAULT_PROJECT = getDefaultC3Project(UBO);
     }
 
     function test_infinity_c3RetireExactC3T() public {
@@ -57,11 +57,11 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, UBO, address(this));
         IERC20(sourceToken).approve(diamond, defaultCarbonRetireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        uint expectedRetirements = currentRetirements + 1;
-        uint expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+        uint256 expectedRetirements = currentRetirements + 1;
+        uint256 expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
 
         // Set up expectEmit
         vm.expectEmit(true, true, true, true);
@@ -79,13 +79,8 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
-        uint retirementIndex = retireC3C3TFacet.c3RetireExactC3T(
-            carbonToken,
-            defaultCarbonRetireAmount,
-            beneficiaryAddress,
-            beneficiary,
-            message,
-            LibTransfer.From.EXTERNAL
+        uint256 retirementIndex = retireC3C3TFacet.c3RetireExactC3T(
+            carbonToken, defaultCarbonRetireAmount, beneficiaryAddress, beneficiary, message, LibTransfer.From.EXTERNAL
         );
 
         // No tokens left in contract
@@ -103,11 +98,11 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
         swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, UBO, address(this));
         IERC20(sourceToken).approve(diamond, defaultCarbonRetireAmount);
 
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-        uint expectedRetirements = currentRetirements + 1;
-        uint expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
+        uint256 expectedRetirements = currentRetirements + 1;
+        uint256 expectedCarbonRetired = currentTotalCarbon + defaultCarbonRetireAmount;
 
         // Set up expectEmit
         vm.expectEmit(true, true, true, true);
@@ -125,7 +120,7 @@ contract RetireC3C3TFacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
-        uint retirementIndex = retireC3C3TFacet.c3RetireExactC3TWithEntity(
+        uint256 retirementIndex = retireC3C3TFacet.c3RetireExactC3TWithEntity(
             carbonToken,
             defaultCarbonRetireAmount,
             entity,

@@ -29,12 +29,25 @@ import {ERC1155ReceiverFacet} from "src/infinity/facets/ERC1155ReceiverFacet.sol
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
+import {C3SushiInit} from "src/infinity/init/C3SushiInit.sol";
+import {DiamondInitCoorest} from "src/infinity/init/DiamondInitCoorest.sol";
 import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
 import {ICRProject} from "./interfaces/ICR.sol";
+import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
+import {IToucanPool} from "src/infinity/interfaces/IToucan.sol";
+import {IwsKLIMA} from "src/infinity/interfaces/IKlima.sol";
 import "./HelperContract.sol";
 
 abstract contract TestHelper is Test, HelperContract {
     using Strings for uint256;
+
+    enum TransactionType {
+        EXACT_SOURCE,
+        DEFAULT_REDEEM,
+        SPECIFIC_REDEEM,
+        DEFAULT_RETIRE,
+        SPECIFIC_RETIRE
+    }
 
     // Users
     Users users;
@@ -197,53 +210,60 @@ abstract contract TestHelper is Test, HelperContract {
         //deploy facets and init contract
         // c3RedeemF = new RedeemC3PoolFacet();
         // toucanRedeemF = new RedeemToucanPoolFacet();
-        // retirementQuoterF = new RetirementQuoter();
-        // retireCarbonF = new RetireCarbonFacet();
-        // retireSourceF = new RetireSourceFacet();
-        retireCarbonmarkF = new RetireCarbonmarkFacet();
+        retirementQuoterF = new RetirementQuoter();
+        retireCarbonF = new RetireCarbonFacet();
+        retireSourceF = new RetireSourceFacet();
+        // retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
-        toucanRetireF = new RetireToucanTCO2Facet();
+        // toucanRetireF = new RetireToucanTCO2Facet();
+
+        DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
+        C3SushiInit init = new C3SushiInit();
 
         // FacetCut array which contains the three standard facets to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
+        IDiamondCut.FacetCut[] memory emptyCut = new IDiamondCut.FacetCut[](0);
 
         // // Klima Infinity specific facets
 
-        bytes4[] memory replace = new bytes4[](2);
-        bytes4[] memory add = new bytes4[](1);
+        // bytes4[] memory replace = new bytes4[](2);
+        // bytes4[] memory add = new bytes4[](1);
 
-        replace[0] = 0x1fd1a6ac;
-        replace[1] = 0x01e85bd2;
-        add[0] = 0xdadd9192;
+        // replace[0] = 0x1fd1a6ac;
+        // replace[1] = 0x01e85bd2;
+        // add[0] = 0xdadd9192;
 
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(toucanRetireF),
+                facetAddress: address(retireCarbonF),
                 action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: replace
+                functionSelectors: generateSelectors("RetireCarbonFacet")
             })
         );
 
         cut[1] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(toucanRetireF),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: add
+                facetAddress: address(retirementQuoterF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetirementQuoter")
             })
         );
 
         cut[2] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonmarkF),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
+                facetAddress: address(retireSourceFacet),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireSourceFacet")
             })
         );
 
         // deploy diamond and perform diamondCut
-        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        // IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
 
+        // Init Contract Only
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
+        IDiamondCut(infinityDiamond).diamondCut(emptyCut, address(init), abi.encodeWithSignature("init()"));
         vm.stopPrank();
     }
 
@@ -371,6 +391,54 @@ abstract contract TestHelper is Test, HelperContract {
         maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
 
+    function getSourceTokens(
+        TransactionType txType,
+        address diamond,
+        address sourceToken,
+        address pool,
+        uint256 amountOut
+    ) internal returns (uint256 sourceAmount) {
+        ConstantsGetter constantsFacet = ConstantsGetter(diamond);
+        address USDC_BRIDGED_HOLDER = vm.envAddress("USDC_BRIDGED_HOLDER");
+        address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
+
+        RetirementQuoter quoterFacet = RetirementQuoter(diamond);
+        if (txType == TransactionType.EXACT_SOURCE) {
+            sourceAmount = amountOut;
+        } else if (txType == TransactionType.DEFAULT_REDEEM) {
+            sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, pool, amountOut);
+        } else if (txType == TransactionType.SPECIFIC_REDEEM) {
+            uint256[] memory amounts = new uint256[](1);
+            amounts[0] = amountOut;
+            sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, pool, amounts);
+        } else if (txType == TransactionType.DEFAULT_RETIRE) {
+            sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, pool, amountOut);
+        } else if (txType == TransactionType.SPECIFIC_RETIRE) {
+            sourceAmount = quoterFacet.getSourceAmountSpecificRetirement(sourceToken, pool, amountOut);
+        }
+
+        address sourceTarget;
+
+        if (sourceToken == constantsFacet.usdc()) {
+            sourceTarget = USDC_BRIDGED_HOLDER;
+        } else if (sourceToken == constantsFacet.klima() || sourceToken == constantsFacet.sKlima()) {
+            sourceTarget = constantsFacet.staking();
+
+            // Ensure that any sKLIMA pulled can succesfully be unstaked
+            uint256 stakingBalance = IERC20(constantsFacet.klima()).balanceOf(constantsFacet.sKlima());
+            vm.assume(sourceAmount < stakingBalance / 2);
+        } else if (sourceToken == constantsFacet.wsKlima()) {
+            sourceTarget = WSKLIMA_HOLDER;
+        } else {
+            sourceTarget = constantsFacet.treasury();
+        }
+
+        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
+
+        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
+        IERC20(sourceToken).approve(diamond, sourceAmount);
+    }
+
     //////////// EVM Helpers ////////////
 
     function increaseTime(uint256 _seconds) internal {
@@ -395,7 +463,25 @@ abstract contract TestHelper is Test, HelperContract {
 
         // address minter = project.owner();
 
-        vm.prank(0x333D9A49b6418e5dC188989614f07c89d8389CC8);
+        vm.prank(0xA0022c05501007281acAE55B94AdE4Fc3dd59ec3);
         project.verifyAndMintExPost(recipient, tokenId, amount, 0, 3_124_224_000, 3_124_224_000, "testing");
+    }
+
+    function getDefaultC3Project(address pool) internal view returns (address) {
+        address[] memory projects = IC3Pool(pool).getFreeRedeemAddresses();
+
+        for (uint256 i; i < projects.length; ++i) {
+            uint256 balance = IERC20(projects[i]).balanceOf(pool);
+            if (balance > 0) return projects[i];
+        }
+    }
+
+    function getDefaultToucanProject(address pool) internal view returns (address) {
+        address[] memory projects = IToucanPool(pool).getScoredTCO2s();
+
+        for (uint256 i; i < projects.length; ++i) {
+            uint256 balance = IERC20(projects[i]).balanceOf(pool);
+            if (balance > 0) return projects[i];
+        }
     }
 }
