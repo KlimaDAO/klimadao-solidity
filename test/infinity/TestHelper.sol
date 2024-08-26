@@ -395,7 +395,7 @@ abstract contract TestHelper is Test, HelperContract {
         uint256 amountOut
     ) internal returns (uint256 sourceAmount) {
         ConstantsGetter constantsFacet = ConstantsGetter(diamond);
-        address USDC_NATIVE_HOLDER = vm.envAddress("USDC_NATIVE_HOLDER");
+        address USDC_BRIDGED_HOLDER = vm.envAddress("USDC_BRIDGED_HOLDER");
         address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
 
         RetirementQuoter quoterFacet = RetirementQuoter(diamond);
@@ -416,7 +416,7 @@ abstract contract TestHelper is Test, HelperContract {
         address sourceTarget;
 
         if (sourceToken == constantsFacet.usdc()) {
-            sourceTarget = USDC_NATIVE_HOLDER;
+            sourceTarget = USDC_BRIDGED_HOLDER;
         } else if (sourceToken == constantsFacet.klima() || sourceToken == constantsFacet.sKlima()) {
             sourceTarget = constantsFacet.staking();
 
