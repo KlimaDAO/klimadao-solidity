@@ -59,7 +59,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
                 maxAmountIn = LibKlima.unwrapKlima(maxAmountIn);
             }
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
-            
+
             uint256 carbonReceived;
             if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
                 carbonReceived = LibSwap.swapWithRetirementBonds(sourceToken, poolToken, maxAmountIn, totalCarbon);
@@ -149,7 +149,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         uint redeemedPool = LibRetire.retireReceivedExactCarbonSpecific(
             poolToken,
             projectToken,
-            retireAmount,
+            retireAmount, // Note: Bridge specific fee gets added in this function call. 
             msg.sender,
             retiringEntityString,
             beneficiaryAddress,

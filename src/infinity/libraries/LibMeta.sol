@@ -5,14 +5,17 @@ library LibMeta {
     bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
         keccak256(bytes("EIP712Domain(string name,string version,uint256 salt,address verifyingContract)"));
 
-    function domainSeparator(string memory name, string memory version)
-        internal
-        view
-        returns (bytes32 domainSeparator_)
-    {
+    function domainSeparator(
+        string memory name,
+        string memory version
+    ) internal view returns (bytes32 domainSeparator_) {
         domainSeparator_ = keccak256(
             abi.encode(
-                EIP712_DOMAIN_TYPEHASH, keccak256(bytes(name)), keccak256(bytes(version)), getChainID(), address(this)
+                EIP712_DOMAIN_TYPEHASH,
+                keccak256(bytes(name)),
+                keccak256(bytes(version)),
+                getChainID(),
+                address(this)
             )
         );
     }
@@ -34,5 +37,26 @@ library LibMeta {
         } else {
             sender_ = msg.sender;
         }
+    }
+
+    /**
+     * @dev Converts an  address to a string representation.
+     * @param _address The address to convert.
+     * @return The string representation of the address.
+     */
+    function addressToString(address _address) internal pure returns (string memory) {
+        bytes32 value = bytes32(uint256(uint160(_address)));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(42);
+        str[0] = "0";
+        str[1] = "x";
+
+        for (uint256 i = 0; i < 20; i++) {
+            str[2 + i * 2] = alphabet[uint8(value[i + 12] >> 4)];
+            str[3 + i * 2] = alphabet[uint8(value[i + 12] & 0x0f)];
+        }
+
+        return string(str);
     }
 }

@@ -19,7 +19,6 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
     address SUSHI_LP = vm.envAddress("SUSHI_NCT_LP");
 
     // Addresses pulled from current diamond constants
@@ -48,76 +47,52 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         WSKLIMA = constantsFacet.wsKlima();
         NCT = constantsFacet.nct();
 
-        DEFAULT_PROJECT = IToucanPool(NCT).getScoredTCO2s()[0];
+        DEFAULT_PROJECT = getDefaultToucanProject(NCT);
         KLIMA_RETIREMENT_BOND = constantsFacet.klimaRetirementBond();
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingNCT_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingNCT_fuzz(uint256 redeemAmount) public {
         redeemNCT(NCT, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemNCT(USDC, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNCT(KLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNCT(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingWSKLIMA_fuzz(uint redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNCT(WSKLIMA, redeemAmount);
     }
 
-    function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-        /// @dev getting trade amount on zero output will revert
-        if (redeemAmount == 0 && sourceToken != NCT) vm.expectRevert();
-        sourceAmount = quoterFacet.getSourceAmountDefaultRedeem(sourceToken, NCT, redeemAmount);
-
-        address sourceTarget;
-
-        if (sourceToken == NCT || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
-
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
-    }
-
-    function redeemNCT(address sourceToken, uint redeemAmount) internal {
+    function redeemNCT(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(NCT).balanceOf(SUSHI_LP) * 10) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, redeemAmount);
-        uint bondBalance = IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND);
+
+        if (redeemAmount == 0 && sourceToken != NCT) vm.expectRevert();
+        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_REDEEM, diamond, sourceToken, NCT, redeemAmount);
+
+        uint256 bondBalance = IERC20(NCT).balanceOf(KLIMA_RETIREMENT_BOND);
 
         if (redeemAmount == 0) {
             vm.expectRevert();
 
             redeemToucanPoolFacet.toucanRedeemExactCarbonPoolDefault(
-                sourceToken,
-                NCT,
-                redeemAmount,
-                sourceAmount,
-                LibTransfer.From.EXTERNAL,
-                LibTransfer.To.EXTERNAL
+                sourceToken, NCT, redeemAmount, sourceAmount, LibTransfer.From.EXTERNAL, LibTransfer.To.EXTERNAL
             );
         } else {
-            (address[] memory projectTokens, uint[] memory amounts) = redeemToucanPoolFacet
+            (address[] memory projectTokens, uint256[] memory amounts) = redeemToucanPoolFacet
                 .toucanRedeemExactCarbonPoolDefault(
-                    sourceToken,
-                    NCT,
-                    redeemAmount,
-                    sourceAmount,
-                    LibTransfer.From.EXTERNAL,
-                    LibTransfer.To.EXTERNAL
-                );
+                sourceToken, NCT, redeemAmount, sourceAmount, LibTransfer.From.EXTERNAL, LibTransfer.To.EXTERNAL
+            );
 
             // No tokens left in contract
             assertZeroTokenBalance(DEFAULT_PROJECT, diamond);

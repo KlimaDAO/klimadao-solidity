@@ -25,8 +25,8 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
     // Addresses defined in .env
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
-    address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
-    address SUSHI_BENTO = vm.envAddress("SUSHI_BENTO");
+    address SUSHI_UBO_LP = vm.envAddress("SUSHI_UBO_LP");
+    address SUSHI_NBO_LP = vm.envAddress("SUSHI_NBO_LP");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
@@ -56,82 +56,65 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
         UBO = constantsFacet.ubo();
         NBO = constantsFacet.nbo();
 
-        DEFAULT_PROJECT_UBO = IC3Pool(UBO).getFreeRedeemAddresses()[0];
-        DEFAULT_PROJECT_NBO = IC3Pool(NBO).getFreeRedeemAddresses()[0];
+        DEFAULT_PROJECT_UBO = getDefaultC3Project(UBO);
+        DEFAULT_PROJECT_NBO = getDefaultC3Project(NBO);
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
         fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
-    function test_infinity_retireExactCarbonDefault_UBO_UBO(uint retireAmount) public {
-        retireExactC3(UBO, UBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_UBO_UBO(uint256 retireAmount) public {
+        retireExactC3(UBO, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_UBO_USDC(uint retireAmount) public {
-        retireExactC3(USDC, UBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_UBO_USDC(uint256 retireAmount) public {
+        retireExactC3(USDC, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_UBO_KLIMA(uint retireAmount) public {
-        retireExactC3(KLIMA, UBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_UBO_KLIMA(uint256 retireAmount) public {
+        retireExactC3(KLIMA, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_UBO_SKLIMA(uint retireAmount) public {
-        retireExactC3(SKLIMA, UBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_UBO_SKLIMA(uint256 retireAmount) public {
+        retireExactC3(SKLIMA, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_UBO_WSKLIMA(uint retireAmount) public {
-        retireExactC3(WSKLIMA, UBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_UBO_WSKLIMA(uint256 retireAmount) public {
+        retireExactC3(WSKLIMA, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_NBO_NBO(uint retireAmount) public {
-        retireExactC3(NBO, NBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_NBO_NBO(uint256 retireAmount) public {
+        retireExactC3(NBO, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_NBO_USDC(uint retireAmount) public {
-        retireExactC3(USDC, NBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_NBO_USDC(uint256 retireAmount) public {
+        retireExactC3(USDC, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_NBO_KLIMA(uint retireAmount) public {
-        retireExactC3(KLIMA, NBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_NBO_KLIMA(uint256 retireAmount) public {
+        retireExactC3(KLIMA, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_NBO_SKLIMA(uint retireAmount) public {
-        retireExactC3(SKLIMA, NBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_NBO_SKLIMA(uint256 retireAmount) public {
+        retireExactC3(SKLIMA, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_NBO_WSKLIMA(uint retireAmount) public {
-        retireExactC3(WSKLIMA, NBO, retireAmount);
+    function test_infinity_retireExactCarbonDefault_NBO_WSKLIMA(uint256 retireAmount) public {
+        retireExactC3(WSKLIMA, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-    function getSourceTokens(
-        address sourceToken,
-        address poolToken,
-        uint retireAmount
-    ) internal returns (uint sourceAmount) {
-        sourceAmount = quoterFacet.getSourceAmountDefaultRetirement(sourceToken, poolToken, retireAmount);
+    function retireExactC3(address sourceToken, address poolToken, uint256 retireAmount, address lpPool) public {
+        vm.assume(retireAmount < (IERC20(poolToken).balanceOf(lpPool) * 90) / 100);
 
-        address sourceTarget;
-
-        if (sourceToken == UBO || sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-        else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-        else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
-
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
-    }
-
-    function retireExactC3(address sourceToken, address poolToken, uint retireAmount) public {
-        vm.assume(retireAmount < (IERC20(poolToken).balanceOf(SUSHI_BENTO) * 90) / 100);
-        uint sourceAmount = getSourceTokens(sourceToken, poolToken, retireAmount);
-
-        uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        if (retireAmount == 0 && sourceToken != poolToken) vm.expectRevert();
+        uint256 sourceAmount =
+            getSourceTokens(TransactionType.DEFAULT_RETIRE, diamond, sourceToken, poolToken, retireAmount);
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         address projectToken = poolToken == UBO ? DEFAULT_PROJECT_UBO : DEFAULT_PROJECT_NBO;
-        uint poolBalance = IERC20(projectToken).balanceOf(poolToken);
+        uint256 poolBalance = IERC20(projectToken).balanceOf(poolToken);
 
         console.log("Trident router to use %s", constantsFacet.sushiTridentRouter());
 

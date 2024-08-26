@@ -12,6 +12,7 @@ import "./Bridges/LibToucanCarbon.sol";
 import "./Bridges/LibMossCarbon.sol";
 import "./Bridges/LibC3Carbon.sol";
 import "./Bridges/LibICRCarbon.sol";
+import "./Bridges/LibCoorestCarbon.sol";
 import "./Token/LibTransfer.sol";
 import "./TokenSwap/LibSwap.sol";
 import "../interfaces/IKlimaInfinity.sol";
@@ -26,7 +27,8 @@ library LibRetire {
         TOUCAN,
         MOSS,
         C3,
-        ICR
+        ICR,
+        COOREST
     }
 
     struct RetireDetails {
@@ -120,7 +122,9 @@ library LibRetire {
     ) internal returns (uint256 redeemedAmount) {
         AppStorage storage s = LibAppStorage.diamondStorage();
         require(
-            s.poolBridge[poolToken] == CarbonBridge.TOUCAN || s.poolBridge[poolToken] == CarbonBridge.C3,
+            s.poolBridge[poolToken] == CarbonBridge.TOUCAN ||
+                s.poolBridge[poolToken] == CarbonBridge.C3 ||
+                s.poolBridge[poolToken] == CarbonBridge.COOREST,
             "Specific redeem not supported."
         );
 
@@ -140,7 +144,6 @@ library LibRetire {
             );
         } else if (s.poolBridge[poolToken] == CarbonBridge.C3) {
             redeemedAmount += LibC3Carbon.getExactCarbonSpecificRedeemFee(poolToken, amount);
-
             LibC3Carbon.redeemSpecificAndRetire(
                 poolToken,
                 projectToken,
@@ -150,6 +153,24 @@ library LibRetire {
                 beneficiaryAddress,
                 beneficiaryString,
                 retirementMessage
+            );
+        } else if (s.poolBridge[poolToken] == CarbonBridge.COOREST) {
+            redeemedAmount += LibCoorestCarbon.getSpecificRetirementFee(poolToken, amount);
+            LibCoorestCarbon.retireCarbonToken(
+                poolToken,
+                amount,
+                redeemedAmount, 
+                LibRetire.RetireDetails({
+                    retiringAddress: retiringAddress,
+                    retiringEntityString: retiringEntityString,
+                    beneficiaryAddress: beneficiaryAddress,
+                    beneficiaryString: beneficiaryString,
+                    retirementMessage: retirementMessage,
+                    beneficiaryLocation: "",
+                    consumptionCountryCode: "",
+                    consumptionPeriodStart: 0,
+                    consumptionPeriodEnd: 0
+                })
             );
         }
     }
@@ -311,11 +332,10 @@ library LibRetire {
      * @param retireAmount      Amount of carbon wanting to retire
      * @return totalCarbon      Total pool token needed
      */
-    function getTotalCarbonSpecific(address poolToken, uint256 retireAmount)
-        internal
-        view
-        returns (uint256 totalCarbon)
-    {
+    function getTotalCarbonSpecific(
+        address poolToken,
+        uint256 retireAmount
+    ) internal view returns (uint256 totalCarbon) {
         // This is for exact carbon retirements
         AppStorage storage s = LibAppStorage.diamondStorage();
 
@@ -325,6 +345,8 @@ library LibRetire {
             totalCarbon += LibToucanCarbon.getSpecificRedeemFee(poolToken, retireAmount);
         } else if (s.poolBridge[poolToken] == CarbonBridge.C3) {
             totalCarbon += LibC3Carbon.getExactCarbonSpecificRedeemFee(poolToken, retireAmount);
+        } else if (s.poolBridge[poolToken] == CarbonBridge.COOREST) {
+            totalCarbon += LibCoorestCarbon.getSpecificRetirementFee(poolToken, retireAmount);
         }
     }
 
@@ -357,12 +379,17 @@ library LibRetire {
     ) internal {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
-        (uint256 currentRetirementIndex,,) =
-            IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(beneficiaryAddress);
+        (uint256 currentRetirementIndex, , ) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(
+            beneficiaryAddress
+        );
 
         // Save the base details of the retirement
         IKlimaCarbonRetirements(C.klimaCarbonRetirements()).carbonRetired(
-            beneficiaryAddress, poolToken, amount, beneficiaryString, retirementMessage
+            beneficiaryAddress,
+            poolToken,
+            amount,
+            beneficiaryString,
+            retirementMessage
         );
 
         // Save the details of the retirement
@@ -373,11 +400,11 @@ library LibRetire {
     /* ========== Account Getters ========== */
 
     function getTotalRetirements(address account) internal view returns (uint256 totalRetirements) {
-        (totalRetirements,,) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
+        (totalRetirements, , ) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
     }
 
     function getTotalCarbonRetired(address account) internal view returns (uint256 totalCarbonRetired) {
-        (, totalCarbonRetired,) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
+        (, totalCarbonRetired, ) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
     }
 
     function getTotalPoolRetired(address account, address poolToken) internal view returns (uint256 totalPoolRetired) {
@@ -390,10 +417,13 @@ library LibRetire {
     }
 
     function getTotalRewardsClaimed(address account) internal view returns (uint256 totalClaimed) {
-        (,, totalClaimed) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
+        (, , totalClaimed) = IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementTotals(account);
     }
 
-    function getRetirementDetails(address account, uint256 retirementIndex)
+    function getRetirementDetails(
+        address account,
+        uint256 retirementIndex
+    )
         internal
         view
         returns (
@@ -405,8 +435,8 @@ library LibRetire {
             uint256 amount
         )
     {
-        (poolTokenAddress, amount, beneficiary, retirementMessage) =
-            IKlimaCarbonRetirements(C.klimaCarbonRetirements()).getRetirementIndexInfo(account, retirementIndex);
+        (poolTokenAddress, amount, beneficiary, retirementMessage) = IKlimaCarbonRetirements(C.klimaCarbonRetirements())
+            .getRetirementIndexInfo(account, retirementIndex);
         beneficiaryAddress = account;
 
         AppStorage storage s = LibAppStorage.diamondStorage();
