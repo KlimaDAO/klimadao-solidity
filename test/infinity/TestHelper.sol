@@ -30,7 +30,7 @@ import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
 import {C3SushiInit} from "src/infinity/init/C3SushiInit.sol";
-import {DiamondInitCoorest} from "../src/infinity/init/DiamondInitCoorest.sol";
+import {DiamondInitCoorest} from "src/infinity/init/DiamondInitCoorest.sol";
 import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
 import {ICRProject} from "./interfaces/ICR.sol";
 import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
