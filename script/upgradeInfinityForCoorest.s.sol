@@ -27,10 +27,11 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
         //deploy updated facets and init contract
         RetireCarbonFacet retireCarbonF = new RetireCarbonFacet();
         RetirementQuoter retirementQuoterF = new RetirementQuoter();
+        RetireSourceFacet retireSourceFacet = new RetireSourceFacet();
         DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
 
         // Klima Infinity specific facets
         cut[0] = (
@@ -48,6 +49,14 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
                 functionSelectors: generateSelectors("RetirementQuoter")
             })
         );
+
+        cut[2] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireSourceFacet),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireSourceFacet")
+            })
+        );        
 
 
         // deploy diamond and perform diamondCut
