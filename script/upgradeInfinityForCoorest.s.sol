@@ -30,7 +30,7 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
         DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](2);
 
         // Klima Infinity specific facets
         cut[0] = (
@@ -49,13 +49,6 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
             })
         );
 
-        cut[2] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(initCoorestF),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("DiamondInitCoorest")
-            })
-        );
 
         // deploy diamond and perform diamondCut
         IDiamondCut(address(diamond)).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
