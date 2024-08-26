@@ -210,9 +210,9 @@ abstract contract TestHelper is Test, HelperContract {
         //deploy facets and init contract
         // c3RedeemF = new RedeemC3PoolFacet();
         // toucanRedeemF = new RedeemToucanPoolFacet();
-        // retirementQuoterF = new RetirementQuoter();
-        // retireCarbonF = new RetireCarbonFacet();
-        // retireSourceF = new RetireSourceFacet();
+        retirementQuoterF = new RetirementQuoter();
+        retireCarbonF = new RetireCarbonFacet();
+        retireSourceF = new RetireSourceFacet();
         // retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
