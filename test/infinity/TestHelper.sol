@@ -261,6 +261,7 @@ abstract contract TestHelper is Test, HelperContract {
 
         // Init Contract Only
         // IDiamondCut(infinityDiamond).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
+        // IDiamondCut(infinityDiamond).diamondCut(emptyCut, address(init), abi.encodeWithSignature("init()"));
         vm.stopPrank();
     }
 

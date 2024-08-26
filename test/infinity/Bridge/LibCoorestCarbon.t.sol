@@ -3,13 +3,16 @@ pragma solidity ^0.8.16;
 import "../TestHelper.sol";
 import {ICCO2} from "../../../src/infinity/interfaces/ICoorest.sol";
 import {ConstantsGetter} from "../../../src/infinity/mocks/ConstantsGetter.sol";
+import {CoorestLibraryMock} from "../../../src/infinity/mocks/CoorestLibraryMock.sol";
 import {LibCoorestCarbon} from "../../../src/infinity/libraries/Bridges/LibCoorestCarbon.sol";
 
 contract LibCoorestCarbonTest is TestHelper {
     ConstantsGetter constantGetter;
+    CoorestLibraryMock coorestLibraryMock;
 
     function setUp() public {
         constantGetter = new ConstantsGetter();
+        coorestLibraryMock = new CoorestLibraryMock();
     }
 
     function test_infinity_coorestFee(uint amount) public {
@@ -28,7 +31,7 @@ contract LibCoorestCarbonTest is TestHelper {
             abi.encode(10000)
         );
 
-        uint fee = LibCoorestCarbon.getSpecificRetirementFee(constantGetter.coorestCCO2Token(), amount);
+        uint fee = coorestLibraryMock.getSpecificRetirementFee(constantGetter.coorestCCO2Token(), amount);
 
         vm.clearMockedCalls();
         assertLt(fee, amount);
@@ -52,7 +55,7 @@ contract LibCoorestCarbonTest is TestHelper {
 
         address cco2 = constantGetter.coorestCCO2Token();
         vm.expectRevert(LibCoorestCarbon.FeePercentageGreaterThanDivider.selector);
-        LibCoorestCarbon.getSpecificRetirementFee(cco2, amount);
+        coorestLibraryMock.getSpecificRetirementFee(cco2, amount);
 
         vm.clearMockedCalls();
     }
@@ -75,7 +78,7 @@ contract LibCoorestCarbonTest is TestHelper {
 
         address cco2 = constantGetter.coorestCCO2Token();
         vm.expectRevert(LibCoorestCarbon.FeeRetireDividerIsZero.selector);
-        LibCoorestCarbon.getSpecificRetirementFee(cco2, amount);
+        coorestLibraryMock.getSpecificRetirementFee(cco2, amount);
 
         vm.clearMockedCalls();
     }
@@ -83,6 +86,6 @@ contract LibCoorestCarbonTest is TestHelper {
     function test_infinity_coorestFeeFailsIfAmountZero() public {
         address cco2 = constantGetter.coorestCCO2Token();
         vm.expectRevert(LibCoorestCarbon.RetireAmountIsZero.selector);
-        LibCoorestCarbon.getSpecificRetirementFee(cco2, 0);
+        coorestLibraryMock.getSpecificRetirementFee(cco2, 0);
     }
 }
