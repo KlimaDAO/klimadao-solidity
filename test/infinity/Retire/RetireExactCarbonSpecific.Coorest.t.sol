@@ -29,56 +29,16 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
     address SUSHI_LP = vm.envAddress("SUSHI_CCO2_LP");
-    address CCO2 = vm.envAddress("COOREST_TOKEN");
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address USDC;
     address KLIMA_TOKEN;
-
-    function upgradeDiamond(address infinityDiamond) internal {
-        ownerF = OwnershipFacet(infinityDiamond);
-
-        vm.startPrank(ownerF.owner());
-
-        RetirementQuoter _retirementQuoterF = new RetirementQuoter();
-        RetireCarbonFacet _retireCarbonF = new RetireCarbonFacet();
-        DiamondInitCoorest _diamondInitCoorest = new DiamondInitCoorest();
-
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
-
-        cut[0] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(_retireCarbonF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireCarbonFacet")
-            })
-        );
-
-        cut[1] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(_retirementQuoterF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetirementQuoter")
-            })
-        );
-
-        cut[2] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(_diamondInitCoorest),
-                action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("DiamondInitCoorest")
-            })
-        );
-
-        IDiamondCut(address(diamond)).diamondCut(cut, address(_diamondInitCoorest), abi.encodeWithSignature("init()"));
-
-        vm.stopPrank();
-    }
+    address CCO2;
 
     function setUp() public {
         addConstantsGetter(diamond);
-        upgradeDiamond(diamond);
+        upgradeCurrentDiamond(diamond);
 
         retireCarbonFacet = RetireCarbonFacet(diamond);
         quoterFacet = RetirementQuoter(diamond);
@@ -87,6 +47,7 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         KLIMA_TOKEN = constantsFacet.klima();
         USDC = constantsFacet.usdc();
+        CCO2 = constantsFacet.coorestCCO2Token();
 
         // Mock Balance from StdUtils
         deal(constantsFacet.usdc(), beneficiaryAddress, 100_000e6);
@@ -96,7 +57,7 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_coorestRetire_USDC() public {
+    function test_infinity_retireExactCarbonSpecific_CCO2_USDC() public {
         uint preTxBalance = IERC20(KLIMA_TOKEN).balanceOf(beneficiaryAddress);
         uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
@@ -108,7 +69,7 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         assertEq(postTxPoCCBalance - preTxPoCCBalance, 1);
     }
 
-    function test_infinity_coorestRetire_Klima() public {
+    function test_infinity_retireExactCarbonSpecific_CCO2_Klima() public {
         uint preTxBalance = IERC20(KLIMA_TOKEN).balanceOf(beneficiaryAddress);
         uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
@@ -180,7 +141,7 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         assertZeroTokenBalance(sourceToken, diamond);
         assertZeroTokenBalance(CCO2, diamond);
 
-        // // Account state values updated
+        // Account state values updated
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + 1);
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount);
 
