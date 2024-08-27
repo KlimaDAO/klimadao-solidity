@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import {LibRetire, C, LibApprove} from "../../libraries/LibRetire.sol";
+import {LibRetire, C, LibApprove, LibTransfer} from "../../libraries/LibRetire.sol";
 import {ICarbonmark} from "../../interfaces/ICarbonmark.sol";
 import "../../ReentrancyGuard.sol";
 
@@ -38,20 +38,27 @@ contract RetireCarbonmarkFacet is ReentrancyGuard {
         require(retireAmount > 0, "Cannot retire zero tonnes");
 
         uint256 balance = IERC20(C.usdc()).balanceOf(msg.sender);
+        address purchaseToken;
 
         if (balance >= maxAmountIn) {
-            LibTransfer.receiveToken(IERC20(C.usdc()), maxAmountIn, msg.sender, fromMode);
-
-            LibApprove.approveToken(IERC20(C.usdc()), C.carbonmark(), maxAmountIn);
+            purchaseToken = C.usdc();
         } else {
-            LibTransfer.receiveToken(IERC20(C.usdc_bridged()), maxAmountIn, msg.sender, fromMode);
-
-            LibApprove.approveToken(IERC20(C.usdc_bridged()), C.carbonmark(), maxAmountIn);
+            purchaseToken = C.usdc_bridged();
         }
+
+        LibTransfer.receiveToken(IERC20(purchaseToken), maxAmountIn, msg.sender, fromMode);
+
+        LibApprove.approveToken(IERC20(purchaseToken), C.carbonmark(), maxAmountIn);
 
         ICarbonmark(C.carbonmark()).fillListing(
             listing.id, listing.account, listing.token, listing.unitPrice, retireAmount, maxAmountIn
         );
+
+        uint256 dustBalance = IERC20(purchaseToken).balanceOf(address(this));
+
+        if (dustBalance != 0) {
+            LibTransfer.sendToken(IERC20(purchaseToken), dustBalance, msg.sender, LibTransfer.To.EXTERNAL);
+        }
 
         if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
 

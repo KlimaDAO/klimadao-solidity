@@ -209,9 +209,9 @@ abstract contract TestHelper is Test, HelperContract {
         //deploy facets and init contract
         // c3RedeemF = new RedeemC3PoolFacet();
         // toucanRedeemF = new RedeemToucanPoolFacet();
-        retirementQuoterF = new RetirementQuoter();
-        retireCarbonF = new RetireCarbonFacet();
-        retireSourceF = new RetireSourceFacet();
+        // retirementQuoterF = new RetirementQuoter();
+        // retireCarbonF = new RetireCarbonFacet();
+        // retireSourceF = new RetireSourceFacet();
         retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
@@ -220,7 +220,7 @@ abstract contract TestHelper is Test, HelperContract {
         // DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
 
         // FacetCut array which contains the three standard facets to be added
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
         IDiamondCut.FacetCut[] memory emptyCut = new IDiamondCut.FacetCut[](0);
 
         // // Klima Infinity specific facets
@@ -235,27 +235,27 @@ abstract contract TestHelper is Test, HelperContract {
 
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonF),
+                facetAddress: address(retireCarbonmarkF),
                 action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireCarbonFacet")
+                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
             })
         );
 
-        cut[1] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retirementQuoterF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetirementQuoter")
-            })
-        );
+        // cut[1] = (
+        //     IDiamondCut.FacetCut({
+        //         facetAddress: address(retirementQuoterF),
+        //         action: IDiamondCut.FacetCutAction.Replace,
+        //         functionSelectors: generateSelectors("RetirementQuoter")
+        //     })
+        // );
 
-        cut[2] = (
-            IDiamondCut.FacetCut({
-                facetAddress: address(retireSourceF),
-                action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireSourceFacet")
-            })
-        );
+        // cut[2] = (
+        //     IDiamondCut.FacetCut({
+        //         facetAddress: address(retireSourceF),
+        //         action: IDiamondCut.FacetCutAction.Replace,
+        //         functionSelectors: generateSelectors("RetireSourceFacet")
+        //     })
+        // );
 
         // deploy diamond and perform diamondCut
         IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
@@ -399,6 +399,7 @@ abstract contract TestHelper is Test, HelperContract {
     ) internal returns (uint256 sourceAmount) {
         ConstantsGetter constantsFacet = ConstantsGetter(diamond);
         address USDC_BRIDGED_HOLDER = vm.envAddress("USDC_BRIDGED_HOLDER");
+        address USDC_NATIVE_HOLDER = vm.envAddress("USDC_NATIVE_HOLDER");
         address WSKLIMA_HOLDER = vm.envAddress("WSKLIMA_HOLDER");
 
         RetirementQuoter quoterFacet = RetirementQuoter(diamond);
@@ -419,6 +420,8 @@ abstract contract TestHelper is Test, HelperContract {
         address sourceTarget;
 
         if (sourceToken == constantsFacet.usdc()) {
+            sourceTarget = USDC_NATIVE_HOLDER;
+        } else if (sourceToken == constantsFacet.usdc_bridged()) {
             sourceTarget = USDC_BRIDGED_HOLDER;
         } else if (sourceToken == constantsFacet.klima() || sourceToken == constantsFacet.sKlima()) {
             sourceTarget = constantsFacet.staking();
