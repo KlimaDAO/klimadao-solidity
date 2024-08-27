@@ -1,5 +1,5 @@
 # SwapRetirementHolder
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/integrations/sushixklima/SwapRetirementHolder.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/integrations/sushixklima/SwapRetirementHolder.sol)
 
 **Inherits:**
 [KeeperCompatibleInterface](/src/integrations/sushixklima/keepers/KeeperCompatibleInterface.sol/interface.KeeperCompatibleInterface.md), [Ownable](/src/protocol/staking/utils/KlimaTreasury.sol/contract.Ownable.md)

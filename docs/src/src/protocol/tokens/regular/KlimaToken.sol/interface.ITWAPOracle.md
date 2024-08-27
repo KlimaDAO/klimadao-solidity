@@ -1,5 +1,5 @@
 # ITWAPOracle
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/KlimaToken.sol)
 
 *Intended to update the TWAP for a token based on accepting an update call from that token.
 expectation is to have this happen in the _beforeTokenTransfer function of ERC20.

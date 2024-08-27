@@ -1,5 +1,5 @@
 # ERC20Permit
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 **Inherits:**
 [ERC20](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20.md), [IERC2612Permit](/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC2612Permit.md)

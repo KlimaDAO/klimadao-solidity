@@ -91,6 +91,7 @@
       - [LibRetire](src/infinity/libraries/LibRetire.sol/library.LibRetire.md)
     - [❱ mocks](src/infinity/mocks/README.md)
       - [ConstantsGetter](src/infinity/mocks/ConstantsGetter.sol/contract.ConstantsGetter.md)
+      - [CoorestLibraryMock](src/infinity/mocks/CoorestLibraryMock.sol/contract.CoorestLibraryMock.md)
     - [Account](src/infinity/AppStorage.sol/contract.Account.md)
     - [Storage](src/infinity/AppStorage.sol/contract.Storage.md)
     - [AppStorage](src/infinity/AppStorage.sol/struct.AppStorage.md)

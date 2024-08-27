@@ -1,5 +1,5 @@
 # KlimaStaking
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/protocol/staking/regular/KlimaStaking_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/staking/regular/KlimaStaking_v2.sol)
 
 **Inherits:**
 [Ownable](/src/protocol/staking/utils/KlimaTreasury.sol/contract.Ownable.md)

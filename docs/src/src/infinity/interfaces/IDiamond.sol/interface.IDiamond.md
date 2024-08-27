@@ -1,5 +1,5 @@
 # IDiamond
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/interfaces/IDiamond.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/interfaces/IDiamond.sol)
 
 \
 Author: Nick Mudge <nick@perfectabstractions.com> (https://twitter.com/mudgen)

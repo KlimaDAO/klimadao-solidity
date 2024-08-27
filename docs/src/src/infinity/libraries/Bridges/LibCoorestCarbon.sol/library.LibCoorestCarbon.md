@@ -1,5 +1,5 @@
 # LibCoorestCarbon
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/b4fb0f4685d5fe4c80ffc162389dfe0abdfe9f39/src/infinity/libraries/Bridges/LibCoorestCarbon.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/libraries/Bridges/LibCoorestCarbon.sol)
 
 **Author:**
 must-be-carbon
@@ -53,7 +53,7 @@ Calculates the Coorest fee that needs to be added to desired retire amount
 
 
 ```solidity
-function getSpecificRetirementFee(address carbonToken, uint256 amount) public view returns (uint256 feeAmount);
+function getSpecificRetirementFee(address carbonToken, uint256 amount) internal view returns (uint256 feeAmount);
 ```
 **Parameters**
 
