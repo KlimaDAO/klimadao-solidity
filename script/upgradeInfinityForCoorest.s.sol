@@ -60,7 +60,10 @@ contract UpgradeInfinityForCoorest is Script, HelperContract {
         );
 
         // deploy diamond and perform diamondCut
-        IDiamondCut(address(diamond)).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
+        // IDiamondCut(address(diamond)).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
+
+        // upgrade without init for interal library function view
+        IDiamondCut(diamond).diamondCut(cut, address(0), "");
 
         vm.stopBroadcast();
     }

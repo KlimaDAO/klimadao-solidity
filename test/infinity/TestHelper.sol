@@ -29,7 +29,6 @@ import {ERC1155ReceiverFacet} from "src/infinity/facets/ERC1155ReceiverFacet.sol
 import {DiamondInit} from "src/infinity/init/DiamondInit.sol";
 import {ConstantsGetter} from "src/infinity/mocks/ConstantsGetter.sol";
 import {DustFacet} from "src/infinity/facets/DustFacet.sol";
-import {C3SushiInit} from "src/infinity/init/C3SushiInit.sol";
 import {DiamondInitCoorest} from "src/infinity/init/DiamondInitCoorest.sol";
 import {IKlimaTreasury, IKlimaRetirementBond, IRetirementBondAllocator} from "src/protocol/interfaces/IKLIMA.sol";
 import {ICRProject} from "./interfaces/ICR.sol";
@@ -218,8 +217,7 @@ abstract contract TestHelper is Test, HelperContract {
         // erc1155ReceiverF = new ERC1155ReceiverFacet();
         // toucanRetireF = new RetireToucanTCO2Facet();
 
-        DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
-        C3SushiInit init = new C3SushiInit();
+        // DiamondInitCoorest initCoorestF = new DiamondInitCoorest();
 
         // FacetCut array which contains the three standard facets to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](3);
@@ -259,11 +257,11 @@ abstract contract TestHelper is Test, HelperContract {
         );
 
         // deploy diamond and perform diamondCut
-        // IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
+        IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
 
         // Init Contract Only
-        IDiamondCut(infinityDiamond).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
-        IDiamondCut(infinityDiamond).diamondCut(emptyCut, address(init), abi.encodeWithSignature("init()"));
+        // IDiamondCut(infinityDiamond).diamondCut(cut, address(initCoorestF), abi.encodeWithSignature("init()"));
+        // IDiamondCut(infinityDiamond).diamondCut(emptyCut, address(init), abi.encodeWithSignature("init()"));
         vm.stopPrank();
     }
 
