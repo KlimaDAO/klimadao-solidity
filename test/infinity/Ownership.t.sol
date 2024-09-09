@@ -9,7 +9,7 @@ import "src/infinity/interfaces/IDiamondCut.sol";
 contract Ownership is TestHelper {
     address diamond = vm.envAddress("INFINITY_ADDRESS");
 
-    function test_ownershipTransfer() public {
+    function test_infinity_ownershipTransfer() public {
         ownerF = OwnershipFacet(diamond);
 
         address newOwner = 0x843dE2e99449834cd6C6456Bd35894d0B157B947;

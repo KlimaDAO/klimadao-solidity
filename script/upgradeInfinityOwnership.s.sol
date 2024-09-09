@@ -23,10 +23,10 @@ contract DeployScript is Script, HelperContract {
         bytes4[] memory add = new bytes4[](2);
         bytes4[] memory replace = new bytes4[](2);
 
-        add[0] = 0x79ba5097;
-        add[1] = 0xe30c3978;
-        replace[0] = 0x8da5cb5b;
-        replace[1] = 0xf2fde38b;
+        add[0] = 0x79ba5097; // acceptOwnership
+        add[1] = 0xe30c3978; // pendingOwner
+        replace[0] = 0x8da5cb5b; // owner
+        replace[1] = 0xf2fde38b; // transferOwnership
 
         cut[0] = (
             IDiamondCut.FacetCut({
