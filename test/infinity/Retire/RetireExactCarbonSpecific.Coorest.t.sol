@@ -58,11 +58,11 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
     }
 
     function test_infinity_retireExactCarbonSpecific_CCO2_USDC() public {
-        uint preTxBalance = IERC20(KLIMA_TOKEN).balanceOf(beneficiaryAddress);
+        uint preTxBalance = IERC20(USDC).balanceOf(beneficiaryAddress);
         uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
-        uint sourceAmount = retireExactCCO2(KLIMA_TOKEN, 100e18);
-        uint postTxBalance = IERC20(KLIMA_TOKEN).balanceOf(beneficiaryAddress);
+        uint sourceAmount = retireExactCCO2(USDC, 100e18);
+        uint postTxBalance = IERC20(USDC).balanceOf(beneficiaryAddress);
         uint postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
         assertEq(preTxBalance - postTxBalance, sourceAmount);
@@ -95,10 +95,9 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         IERC20(sourceToken).approve(diamond, sourceAmount);
     }
 
-    function retireExactCCO2Base(
-        address sourceToken,
-        uint retireAmount
-    ) public returns (uint sourceAmount, uint retirementIndex) {
+    function retireExactCCO2Base(address sourceToken, uint retireAmount)
+        public returns (uint sourceAmount, uint retirementIndex)
+    {
         sourceAmount = getSourceTokens(sourceToken, retireAmount);
 
         vm.expectEmit(true, true, true, true);
@@ -131,17 +130,20 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
     }
 
     function retireExactCCO2(address sourceToken, uint retireAmount) public returns (uint) {
+        uint preTxBalance = IERC20(CCO2).balanceOf(diamond);
+
         uint currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
         (uint sourceAmount, uint retirementIndex) = retireExactCCO2Base(sourceToken, retireAmount);
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), retirementIndex);
 
-        // No tokens left in contract
+        // // No source token left in contract
         assertZeroTokenBalance(sourceToken, diamond);
-        assertZeroTokenBalance(CCO2, diamond);
+        // only cco2 tokens that were in the contract before the txn should remain
+        assertTokenBalance(CCO2, diamond, preTxBalance);
 
-        // Account state values updated
+        // // Account state values updated
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + 1);
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount);
 
