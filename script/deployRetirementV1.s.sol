@@ -9,8 +9,8 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
 
-import "oz/proxy/transparent/TransparentUpgradeableProxy.sol";
-import "oz/proxy/transparent/ProxyAdmin.sol";
+import "oz-4-8-3/proxy/transparent/TransparentUpgradeableProxy.sol";
+import "oz-4-8-3/proxy/transparent/ProxyAdmin.sol";
 
 import {KlimaCarbonRetirements} from "../src/retirement_v1/KlimaCarbonRetirements.sol";
 import {KlimaRetirementAggregator} from "../src/retirement_v1/KlimaRetirementAggregator.sol";

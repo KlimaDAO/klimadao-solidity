@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import "oz/access/Ownable2Step.sol";
-import "oz/token/ERC20/utils/SafeERC20.sol";
+import "oz-4-8-3/access/Ownable2Step.sol";
+import "oz-4-8-3/token/ERC20/utils/SafeERC20.sol";
 
 import {IKlima, IKlimaTreasury, IKlimaRetirementBond} from "../interfaces/IKLIMA.sol";
 
@@ -11,7 +11,6 @@ import {IKlima, IKlimaTreasury, IKlimaRetirementBond} from "../interfaces/IKLIMA
  * @author Cujo
  * @notice A contract for allocating retirement bonds using excess reserves from the Klima Treasury.
  */
-
 contract RetirementBondAllocator is Ownable2Step {
     using SafeERC20 for IKlima;
 
@@ -89,11 +88,9 @@ contract RetirementBondAllocator is Ownable2Step {
      * @param _maxReservePercent The new maximum reserve percentage allowed. 500 = 5%.
      */
     function updateMaxReservePercent(uint256 _maxReservePercent) external onlyDAO {
-
         uint256 oldMax = maxReservePercent;
         maxReservePercent = _maxReservePercent;
 
         emit MaxPercentUpdated(oldMax, maxReservePercent);
     }
-
 }
