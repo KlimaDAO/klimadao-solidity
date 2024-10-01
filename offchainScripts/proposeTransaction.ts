@@ -17,7 +17,7 @@ const apiKit = new SafeApiKit({
   chainId: 11155111n,
 });
 
-if (!RPC_URL || !OWNER_1_PRIVATE_KEY || !OWNER_1_ADDRESS || !SAFE_ADDRESS) {
+if (!RPC_URL || !OWNER_1_PRIVATE_KEY || !OWNER_1_ADDRESS || !SAFE_ADDRESS || !RETIREMENT_AGGREGATOR) {
   throw new Error("Missing environment variables");
 }
 
