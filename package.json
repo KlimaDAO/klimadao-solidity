@@ -8,7 +8,9 @@
     "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test test_infinity --summary",
     "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test  test_protocol --summary",
     "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
-    "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi"
+    "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi",
+    "upgrade-infinity-for-native-usdc": "forge script script/upgradeInfinityForNativeUsdc.sol --fork-url http://localhost:8545 --broadcast --ffi",
+    "propose-txn": "bun offchainScripts/proposeTransaction.ts"
   },
   "repository": {
     "type": "git",
@@ -29,5 +31,10 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-foundry": "^1.0.1",
     "hardhat": "^2.14.0"
+  },
+  "dependencies": {
+    "@safe-global/api-kit": "^2.4.6",
+    "@safe-global/protocol-kit": "^4.1.1",
+    "@safe-global/safe-core-sdk-types": "^5.1.0"
   }
 }
