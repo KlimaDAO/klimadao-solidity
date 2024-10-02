@@ -72,15 +72,15 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
         addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
 
-        // need to save these
-        console2.log("usdcInitCalldata");
-        console2.logBytes(usdcInitCalldata);
-        console2.log("init address");
-        console2.log(address(nativeUSDCInitF));
-        console2.log("diamondCutCalldata");
-        console2.logBytes(diamondCutCalldata);
-        console2.log("addNewRetireCarbonmarkFacetCalldata");
-        console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
+        // // need to save these
+        // console2.log("usdcInitCalldata");
+        // console2.logBytes(usdcInitCalldata);
+        // console2.log("init address");
+        // console2.log(address(nativeUSDCInitF));
+        // console2.log("diamondCutCalldata");
+        // console2.logBytes(diamondCutCalldata);
+        // console2.log("addNewRetireCarbonmarkFacetCalldata");
+        // console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
 
 
 

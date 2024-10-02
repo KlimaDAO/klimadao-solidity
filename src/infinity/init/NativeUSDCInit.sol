@@ -11,20 +11,6 @@ contract NativeUSDCInit {
     AppStorage internal s;
     function init() external {
 
-
-        // // C3SushiInit
-        // Duplicate from DiamondInit
-        // // Default UBO Swap setup
-        // s.swap[C.ubo()][C.usdc_bridged()].swapDexes = [0];
-        // s.swap[C.ubo()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
-        // s.swap[C.ubo()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima(), C.ubo()];
-
-        // // Default NBO Swap setup
-        // s.swap[C.nbo()][C.usdc_bridged()].swapDexes = [0];
-        // s.swap[C.nbo()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
-        // s.swap[C.nbo()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima(), C.nbo()];
-        
-
         //Diamond Init
 
         /* Default BCT Swap setup */
