@@ -16,6 +16,18 @@ import {console2} from "forge-std/console2.sol";
 import "../test/infinity/HelperContract.sol";
 contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
+    RetireCarbonmarkFacet public retireCarbonmarkF;
+    NativeUSDCInit public nativeUSDCInitF;
+    IDiamondCut.FacetCut[] public cuts;
+
+    bytes public usdcInitCalldata;
+    bytes public diamondCutCalldata;
+    bytes public addNewRetireCarbonmarkFacetCalldata;
+
+    function getCuts() public view returns (IDiamondCut.FacetCut[] memory) {
+        return cuts;
+    }
+
     function run() external {
         //read env variables and choose EOA for transaction signing
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -25,11 +37,11 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         vm.startBroadcast(deployerPrivateKey);
 
         //deploy updated facets and init contract
-        RetireCarbonmarkFacet retireCarbonmarkF = new RetireCarbonmarkFacet();
+        retireCarbonmarkF = new RetireCarbonmarkFacet();
         // updated init contracts
-        NativeUSDCInit nativeUSDCInitF = new NativeUSDCInit();
+        nativeUSDCInitF = new NativeUSDCInit();
 
-        // FacetCut array which contains the three standard facets to be added
+        // FacetCut array which contains the standard facet to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
 
         // Klima Infinity specific facets
@@ -41,22 +53,24 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
             })
         );
 
+        cuts.push(cut[0]);
+        
         vm.stopBroadcast();
 
         // usdc init calldata
-        bytes memory usdcInitCalldata = abi.encodeWithSignature("init()"); 
+        usdcInitCalldata = abi.encodeWithSignature("init()"); 
 
         // update diamond paths with native usdc init
         // IDiamondCut(address(diamond)).diamondCut([], address(nativeUSDCInitF), abi.encodeWithSignature("init()"));
 
         // dont need selectors for diamond correct as we're just hitting the fallback anyway?
 
-        bytes memory diamondCutCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, new IDiamondCut.FacetCut[](0), address(nativeUSDCInitF), usdcInitCalldata);
+        diamondCutCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, new IDiamondCut.FacetCut[](0), address(nativeUSDCInitF), usdcInitCalldata);
 
         // upgrade without init for updated retireCarbonmarkListing implementation
         // IDiamondCut(diamond).diamondCut(cut, address(0), "");
 
-        bytes memory addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
+        addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
 
         // need to save these
         console2.log("usdcInitCalldata");

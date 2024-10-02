@@ -10,7 +10,8 @@
     "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
     "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi",
     "upgrade-infinity-for-native-usdc": "forge script script/upgradeInfinityForNativeUsdc.sol --fork-url http://localhost:8545 --broadcast --ffi",
-    "propose-txn": "bun offchainScripts/proposeTransaction.ts"
+    "propose-txn": "bun offchainScripts/proposeTransaction.ts",
+    "test:upgrade-native-usdc": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-contract UpgradeInfinityForNativeUsdcTest --summary"
   },
   "repository": {
     "type": "git",
