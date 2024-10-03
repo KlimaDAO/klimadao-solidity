@@ -7,6 +7,8 @@ pragma solidity ^0.8.0;
  */
 
 import "../C.sol";
+import "../AppStorage.sol";
+import "../libraries/LibAppStorage.sol";
 
 contract ConstantsGetter {
     function toucanCert() external pure returns (address) {
@@ -107,5 +109,15 @@ contract ConstantsGetter {
 
     function coorestCCO2Token() external pure returns (address) {
         return C.coorestCCO2Token();
+    }
+
+    function getSwapInfo(address poolToken, address sourceToken) external view returns (uint8[] memory swapDexes, address[] memory ammRouters, address[] memory swapPath) {
+        AppStorage storage s = LibAppStorage.diamondStorage();
+
+        Storage.DefaultSwap storage defaultSwap = s.swap[poolToken][sourceToken];
+        swapDexes = defaultSwap.swapDexes;
+        ammRouters = defaultSwap.ammRouters;
+        swapPath = defaultSwap.swapPaths[0];
+        return (swapDexes, ammRouters, swapPath);
     }
 }

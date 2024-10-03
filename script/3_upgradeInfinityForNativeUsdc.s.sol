@@ -21,7 +21,7 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
     IDiamondCut.FacetCut[] public cuts;
 
     bytes public usdcInitCalldata;
-    bytes public diamondCutCalldata;
+    bytes public updateSwapPathsCalldata;
     bytes public addNewRetireCarbonmarkFacetCalldata;
 
     function getCuts() public view returns (IDiamondCut.FacetCut[] memory) {
@@ -63,9 +63,7 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         // update diamond paths with native usdc init
         // IDiamondCut(address(diamond)).diamondCut([], address(nativeUSDCInitF), abi.encodeWithSignature("init()"));
 
-        // dont need selectors for diamond correct as we're just hitting the fallback anyway?
-
-        diamondCutCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, new IDiamondCut.FacetCut[](0), address(nativeUSDCInitF), usdcInitCalldata);
+        updateSwapPathsCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, new IDiamondCut.FacetCut[](0), address(nativeUSDCInitF), usdcInitCalldata);
 
         // upgrade without init for updated retireCarbonmarkListing implementation
         // IDiamondCut(diamond).diamondCut(cut, address(0), "");
