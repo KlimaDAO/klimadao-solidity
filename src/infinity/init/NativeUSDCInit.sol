@@ -11,8 +11,6 @@ contract NativeUSDCInit {
     AppStorage internal s;
     function init() external {
 
-        //Diamond Init
-
         /* Default BCT Swap setup */
         s.swap[C.bct()][C.usdc_bridged()].swapDexes = [0];
         s.swap[C.bct()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
@@ -40,9 +38,6 @@ contract NativeUSDCInit {
         s.swap[C.nbo()][C.usdc_bridged()].ammRouters = [C.sushiRouter(), C.sushiTridentRouter()];
         s.swap[C.nbo()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima()];
         s.swap[C.nbo()][C.usdc_bridged()].swapPaths[1] = [C.klima(), C.nbo()];
-
-
-        // DiamonInitCoorest
 
         /* Default Coorest CCO2 Swap Setup */
         s.swap[C.coorestCCO2Token()][C.usdc_bridged()].swapDexes = [0];
