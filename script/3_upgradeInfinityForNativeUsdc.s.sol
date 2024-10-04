@@ -34,13 +34,17 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // deploy updated facet
+        // Deploy updated Retire CM Facet
         retireCarbonmarkF = new RetireCarbonmarkFacet();
 
-        // updated init contracts
+        // Deployed swap routes update init contract
         nativeUSDCInitF = new NativeUSDCInit();
 
         vm.stopBroadcast();
+
+        // Given, all the following updates to the Klima Infinity will be 
+        // processed by a multiple, when we generate the calldata that will 
+        // be plugged to the safeSDK to propose multi-sign txn. 
 
         // FacetCut array which contains the standard facet to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
