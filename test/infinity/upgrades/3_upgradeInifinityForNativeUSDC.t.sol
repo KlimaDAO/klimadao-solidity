@@ -17,8 +17,9 @@ import {ICarbonmark} from "../../../src/infinity/interfaces/ICarbonmark.sol";
 import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
 import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
 import {TestHelper} from "../TestHelper.sol";
+import {ListingsHelper} from "../../helpers/Listings.sol";
 
-contract UpgradeInfinityForNativeUsdcTest is TestHelper {
+contract UpgradeInfinityForNativeUsdcTest is TestHelper, ListingsHelper {
     UpgradeInfinityForNativeUsdc upgradeScript;
     address diamond;
     address carbonmark;
@@ -29,11 +30,10 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
     address payable INFINITY_ADDRESS;
     address multisig;
 
-    address eoa = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
-    address VCS_1190_2018 = address(0x64de5C0A430B2b15c6a3A7566c3930e1cF9b22DF);
+    // address eoa = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
+    // address VCS_1190_2018 = address(0x64de5C0A430B2b15c6a3A7566c3930e1cF9b22DF);
 
-    address seller = address(0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
-    address buyer = address(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC);
+    // address seller = address(0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
 
     ConstantsGetter constantsFacet;
 
@@ -255,31 +255,15 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
         vm.startPrank(seller);
         IERC20(VCS_1190_2018).approve(address(INFINITY_ADDRESS), 100e18);
         IERC20(VCS_1190_2018).approve(address(carbonmark), 100e18);
+
         // create a carbonmark listing
         bytes32 carbonmarkListingId =
-            ICarbonmark(carbonmark).createListing(VCS_1190_2018, amount, unitPrice, minFillAmount, deadline);
+            createCarbonmarkListing(carbonmark, INFINITY_ADDRESS, amount, unitPrice, minFillAmount, deadline);
         vm.stopPrank();
 
-        ICarbonmark.CreditListing memory listing = ICarbonmark.CreditListing({
-            id: carbonmarkListingId,
-            account: ICarbonmark(carbonmark).getListingOwner(carbonmarkListingId),
-            token: VCS_1190_2018,
-            tokenId: 0,
-            remainingAmount: ICarbonmark(carbonmark).getRemainingAmount(carbonmarkListingId),
-            unitPrice: unitPrice
-        });
-
-        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
-            retiringAddress: buyer,
-            retiringEntityString: "Test Retiring Entity",
-            beneficiaryAddress: buyer,
-            beneficiaryString: "Test Beneficiary",
-            retirementMessage: "Test Retirement Message",
-            beneficiaryLocation: "United States",
-            consumptionCountryCode: "US",
-            consumptionPeriodStart: block.timestamp,
-            consumptionPeriodEnd: block.timestamp + 1 days
-        });
+        ICarbonmark.CreditListing memory listingStruct =
+            getCarbonmarkListingStruct(carbonmark, carbonmarkListingId, amount, unitPrice);
+        LibRetire.RetireDetails memory retirementDetails = getRetirementDetails(buyer);
 
         // ensure only native USDC is available
         deal(C.usdc(), buyer, 100e6);
@@ -293,7 +277,7 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
         vm.startPrank(buyer);
         IERC20(C.usdc()).approve(address(INFINITY_ADDRESS), 100e6);
         RetireCarbonmarkFacet(INFINITY_ADDRESS).retireCarbonmarkListing(
-            listing, maxAmountIn, amount, details, LibTransfer.From.EXTERNAL
+            listingStruct, maxAmountIn, amount, retirementDetails, LibTransfer.From.EXTERNAL
         );
         vm.stopPrank();
 
@@ -326,33 +310,16 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
         vm.startPrank(seller);
         IERC20(VCS_1190_2018).approve(address(INFINITY_ADDRESS), 100e18);
         IERC20(VCS_1190_2018).approve(address(carbonmark), 100e18);
+
         // create a carbonmark listing
         bytes32 carbonmarkListingId =
-            ICarbonmark(carbonmark).createListing(VCS_1190_2018, amount, unitPrice, minFillAmount, deadline);
+            createCarbonmarkListing(carbonmark, INFINITY_ADDRESS, amount, unitPrice, minFillAmount, deadline);
         vm.stopPrank();
 
-        ICarbonmark.CreditListing memory listing = ICarbonmark.CreditListing({
-            id: carbonmarkListingId,
-            account: ICarbonmark(carbonmark).getListingOwner(carbonmarkListingId),
-            token: VCS_1190_2018,
-            tokenId: 0,
-            remainingAmount: ICarbonmark(carbonmark).getRemainingAmount(carbonmarkListingId),
-            unitPrice: unitPrice
-        });
-
-        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
-            retiringAddress: buyer,
-            retiringEntityString: "Test Retiring Entity",
-            beneficiaryAddress: buyer,
-            beneficiaryString: "Test Beneficiary",
-            retirementMessage: "Test Retirement Message",
-            beneficiaryLocation: "United States",
-            consumptionCountryCode: "US",
-            consumptionPeriodStart: block.timestamp,
-            consumptionPeriodEnd: block.timestamp + 1 days
-        });
-
-        // ensure only native USDC is available
+        ICarbonmark.CreditListing memory listingStruct =
+            getCarbonmarkListingStruct(carbonmark, carbonmarkListingId, amount, unitPrice);
+        LibRetire.RetireDetails memory retirementDetails = getRetirementDetails(buyer);
+        // ensure only bridged USDC is available
         deal(C.usdc(), buyer, 0);
         deal(C.usdc_bridged(), buyer, 100e6);
 
@@ -364,7 +331,7 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
         vm.startPrank(buyer);
         IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), 100e6);
         RetireCarbonmarkFacet(INFINITY_ADDRESS).retireCarbonmarkListing(
-            listing, maxAmountIn, amount, details, LibTransfer.From.EXTERNAL
+            listingStruct, maxAmountIn, amount, retirementDetails, LibTransfer.From.EXTERNAL
         );
         vm.stopPrank();
 
@@ -374,5 +341,16 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
             100e6 - maxAmountIn,
             "Buyer should have balance minus maxAmountIn of native USDC"
         );
+    }
+
+    function testRetireCarbonmarkFacetListing_notEnoughBalanceOfEitherUSDC() public {
+        upgradeScript.run();
+
+        IDiamondCut.FacetCut[] memory cut = upgradeScript.getCuts();
+
+        vm.prank(multisig);
+        IDiamondCut(INFINITY_ADDRESS).diamondCut(cut, address(0), "");
+        
+        
     }
 }
