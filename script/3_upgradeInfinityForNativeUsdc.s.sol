@@ -42,9 +42,9 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
         vm.stopBroadcast();
 
-        // Given, all the following updates to the Klima Infinity will be 
-        // processed by a multiple, when we generate the calldata that will 
-        // be plugged to the safeSDK to propose multi-sign txn. 
+        // Given, all the following updates to the Klima Infinity will be
+        // processed by a multiple, when we generate the calldata that will
+        // be plugged to the safeSDK to propose multi-sign txn.
 
         // FacetCut array which contains the standard facet to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
@@ -64,11 +64,11 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
             IDiamondCut.diamondCut.selector,
             new IDiamondCut.FacetCut[](0),
             address(nativeUSDCInitF),
-            usdcInitCalldataabi.encodeWithSignature("init()")
+            abi.encodeWithSignature("init()")
         );
 
         console2.log("Update Swap Paths Call Data");
-        console2.log(updateSwapPathsCalldata);
+        console2.logBytes(updateSwapPathsCalldata);
 
         addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(
             IDiamondCut.diamondCut.selector,
@@ -78,6 +78,59 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         );
 
         console2.log("Updated Retire Carbonmark Facet Call Data");
-        console2.log(addNewRetireCarbonmarkFacetCalldata);
+        console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
+    }
+
+    function run_test() external {
+        address owner = vm.envAddress("INFINITY_OWNER_ADDRESS");
+        address diamond = vm.envAddress("INFINITY_ADDRESS");
+
+        // Deploy updated Retire CM Facet
+        retireCarbonmarkF = new RetireCarbonmarkFacet();
+
+        // Deployed swap routes update init contract
+        nativeUSDCInitF = new NativeUSDCInit();
+
+        // Given, all the following updates to the Klima Infinity will be
+        // processed by a multiple, when we generate the calldata that will
+        // be plugged to the safeSDK to propose multi-sign txn.
+
+        // FacetCut array which contains the standard facet to be added
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
+
+        // Klima Infinity specific facets
+        cut[0] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(retireCarbonmarkF),
+                action: IDiamondCut.FacetCutAction.Replace,
+                functionSelectors: generateSelectors("RetireCarbonmarkFacet")
+            })
+        );
+
+        cuts.push(cut[0]);
+
+        updateSwapPathsCalldata = abi.encodeWithSelector(
+            IDiamondCut.diamondCut.selector,
+            new IDiamondCut.FacetCut[](0),
+            address(nativeUSDCInitF),
+            abi.encodeWithSignature("init()")
+        );
+
+        address(diamond).call(updateSwapPathsCalldata);
+
+        console2.log("Update Swap Paths Call Data");
+        console2.logBytes(updateSwapPathsCalldata);
+
+        addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(
+            IDiamondCut.diamondCut.selector,
+            cut,
+            address(0),
+            ""
+        );
+
+        console2.log("Updated Retire Carbonmark Facet Call Data");
+        console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
+
+        address(diamond).call(addNewRetireCarbonmarkFacetCalldata);
     }
 }
