@@ -19,9 +19,9 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
     NativeUSDCInit public nativeUSDCInitF;
     IDiamondCut.FacetCut[] public cuts;
 
-    bytes public usdcInitCalldata;
     bytes public updateSwapPathsCalldata;
     bytes public addNewRetireCarbonmarkFacetCalldata;
+    bytes public usdcInitCalldata;
 
     function getCuts() public view returns (IDiamondCut.FacetCut[] memory) {
         return cuts;
@@ -64,11 +64,11 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
             IDiamondCut.diamondCut.selector,
             new IDiamondCut.FacetCut[](0),
             address(nativeUSDCInitF),
-            usdcInitCalldataabi.encodeWithSignature("init()")
+            abi.encodeWithSignature("init()")
         );
 
         console2.log("Update Swap Paths Call Data");
-        console2.log(updateSwapPathsCalldata);
+        console2.logBytes(updateSwapPathsCalldata);
 
         addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(
             IDiamondCut.diamondCut.selector,
@@ -78,6 +78,6 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         );
 
         console2.log("Updated Retire Carbonmark Facet Call Data");
-        console2.log(addNewRetireCarbonmarkFacetCalldata);
+        console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
     }
 }
