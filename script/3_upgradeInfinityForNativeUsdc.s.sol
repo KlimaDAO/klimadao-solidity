@@ -10,12 +10,11 @@ import "../src/infinity/facets/DiamondLoupeFacet.sol";
 import {RetireCarbonmarkFacet} from "../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
 import {NativeUSDCInit} from "../src/infinity/init/NativeUSDCInit.sol";
 
-
 import {console2} from "forge-std/console2.sol";
 
 import "../test/infinity/HelperContract.sol";
-contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
+contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
     RetireCarbonmarkFacet public retireCarbonmarkF;
     NativeUSDCInit public nativeUSDCInitF;
     IDiamondCut.FacetCut[] public cuts;
@@ -33,13 +32,15 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address diamond = vm.envAddress("INFINITY_ADDRESS");
 
-
         vm.startBroadcast(deployerPrivateKey);
 
         // deploy updated facet
         retireCarbonmarkF = new RetireCarbonmarkFacet();
+
         // updated init contracts
         nativeUSDCInitF = new NativeUSDCInit();
+
+        vm.stopBroadcast();
 
         // FacetCut array which contains the standard facet to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
@@ -54,33 +55,25 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         );
 
         cuts.push(cut[0]);
-        
-        vm.stopBroadcast();
 
-        // usdc init calldata
-        usdcInitCalldata = abi.encodeWithSignature("init()"); 
+        updateSwapPathsCalldata = abi.encodeWithSelector(
+            IDiamondCut.diamondCut.selector,
+            new IDiamondCut.FacetCut[](0),
+            address(nativeUSDCInitF),
+            usdcInitCalldataabi.encodeWithSignature("init()")
+        );
 
-        // update diamond paths with native usdc init
-        // IDiamondCut(address(diamond)).diamondCut([], address(nativeUSDCInitF), abi.encodeWithSignature("init()"));
+        console2.log("Update Swap Paths Call Data");
+        console2.log(updateSwapPathsCalldata);
 
-        updateSwapPathsCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, new IDiamondCut.FacetCut[](0), address(nativeUSDCInitF), usdcInitCalldata);
+        addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(
+            IDiamondCut.diamondCut.selector,
+            cut,
+            address(0),
+            ""
+        );
 
-        // upgrade without init for updated retireCarbonmarkListing implementation
-        // IDiamondCut(diamond).diamondCut(cut, address(0), "");
-
-        addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
-
-        // // need to save these
-        // console2.log("usdcInitCalldata");
-        // console2.logBytes(usdcInitCalldata);
-        // console2.log("init address");
-        // console2.log(address(nativeUSDCInitF));
-        // console2.log("diamondCutCalldata");
-        // console2.logBytes(diamondCutCalldata);
-        // console2.log("addNewRetireCarbonmarkFacetCalldata");
-        // console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
-
-
-
+        console2.log("Updated Retire Carbonmark Facet Call Data");
+        console2.log(addNewRetireCarbonmarkFacetCalldata);
     }
 }
