@@ -36,7 +36,7 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        //deploy updated facets and init contract
+        // deploy updated facet
         retireCarbonmarkF = new RetireCarbonmarkFacet();
         // updated init contracts
         nativeUSDCInitF = new NativeUSDCInit();

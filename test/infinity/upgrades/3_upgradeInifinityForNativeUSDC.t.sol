@@ -13,7 +13,9 @@ import {C} from "../../../src/infinity/C.sol";
 import {LibDiamond} from "../../../src/infinity/libraries/LibDiamond.sol";
 import {OwnershipFacet} from "../../../src/infinity/facets/OwnershipFacet.sol";
 import {ConstantsGetter} from "../../../src/infinity/mocks/ConstantsGetter.sol";
-
+import {ICarbonmark} from "../../../src/infinity/interfaces/ICarbonmark.sol";
+import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
+import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
 import {TestHelper} from "../TestHelper.sol";
 
 contract UpgradeInfinityForNativeUsdcTest is TestHelper {
@@ -21,9 +23,16 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
     address mockDiamond;
     uint256 deployerPrivateKey;
     uint256 polygonFork;
+
+    // set by env
     address payable INFINITY_ADDRESS;
-    address multisig = address(0x843dE2e99449834cd6C6456Bd35894d0B157B947);
+    address multisig;
+    // testin
     address eoa = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
+    address VCS_1190_2018 = address(0x64de5C0A430B2b15c6a3A7566c3930e1cF9b22DF);
+
+    address seller = address(0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
+    address buyer = address(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC);
 
     ConstantsGetter constantsFacet;
 
@@ -154,6 +163,7 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
 
         // Set up environment variables
         INFINITY_ADDRESS = payable(vm.envAddress("INFINITY_ADDRESS"));
+        multisig = vm.envAddress("CONTRACT_MULTISIG");
 
         addConstantsGetter(INFINITY_ADDRESS);
         constantsFacet = ConstantsGetter(INFINITY_ADDRESS);
@@ -229,6 +239,9 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
     function testUpdatedRetireCarbonmarkFacet() public {
         upgradeScript.run();
 
+        DiamondLoupeFacet loupe = DiamondLoupeFacet(INFINITY_ADDRESS);
+        address oldFacetAddress = loupe.facetAddress(RetireCarbonmarkFacet.retireCarbonmarkListing.selector);
+
         address owner = setEOAOwner();
 
         bytes memory addNewRetireCarbonmarkFacetCalldata = upgradeScript.addNewRetireCarbonmarkFacetCalldata();
@@ -237,6 +250,12 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
         IDiamondCut.FacetCut[] memory cut = upgradeScript.getCuts();
         IDiamondCut(INFINITY_ADDRESS).diamondCut(cut, address(0), "");
         vm.stopPrank();
+
+        // Get the facet address after update
+        address newFacetAddress = loupe.facetAddress(RetireCarbonmarkFacet.retireCarbonmarkListing.selector);
+
+        // Verify that the facet address is different
+        assertNotEq(oldFacetAddress, newFacetAddress, "Facet address should have changed");
 
         verifyUpdatedRetireCarbonmarkFacet();
     }
@@ -253,25 +272,69 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper {
         assertTrue(success, "Add new RetireCarbonmarkFacet failed");
         vm.stopPrank();
 
-        verifyUpdatedetireCarbonmarkFacet();
+        verifyUpdatedRetireCarbonmarkFacet();
     }
 
     function testRetireCarbonmarkFacetListingWithNativeUSDC() public {
         upgradeScript.run();
 
+        IDiamondCut.FacetCut[] memory cut = upgradeScript.getCuts();
+
+        address carbonmark = constantsFacet.carbonmark();
+
         address owner = setEOAOwner();
 
-        bytes memory addNewRetireCarbonmarkFacetCalldata = upgradeScript.addNewRetireCarbonmarkFacetCalldata();
-
-        vm.startPrank(owner);
-        IDiamondCut.FacetCut[] memory cut = upgradeScript.getCuts();
+        vm.prank(owner);
         IDiamondCut(INFINITY_ADDRESS).diamondCut(cut, address(0), "");
-        vm.stopPrank();
 
         verifyUpdatedRetireCarbonmarkFacet();
 
-        // retire carbonmark
-        RetireCarbonmarkFacet retireCarbonmarkFacet = RetireCarbonmarkFacet(INFINITY_ADDRESS);
-        retireCarbonmarkFacet.retireCarbonmarkListing(C.bct(), 100);
+        uint256 amount = 15e18;
+        uint256 unitPrice = 1e6;
+        uint256 minFillAmount = 1e18;
+        uint256 deadline = block.timestamp + 100 days;
+
+        vm.deal(seller, 1 ether);
+        deal(VCS_1190_2018, seller, 100e18);
+
+        vm.startPrank(seller);
+        IERC20(VCS_1190_2018).approve(address(INFINITY_ADDRESS), 100e18);
+        IERC20(VCS_1190_2018).approve(address(carbonmark), 100e18);
+        bytes32 carbonmarkListingId =
+            ICarbonmark(carbonmark).createListing(VCS_1190_2018, amount, unitPrice, minFillAmount, deadline);
+        vm.stopPrank();
+
+        ICarbonmark.CreditListing memory listing = ICarbonmark.CreditListing({
+            id: carbonmarkListingId,
+            account: ICarbonmark(carbonmark).getListingOwner(carbonmarkListingId),
+            token: VCS_1190_2018,
+            tokenId: 0,
+            remainingAmount: ICarbonmark(carbonmark).getRemainingAmount(carbonmarkListingId),
+            unitPrice: unitPrice
+        });
+
+        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
+            retiringAddress: buyer,
+            retiringEntityString: "Test Retiring Entity",
+            beneficiaryAddress: buyer,
+            beneficiaryString: "Test Beneficiary",
+            retirementMessage: "Test Retirement Message",
+            beneficiaryLocation: "United States",
+            consumptionCountryCode: "US",
+            consumptionPeriodStart: block.timestamp,
+            consumptionPeriodEnd: block.timestamp + 1 days
+        });
+
+        deal(C.usdc(), buyer, 1000e6);
+        deal(C.usdc_bridged(), buyer, 0);
+
+        uint256 maxAmountIn = (amount * unitPrice) / 1e18;
+
+        vm.startPrank(buyer);
+        IERC20(C.usdc()).approve(address(INFINITY_ADDRESS), 1000e6);
+        RetireCarbonmarkFacet(INFINITY_ADDRESS).retireCarbonmarkListing(
+            listing, 1_000_000_000, amount, details, LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
     }
 }
