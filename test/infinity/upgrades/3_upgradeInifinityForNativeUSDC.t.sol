@@ -81,23 +81,19 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper, ListingsHelper {
 
         // Test UBO swap path
         (swapDexes, ammRouters, swapPath) = constantsFacet.getSwapInfo(C.ubo(), C.usdc_bridged());
-        assertEq(swapDexes.length, 2, "Incorrect number of swap dexes for UBO");
+        assertEq(swapDexes.length, 1, "Incorrect number of swap dexes for UBO");
         assertEq(swapDexes[0], 0, "Incorrect swap dex for UBO");
-        assertEq(swapDexes[1], 1, "Incorrect swap dex for UBO");
-        assertEq(ammRouters.length, 2, "Incorrect number of AMM routers for UBO");
+        assertEq(ammRouters.length, 1, "Incorrect number of AMM routers for UBO");
         assertEq(ammRouters[0], C.sushiRouter(), "Incorrect AMM router for UBO");
-        assertEq(ammRouters[1], C.sushiTridentRouter(), "Incorrect AMM router for UBO");
-        assertEq(swapPath.length, 2, "Incorrect number of addresses in swap path for UBO");
+        assertEq(swapPath.length, 3, "Incorrect number of addresses in swap path for UBO");
 
         // Test NBO swap path
         (swapDexes, ammRouters, swapPath) = constantsFacet.getSwapInfo(C.nbo(), C.usdc_bridged());
-        assertEq(swapDexes.length, 2, "Incorrect number of swap dexes for NBO");
+        assertEq(swapDexes.length, 1, "Incorrect number of swap dexes for NBO");
         assertEq(swapDexes[0], 0, "Incorrect swap dex for NBO");
-        assertEq(swapDexes[1], 1, "Incorrect swap dex for NBO");
-        assertEq(ammRouters.length, 2, "Incorrect number of AMM routers for NBO");
+        assertEq(ammRouters.length, 1, "Incorrect number of AMM routers for NBO");
         assertEq(ammRouters[0], C.sushiRouter(), "Incorrect AMM router for NBO");
-        assertEq(ammRouters[1], C.sushiTridentRouter(), "Incorrect AMM router for NBO");
-        assertEq(swapPath.length, 2, "Incorrect number of addresses in swap path for NBO");
+        assertEq(swapPath.length, 3, "Incorrect number of addresses in swap path for NBO");
 
         // Test Coorest CCO2 swap path
         (swapDexes, ammRouters, swapPath) = constantsFacet.getSwapInfo(C.coorestCCO2Token(), C.usdc_bridged());
