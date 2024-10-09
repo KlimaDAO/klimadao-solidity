@@ -14,7 +14,7 @@ const RETIREMENT_AGGREGATOR = process.env.RETIREMENT_AGGREGATOR;
 
 // Sepolia for testing
 const apiKit = new SafeApiKit({
-  chainId: 11155111n,
+  chainId: 137n,
 });
 
 if (
