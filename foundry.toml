@@ -28,3 +28,6 @@ tab_width = 4
 
 [doc]
 book = "book.toml"
+
+[etherscan]
+polygon = { key = "${POLYGONSCAN_API_KEY}" }

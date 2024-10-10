@@ -67,7 +67,10 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
             abi.encodeWithSignature("init()")
         );
 
-        console2.log("Update Swap Paths Call Data");
+        console2.log("New nativeUSDCInitF address");
+        console2.logAddress(address(nativeUSDCInitF));
+
+        console2.log("Update Swap Paths Calldata");
         console2.logBytes(updateSwapPathsCalldata);
 
         addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(
@@ -77,7 +80,10 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
             ""
         );
 
-        console2.log("Updated Retire Carbonmark Facet Call Data");
+        console2.log("New retireCarbonmarkF address");
+        console2.logAddress(address(retireCarbonmarkF));
+
+        console2.log("Updated Retire Carbonmark Facet Calldata");
         console2.logBytes(addNewRetireCarbonmarkFacetCalldata);
     }
 }
