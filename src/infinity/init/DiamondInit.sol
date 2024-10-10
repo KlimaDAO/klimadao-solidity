@@ -68,38 +68,38 @@ contract DiamondInit {
         s.fee = 1000;
 
         // Default BCT Swap setup
-        s.swap[C.bct()][C.usdc()].swapDexes = [0];
-        s.swap[C.bct()][C.usdc()].ammRouters = [C.sushiRouter()];
-        s.swap[C.bct()][C.usdc()].swapPaths[0] = [C.usdc(), C.klima(), C.bct()];
+        s.swap[C.bct()][C.usdc_bridged()].swapDexes = [0];
+        s.swap[C.bct()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
+        s.swap[C.bct()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima(), C.bct()];
 
         s.swap[C.bct()][C.klima()].swapDexes = [0];
         s.swap[C.bct()][C.klima()].ammRouters = [C.sushiRouter()];
         s.swap[C.bct()][C.klima()].swapPaths[0] = [C.klima(), C.bct()];
 
         // Default NCT Swap setup
-        s.swap[C.nct()][C.usdc()].swapDexes = [0];
-        s.swap[C.nct()][C.usdc()].ammRouters = [C.sushiRouter()];
-        s.swap[C.nct()][C.usdc()].swapPaths[0] = [C.usdc(), C.nct()];
+        s.swap[C.nct()][C.usdc_bridged()].swapDexes = [0];
+        s.swap[C.nct()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
+        s.swap[C.nct()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.nct()];
 
         s.swap[C.nct()][C.klima()].swapDexes = [0];
         s.swap[C.nct()][C.klima()].ammRouters = [C.sushiRouter()];
         s.swap[C.nct()][C.klima()].swapPaths[0] = [C.klima(), C.nct()];
 
         // Default MCO2 Swap setup
-        s.swap[C.mco2()][C.usdc()].swapDexes = [0, 0];
-        s.swap[C.mco2()][C.usdc()].ammRouters = [C.sushiRouter(), C.quickswapRouter()];
-        s.swap[C.mco2()][C.usdc()].swapPaths[0] = [C.usdc(), C.klima()];
-        s.swap[C.mco2()][C.usdc()].swapPaths[1] = [C.klima(), C.mco2()];
+        s.swap[C.mco2()][C.usdc_bridged()].swapDexes = [0, 0];
+        s.swap[C.mco2()][C.usdc_bridged()].ammRouters = [C.sushiRouter(), C.quickswapRouter()];
+        s.swap[C.mco2()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima()];
+        s.swap[C.mco2()][C.usdc_bridged()].swapPaths[1] = [C.klima(), C.mco2()];
 
         s.swap[C.mco2()][C.klima()].swapDexes = [0];
         s.swap[C.mco2()][C.klima()].ammRouters = [C.quickswapRouter()];
         s.swap[C.mco2()][C.klima()].swapPaths[0] = [C.klima(), C.mco2()];
 
         // Default UBO Swap setup
-        s.swap[C.ubo()][C.usdc()].swapDexes = [0, 1];
-        s.swap[C.ubo()][C.usdc()].ammRouters = [C.sushiRouter(), C.sushiTridentRouter()];
-        s.swap[C.ubo()][C.usdc()].swapPaths[0] = [C.usdc(), C.klima()];
-        s.swap[C.ubo()][C.usdc()].swapPaths[1] = [C.klima(), C.ubo()];
+        s.swap[C.ubo()][C.usdc_bridged()].swapDexes = [0, 1];
+        s.swap[C.ubo()][C.usdc_bridged()].ammRouters = [C.sushiRouter(), C.sushiTridentRouter()];
+        s.swap[C.ubo()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima()];
+        s.swap[C.ubo()][C.usdc_bridged()].swapPaths[1] = [C.klima(), C.ubo()];
 
         s.swap[C.ubo()][C.klima()].swapDexes = [1];
         s.swap[C.ubo()][C.klima()].ammRouters = [C.sushiTridentRouter()];
@@ -108,10 +108,10 @@ contract DiamondInit {
         s.tridentPool[C.klima()][C.ubo()] = 0x5400A05B8B45EaF9105315B4F2e31F806AB706dE;
 
         // Default NBO Swap setup
-        s.swap[C.nbo()][C.usdc()].swapDexes = [0, 1];
-        s.swap[C.nbo()][C.usdc()].ammRouters = [C.sushiRouter(), C.sushiTridentRouter()];
-        s.swap[C.nbo()][C.usdc()].swapPaths[0] = [C.usdc(), C.klima()];
-        s.swap[C.nbo()][C.usdc()].swapPaths[1] = [C.klima(), C.nbo()];
+        s.swap[C.nbo()][C.usdc_bridged()].swapDexes = [0, 1];
+        s.swap[C.nbo()][C.usdc_bridged()].ammRouters = [C.sushiRouter(), C.sushiTridentRouter()];
+        s.swap[C.nbo()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima()];
+        s.swap[C.nbo()][C.usdc_bridged()].swapPaths[1] = [C.klima(), C.nbo()];
 
         s.swap[C.nbo()][C.klima()].swapDexes = [1];
         s.swap[C.nbo()][C.klima()].ammRouters = [C.sushiTridentRouter()];

@@ -1,5 +1,5 @@
 # Address
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 
 ## Functions
@@ -30,7 +30,7 @@ function isContract(address account) internal view returns (bool);
 https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
 of certain opcodes, possibly making contracts go over the 2300 gas limit
 imposed by `transfer`, making them unable to receive funds via
-`transfer`. {sendValue} removes this limitation.
+`transfer`. [sendValue](/src/protocol/tokens/regular/sKlimaToken_v2.sol/library.Address.md#sendvalue) removes this limitation.
 https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
 IMPORTANT: because control is transferred to `recipient`, care must be
 taken to not create reentrancy vulnerabilities. Consider using
@@ -63,7 +63,7 @@ function functionCall(address target, bytes memory data) internal returns (bytes
 
 ### functionCall
 
-*Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+*Same as [`functionCall`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncall), but with
 `errorMessage` as a fallback revert reason when `target` reverts.
 _Available since v3.1._*
 
@@ -74,7 +74,7 @@ function functionCall(address target, bytes memory data, string memory errorMess
 
 ### functionCallWithValue
 
-*Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+*Same as [`functionCall`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncall),
 but also transferring `value` wei to `target`.
 Requirements:
 - the calling contract must have an ETH balance of at least `value`.
@@ -88,7 +88,7 @@ function functionCallWithValue(address target, bytes memory data, uint256 value)
 
 ### functionCallWithValue
 
-*Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+*Same as [`functionCallWithValue`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncallwithvalue), but
 with `errorMessage` as a fallback revert reason when `target` reverts.
 _Available since v3.1._*
 
@@ -110,7 +110,7 @@ function _functionCallWithValue(address target, bytes memory data, uint256 weiVa
 
 ### functionStaticCall
 
-*Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+*Same as [`functionCall`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncall),
 but performing a static call.
 _Available since v3.3._*
 
@@ -121,7 +121,7 @@ function functionStaticCall(address target, bytes memory data) internal view ret
 
 ### functionStaticCall
 
-*Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+*Same as [`functionCall`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncall),
 but performing a static call.
 _Available since v3.3._*
 
@@ -135,7 +135,7 @@ function functionStaticCall(address target, bytes memory data, string memory err
 
 ### functionDelegateCall
 
-*Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+*Same as [`functionCall`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncall),
 but performing a delegate call.
 _Available since v3.3._*
 
@@ -146,7 +146,7 @@ function functionDelegateCall(address target, bytes memory data) internal return
 
 ### functionDelegateCall
 
-*Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+*Same as [`functionCall`](/lib/openzeppelin-contracts-upgradeable/contracts/mocks/AddressImplUpgradeable.sol/contract.AddressImplUpgradeable.md#functioncall),
 but performing a delegate call.
 _Available since v3.3._*
 

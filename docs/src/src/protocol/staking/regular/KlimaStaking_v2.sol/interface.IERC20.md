@@ -1,5 +1,5 @@
 # IERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/staking/regular/KlimaStaking_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/staking/regular/KlimaStaking_v2.sol)
 
 
 ## Functions
@@ -32,7 +32,7 @@ function balanceOf(address account) external view returns (uint256);
 
 *Moves `amount` tokens from the caller's account to `recipient`.
 Returns a boolean value indicating whether the operation succeeded.
-Emits a {Transfer} event.*
+Emits a [Transfer](/src/protocol/staking/regular/KlimaStaking_v2.sol/interface.IERC20.md#transfer) event.*
 
 
 ```solidity
@@ -42,7 +42,7 @@ function transfer(address recipient, uint256 amount) external returns (bool);
 ### allowance
 
 *Returns the remaining number of tokens that `spender` will be
-allowed to spend on behalf of `owner` through {transferFrom}. This is
+allowed to spend on behalf of `owner` through [transferFrom](/src/protocol/staking/regular/KlimaStaking_v2.sol/interface.IERC20.md#transferfrom). This is
 zero by default.
 This value changes when {approve} or {transferFrom} are called.*
 
@@ -61,7 +61,7 @@ transaction ordering. One possible solution to mitigate this race
 condition is to first reduce the spender's allowance to 0 and set the
 desired value afterwards:
 https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-Emits an {Approval} event.*
+Emits an [Approval](/src/protocol/staking/regular/KlimaStaking_v2.sol/interface.IERC20.md#approval) event.*
 
 
 ```solidity
@@ -74,7 +74,7 @@ function approve(address spender, uint256 amount) external returns (bool);
 allowance mechanism. `amount` is then deducted from the caller's
 allowance.
 Returns a boolean value indicating whether the operation succeeded.
-Emits a {Transfer} event.*
+Emits a [Transfer](/src/protocol/staking/regular/KlimaStaking_v2.sol/interface.IERC20.md#transfer) event.*
 
 
 ```solidity
@@ -94,7 +94,7 @@ event Transfer(address indexed from, address indexed to, uint256 value);
 
 ### Approval
 *Emitted when the allowance of a `spender` for an `owner` is set by
-a call to {approve}. `value` is the new allowance.*
+a call to [approve](/src/protocol/staking/regular/KlimaStaking_v2.sol/interface.IERC20.md#approve). `value` is the new allowance.*
 
 
 ```solidity

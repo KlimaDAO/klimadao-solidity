@@ -54,7 +54,7 @@ contract retireCarbonFalseToucan is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -66,7 +66,6 @@ contract retireCarbonFalseToucan is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_infinity_v1_retireCarbon_False_BCT_BCT(uint256 retireAmount) public {

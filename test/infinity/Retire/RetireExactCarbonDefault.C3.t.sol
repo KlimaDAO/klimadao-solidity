@@ -49,7 +49,7 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -61,7 +61,6 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_infinity_retireExactCarbonDefault_UBO_UBO(uint256 retireAmount) public {

@@ -43,7 +43,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();

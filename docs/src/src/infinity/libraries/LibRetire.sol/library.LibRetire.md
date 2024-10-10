@@ -1,5 +1,5 @@
 # LibRetire
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/libraries/LibRetire.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/libraries/LibRetire.sol)
 
 **Author:**
 Cujo
@@ -95,6 +95,25 @@ function retireReceivedCreditToken(
 |`beneficiaryAddress`|`address`|  0x address for the beneficiary|
 |`beneficiaryString`|`string`|   String description of the beneficiary|
 |`retirementMessage`|`string`|   String message for this specific retirement|
+
+
+### retireReceivedCreditToken
+
+Retire received carbon based on the bridge of the provided pool tokens using default redemption
+
+
+```solidity
+function retireReceivedCreditToken(address creditToken, uint256 tokenId, uint256 amount, RetireDetails memory details)
+    internal;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`creditToken`|`address`|         Credit token used to retire|
+|`tokenId`|`uint256`|             Token Id for the credit (if applicable)|
+|`amount`|`uint256`|              The amount of carbon to retire|
+|`details`|`RetireDetails`|             Encoded struct of retirement details needed for the retirement|
 
 
 ### retireReceivedCarbonSpecificFromSource
@@ -287,6 +306,10 @@ struct RetireDetails {
     address beneficiaryAddress;
     string beneficiaryString;
     string retirementMessage;
+    string beneficiaryLocation;
+    string consumptionCountryCode;
+    uint256 consumptionPeriodStart;
+    uint256 consumptionPeriodEnd;
 }
 ```
 
@@ -298,7 +321,8 @@ enum CarbonBridge {
     TOUCAN,
     MOSS,
     C3,
-    ICR
+    ICR,
+    COOREST
 }
 ```
 

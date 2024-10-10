@@ -1,5 +1,5 @@
 # ConstantsGetter
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/mocks/ConstantsGetter.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/mocks/ConstantsGetter.sol)
 
 **Author:**
 Cujo
@@ -60,6 +60,13 @@ function sKlima() external pure returns (address);
 
 ```solidity
 function wsKlima() external pure returns (address);
+```
+
+### usdc_bridged
+
+
+```solidity
+function usdc_bridged() external pure returns (address);
 ```
 
 ### usdc
@@ -151,5 +158,26 @@ function klimaRetirementBond() external pure returns (address);
 
 ```solidity
 function carbonmark() external pure returns (address);
+```
+
+### coorestPool
+
+
+```solidity
+function coorestPool() external pure returns (address);
+```
+
+### coorestPoCCToken
+
+
+```solidity
+function coorestPoCCToken() external pure returns (address);
+```
+
+### coorestCCO2Token
+
+
+```solidity
+function coorestCCO2Token() external pure returns (address);
 ```
 

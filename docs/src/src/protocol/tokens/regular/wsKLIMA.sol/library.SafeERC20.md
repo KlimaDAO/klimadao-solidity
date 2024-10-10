@@ -1,5 +1,5 @@
 # SafeERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/wsKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/wsKLIMA.sol)
 
 *Wrappers around ERC20 operations that throw on failure (when the token
 contract returns false). Tokens that return no value (and instead revert or
@@ -27,7 +27,7 @@ function safeTransferFrom(IERC20 token, address from, address to, uint256 value)
 ### safeApprove
 
 *Deprecated. This function has issues similar to the ones found in
-{IERC20-approve}, and its usage is discouraged.
+[IERC20-approve](/src/protocol/tokens/regular/sKlimaToken.sol/interface.IERC20.md#approve), and its usage is discouraged.
 Whenever possible, use {safeIncreaseAllowance} and
 {safeDecreaseAllowance} instead.*
 

@@ -1,5 +1,5 @@
 # ERC20Permit
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 **Inherits:**
 [ERC20](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20.md), [IERC2612Permit](/src/protocol/tokens/regular/KlimaToken.sol/interface.IERC2612Permit.md)
@@ -37,7 +37,7 @@ constructor();
 
 ### permit
 
-*See {IERC2612Permit-permit}.*
+*See [IERC2612Permit-permit](/src/protocol/interfaces/IUniswapV2Pair.sol/interface.IUniswapV2Pair.md#permit).*
 
 
 ```solidity
@@ -49,7 +49,7 @@ function permit(address owner, address spender, uint256 amount, uint256 deadline
 
 ### nonces
 
-*See {IERC2612Permit-nonces}.*
+*See [IERC2612Permit-nonces](/src/protocol/interfaces/IUniswapV2Pair.sol/interface.IUniswapV2Pair.md#nonces).*
 
 
 ```solidity

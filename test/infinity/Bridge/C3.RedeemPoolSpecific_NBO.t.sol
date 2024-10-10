@@ -43,7 +43,7 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -75,23 +75,6 @@ contract RedeemNBOSpecificTest is TestHelper, AssertionHelper {
     function test_infinity_c3RedeemPoolSpecific_redeemNBO_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
         redeemNBO(WSKLIMA, redeemAmount);
     }
-
-    // function getSourceTokens(address sourceToken, uint redeemAmount) internal returns (uint sourceAmount) {
-    //     uint[] memory amounts = new uint[](1);
-    //     amounts[0] = redeemAmount;
-    //     sourceAmount = quoterFacet.getSourceAmountSpecificRedeem(sourceToken, NBO, amounts);
-
-    //     address sourceTarget;
-
-    //     if (sourceToken == NBO || sourceToken == USDC) sourceTarget = KLIMA_TREASURY;
-    //     else if (sourceToken == KLIMA || sourceToken == SKLIMA) sourceTarget = STAKING;
-    //     else if (sourceToken == WSKLIMA) sourceTarget = WSKLIMA_HOLDER;
-
-    //     vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-    //     swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-    //     IERC20(sourceToken).approve(diamond, sourceAmount);
-    // }
 
     function redeemNBO(address sourceToken, uint256 redeemAmount) internal {
         vm.assume(redeemAmount < (IERC20(NBO).balanceOf(SUSHI_LP) * 90) / 100);

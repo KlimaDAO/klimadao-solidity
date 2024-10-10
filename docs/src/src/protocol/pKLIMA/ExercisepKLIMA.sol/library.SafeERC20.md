@@ -1,5 +1,5 @@
 # SafeERC20
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/pKLIMA/ExercisepKLIMA.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/pKLIMA/ExercisepKLIMA.sol)
 
 Submitted for verification at Etherscan.io on 2021-06-03
 Submitted for verification at Etherscan.io on 2021-04-14
@@ -30,7 +30,7 @@ function safeTransferFrom(IERC20 token, address from, address to, uint256 value)
 ### safeApprove
 
 *Deprecated. This function has issues similar to the ones found in
-{IERC20-approve}, and its usage is discouraged.
+[IERC20-approve](/src/protocol/pKLIMA/ExercisepKLIMA.sol/interface.IERC20.md#approve), and its usage is discouraged.
 Whenever possible, use {safeIncreaseAllowance} and
 {safeDecreaseAllowance} instead.*
 

@@ -1,5 +1,5 @@
 # IERC2612Permit
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/sKlimaToken_v2.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/sKlimaToken_v2.sol)
 
 
 ## Functions
@@ -7,7 +7,7 @@
 
 *Sets `amount` as the allowance of `spender` over `owner`'s tokens,
 given `owner`'s signed approval.
-IMPORTANT: The same issues {IERC20-approve} has related to transaction
+IMPORTANT: The same issues [IERC20-approve](/src/protocol/tokens/regular/sKlimaToken_v2.sol/contract.sKLIMAv2.md#approve) has related to transaction
 ordering also apply here.
 Emits an {Approval} event.
 Requirements:
@@ -30,7 +30,7 @@ function permit(address owner, address spender, uint256 amount, uint256 deadline
 ### nonces
 
 *Returns the current ERC2612 nonce for `owner`. This value must be
-included whenever a signature is generated for {permit}.
+included whenever a signature is generated for [permit](/src/protocol/tokens/regular/sKlimaToken_v2.sol/interface.IERC2612Permit.md#permit).
 Every successful call to {permit} increases ``owner``'s nonce by one. This
 prevents a signature from being used multiple times.*
 

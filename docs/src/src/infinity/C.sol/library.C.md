@@ -1,5 +1,5 @@
 # C
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/C.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/C.sol)
 
 **Author:**
 Cujo
@@ -55,10 +55,17 @@ address private constant TREASURY = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
 ```
 
 
+### USDC_BRIDGED
+
+```solidity
+address private constant USDC_BRIDGED = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+```
+
+
 ### USDC
 
 ```solidity
-address private constant USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+address private constant USDC = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
 ```
 
 
@@ -181,6 +188,27 @@ address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d
 ```
 
 
+### COOREST_POOL
+
+```solidity
+address constant COOREST_POOL = 0x363ae9B7Dbf55c0956A74C3be4ed0996d277A8BE;
+```
+
+
+### COOREST_POCC_TOKEN
+
+```solidity
+address constant COOREST_POCC_TOKEN = 0x51cF819352FC536aD8A84214922615C160BB497D;
+```
+
+
+### COOREST_CCO2_TOKEN
+
+```solidity
+address constant COOREST_CCO2_TOKEN = 0x82B37070e43C1BA0EA9e2283285b674eF7f1D4E2;
+```
+
+
 ## Functions
 ### toucanCert
 
@@ -236,6 +264,13 @@ function sKlima() internal pure returns (address);
 
 ```solidity
 function wsKlima() internal pure returns (address);
+```
+
+### usdc_bridged
+
+
+```solidity
+function usdc_bridged() internal pure returns (address);
 ```
 
 ### usdc
@@ -348,5 +383,26 @@ function carbonmark() internal pure returns (address);
 
 ```solidity
 function icrProjectRegistry() internal pure returns (address);
+```
+
+### coorestPool
+
+
+```solidity
+function coorestPool() internal pure returns (address);
+```
+
+### coorestPoCCToken
+
+
+```solidity
+function coorestPoCCToken() internal pure returns (address);
+```
+
+### coorestCCO2Token
+
+
+```solidity
+function coorestCCO2Token() internal pure returns (address);
 ```
 
