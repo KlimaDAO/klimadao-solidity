@@ -42,23 +42,21 @@ const safeTransactionData: MetaTransactionData = {
 
 const nextNonce = await apiKit.getNextNonce(SAFE_ADDRESS);
 
-console.log(nextNonce);
+const safeTransaction = await protocolKitOwner1.createTransaction({
+  transactions: [safeTransactionData],
+  options: {
+    nonce: nextNonce,
+  },
+});
 
-// const safeTransaction = await protocolKitOwner1.createTransaction({
-//   transactions: [safeTransactionData],
-//   options: {
-//     nonce: nextNonce,
-//   },
-// });
+const safeTxHash = await protocolKitOwner1.getTransactionHash(safeTransaction);
+const signature = await protocolKitOwner1.signHash(safeTxHash);
 
-// const safeTxHash = await protocolKitOwner1.getTransactionHash(safeTransaction);
-// const signature = await protocolKitOwner1.signHash(safeTxHash);
-
-// // Propose transaction to the service
-// await apiKit.proposeTransaction({
-//   safeAddress: SAFE_ADDRESS,
-//   safeTransactionData: safeTransaction.data,
-//   safeTxHash,
-//   senderAddress: OWNER_1_ADDRESS,
-//   senderSignature: signature.data,
-// });
+// Propose transaction to the service
+await apiKit.proposeTransaction({
+  safeAddress: SAFE_ADDRESS,
+  safeTransactionData: safeTransaction.data,
+  safeTxHash,
+  senderAddress: OWNER_1_ADDRESS,
+  senderSignature: signature.data,
+});
