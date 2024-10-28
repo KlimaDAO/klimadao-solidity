@@ -19,7 +19,8 @@ library C {
     address private constant TREASURY = 0x7Dd4f0B986F032A44F913BF92c9e8b7c17D77aD7;
 
     // Standard Swap ERC20s
-    address private constant USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address private constant USDC_BRIDGED = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+    address private constant USDC = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
 
     // DEX Router Addresses
     address private constant SUSHI_POLYGON = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
@@ -85,6 +86,10 @@ library C {
 
     function wsKlima() internal pure returns (address) {
         return WSKLIMA;
+    }
+
+    function usdc_bridged() internal pure returns (address) {
+        return USDC_BRIDGED;
     }
 
     function usdc() internal pure returns (address) {

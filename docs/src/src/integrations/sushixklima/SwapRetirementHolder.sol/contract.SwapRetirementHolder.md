@@ -1,8 +1,8 @@
 # SwapRetirementHolder
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/integrations/sushixklima/SwapRetirementHolder.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/integrations/sushixklima/SwapRetirementHolder.sol)
 
 **Inherits:**
-[KeeperCompatibleInterface](/src/integrations/sushixklima/keepers/KeeperCompatibleInterface.sol/interface.KeeperCompatibleInterface.md), [Ownable](/src/protocol/staking/regular/KlimaStaking_v2.sol/contract.Ownable.md)
+[KeeperCompatibleInterface](/src/integrations/sushixklima/keepers/KeeperCompatibleInterface.sol/interface.KeeperCompatibleInterface.md), [Ownable](/src/protocol/staking/utils/KlimaTreasury.sol/contract.Ownable.md)
 
 
 ## State Variables

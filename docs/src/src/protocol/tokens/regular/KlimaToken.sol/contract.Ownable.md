@@ -1,8 +1,8 @@
 # Ownable
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/KlimaToken.sol)
 
 **Inherits:**
-[IOwnable](/src/protocol/staking/regular/KlimaStaking_v2.sol/interface.IOwnable.md)
+[IOwnable](/src/protocol/staking/utils/KlimaTreasury.sol/interface.IOwnable.md)
 
 
 ## State Variables

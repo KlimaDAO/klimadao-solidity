@@ -1,5 +1,5 @@
 # RetireCarbonmarkFacet
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/facets/Retire/RetireCarbonmarkFacet.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/facets/Retire/RetireCarbonmarkFacet.sol)
 
 **Inherits:**
 [ReentrancyGuard](/src/infinity/ReentrancyGuard.sol/abstract.ReentrancyGuard.md)
@@ -16,10 +16,7 @@ function retireCarbonmarkListing(
     ICarbonmark.CreditListing memory listing,
     uint256 maxAmountIn,
     uint256 retireAmount,
-    string memory retiringEntityString,
-    address beneficiaryAddress,
-    string memory beneficiaryString,
-    string memory retirementMessage,
+    LibRetire.RetireDetails memory details,
     LibTransfer.From fromMode
 ) external payable nonReentrant returns (uint256 retirementIndex);
 ```
@@ -30,10 +27,7 @@ function retireCarbonmarkListing(
 |`listing`|`ICarbonmark.CreditListing`||
 |`maxAmountIn`|`uint256`|         Maximum amount of USDC tokens to spend for this retirement|
 |`retireAmount`|`uint256`|        The amount of carbon to retire|
-|`retiringEntityString`|`string`|String description of the retiring entity|
-|`beneficiaryAddress`|`address`|  0x address for the beneficiary|
-|`beneficiaryString`|`string`|   String description of the beneficiary|
-|`retirementMessage`|`string`|   String message for this specific retirement|
+|`details`|`LibRetire.RetireDetails`|             Encoded struct of retirement details needed for the retirement|
 |`fromMode`|`LibTransfer.From`|            From Mode for transfering tokens|
 
 **Returns**

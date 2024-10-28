@@ -51,7 +51,7 @@ contract RetireCarbonSpecificTrueToucanNCT is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc();
+        USDC = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -61,7 +61,6 @@ contract RetireCarbonSpecificTrueToucanNCT is TestHelper, AssertionHelper {
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
-        fundRetirementBonds(constantsFacet.klimaRetirementBond());
     }
 
     function test_infinity_v1_retireCarbonSpecific_True_NCT_NCT(uint256 retireAmount) public {

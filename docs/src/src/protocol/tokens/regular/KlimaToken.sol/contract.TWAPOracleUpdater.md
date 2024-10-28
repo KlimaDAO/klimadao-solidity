@@ -1,5 +1,5 @@
 # TWAPOracleUpdater
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/protocol/tokens/regular/KlimaToken.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/protocol/tokens/regular/KlimaToken.sol)
 
 **Inherits:**
 [ERC20Permit](/src/protocol/tokens/regular/KlimaToken.sol/abstract.ERC20Permit.md), [VaultOwned](/src/protocol/tokens/regular/KlimaToken.sol/contract.VaultOwned.md)

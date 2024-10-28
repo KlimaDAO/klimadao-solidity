@@ -1,5 +1,5 @@
 # Storage
-[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/704b462e69030cb9a43680057bee91d745d579ba/src/infinity/AppStorage.sol)
+[Git Source](https://github.com/KlimaDAO/klimadao-solidity/blob/0daf6561853dcea28093c3f0ddf1098de21c5de2/src/infinity/AppStorage.sol)
 
 
 ## Structs
@@ -35,4 +35,13 @@ struct Token1155Settings {
     uint256[] values;
 }
 ```
+
+**Properties**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`tokenId`|`uint256`|     The last tokenId received from transferSingle|
+|`value`|`uint256`|       The last value received from transferSingle|
+|`ids`|`uint256[]`|         The last tokenIds received from transferBatch|
+|`values`|`uint256[]`|      The last values received from transferBatch|
 

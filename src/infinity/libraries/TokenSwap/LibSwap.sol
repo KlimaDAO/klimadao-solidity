@@ -30,9 +30,9 @@ library LibSwap {
     function swapToExactCarbonDefault(
         address sourceToken,
         address carbonToken,
-        uint sourceAmount,
-        uint carbonAmount
-    ) internal returns (uint carbonReceived) {
+        uint256 sourceAmount,
+        uint256 carbonAmount
+    ) internal returns (uint256 carbonReceived) {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         // If providing a staked version of Klima, update sourceToken to use Klima default path.
@@ -41,25 +41,24 @@ library LibSwap {
         // If source token is not defined in the default, swap to USDC on Sushiswap.
         // This is wrapped in its own statement to allow for the fewest number of swaps
         if (s.swap[carbonToken][sourceToken].swapDexes.length == 0) {
-            address[] memory firstPath = new address[](s.swap[carbonToken][C.usdc()].swapPaths[0].length + 1);
+            address[] memory firstPath = new address[](s.swap[carbonToken][C.usdc_bridged()].swapPaths[0].length + 1);
             firstPath[0] = sourceToken;
-            for (uint8 i = 0; i < s.swap[carbonToken][C.usdc()].swapPaths[0].length; ++i) {
-                firstPath[i + 1] = s.swap[carbonToken][C.usdc()].swapPaths[0][i];
+            for (uint8 i = 0; i < s.swap[carbonToken][C.usdc_bridged()].swapPaths[0].length; ++i) {
+                firstPath[i + 1] = s.swap[carbonToken][C.usdc_bridged()].swapPaths[0][i];
             }
 
             // Now that we have added to the initial USDC path, set the sourceToken to USDC and proceed as normal.
-            sourceToken = C.usdc();
+            sourceToken = C.usdc_bridged();
 
             // Single DEX swap
             if (s.swap[carbonToken][sourceToken].swapDexes.length == 1) {
-                return
-                    _performToExactSwap(
-                        s.swap[carbonToken][sourceToken].swapDexes[0],
-                        s.swap[carbonToken][sourceToken].ammRouters[0],
-                        firstPath,
-                        sourceAmount,
-                        carbonAmount
-                    );
+                return _performToExactSwap(
+                    s.swap[carbonToken][sourceToken].swapDexes[0],
+                    s.swap[carbonToken][sourceToken].ammRouters[0],
+                    firstPath,
+                    sourceAmount,
+                    carbonAmount
+                );
             }
 
             // Multiple DEX swap
@@ -79,14 +78,13 @@ library LibSwap {
 
         // Single DEX swap
         if (s.swap[carbonToken][sourceToken].swapDexes.length == 1) {
-            return
-                _performToExactSwap(
-                    s.swap[carbonToken][sourceToken].swapDexes[0],
-                    s.swap[carbonToken][sourceToken].ammRouters[0],
-                    s.swap[carbonToken][sourceToken].swapPaths[0],
-                    sourceAmount,
-                    carbonAmount
-                );
+            return _performToExactSwap(
+                s.swap[carbonToken][sourceToken].swapDexes[0],
+                s.swap[carbonToken][sourceToken].ammRouters[0],
+                s.swap[carbonToken][sourceToken].swapPaths[0],
+                sourceAmount,
+                carbonAmount
+            );
         }
 
         // Multiple DEX swap
@@ -113,11 +111,10 @@ library LibSwap {
      * @param amount                Amount of the source token to swap
      * @return carbonReceived       Pool tokens actually received
      */
-    function swapExactSourceToCarbonDefault(
-        address sourceToken,
-        address carbonToken,
-        uint amount
-    ) internal returns (uint carbonReceived) {
+    function swapExactSourceToCarbonDefault(address sourceToken, address carbonToken, uint256 amount)
+        internal
+        returns (uint256 carbonReceived)
+    {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         // If providing a staked version of Klima, update sourceToken to use Klima default path.
@@ -128,27 +125,23 @@ library LibSwap {
         if (s.swap[carbonToken][sourceToken].swapDexes.length == 0) {
             address[] memory path = new address[](2);
             path[0] = sourceToken;
-            path[1] = C.usdc();
+            path[1] = C.usdc_bridged();
 
             amount = _performExactSourceSwap(
-                s.swap[carbonToken][C.usdc()].swapDexes[0],
-                s.swap[carbonToken][C.usdc()].ammRouters[0],
-                path,
-                amount
+                s.swap[carbonToken][C.usdc_bridged()].swapDexes[0], s.swap[carbonToken][C.usdc_bridged()].ammRouters[0], path, amount
             );
             // Now that we have USDC, set the sourceToken to USDC and proceed as normal.
-            sourceToken = C.usdc();
+            sourceToken = C.usdc_bridged();
         }
 
         // Single DEX swap
         if (s.swap[carbonToken][sourceToken].swapDexes.length == 1) {
-            return
-                _performExactSourceSwap(
-                    s.swap[carbonToken][sourceToken].swapDexes[0],
-                    s.swap[carbonToken][sourceToken].ammRouters[0],
-                    s.swap[carbonToken][sourceToken].swapPaths[0],
-                    amount
-                );
+            return _performExactSourceSwap(
+                s.swap[carbonToken][sourceToken].swapDexes[0],
+                s.swap[carbonToken][sourceToken].ammRouters[0],
+                s.swap[carbonToken][sourceToken].swapPaths[0],
+                amount
+            );
         }
 
         // Multiple DEX swap
@@ -173,10 +166,11 @@ library LibSwap {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         address dustToken = sourceToken;
-        if (sourceToken == C.wsKlima() || sourceToken == C.sKlima()) dustToken = C.klima();
-        else if (s.swap[poolToken][sourceToken].swapDexes.length == 0) {
-            dustToken = C.usdc();
-            sourceToken = C.usdc();
+        if (sourceToken == C.wsKlima() || sourceToken == C.sKlima()) {
+            dustToken = C.klima();
+        } else if (s.swap[poolToken][sourceToken].swapDexes.length == 0) {
+            dustToken = C.usdc_bridged();
+            sourceToken = C.usdc_bridged();
         }
 
         uint256 dustBalance = IERC20(dustToken).balanceOf(address(this));
@@ -199,7 +193,7 @@ library LibSwap {
      */
     function swapToKlimaFromUsdc(uint256 sourceAmount, uint256 klimaAmount) internal returns (uint256 klimaReceived) {
         address[] memory path = new address[](2);
-        path[0] = C.usdc();
+        path[0] = C.usdc_bridged();
         path[1] = C.klima();
 
         return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
@@ -218,7 +212,7 @@ library LibSwap {
     {
         address[] memory path = new address[](3);
         path[0] = sourceToken;
-        path[1] = C.usdc();
+        path[1] = C.usdc_bridged();
         path[2] = C.klima();
         return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
     }
@@ -245,7 +239,7 @@ library LibSwap {
 
         // The only other source tokens at this point should be USDC or non-KLIMA and non-Pool tokens
 
-        if (sourceToken == C.usdc()) {
+        if (sourceToken == C.usdc_bridged()) {
             sourceAmount = swapToKlimaFromUsdc(sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
         } else {
             sourceAmount =
@@ -265,11 +259,11 @@ library LibSwap {
      * @param amount            Amount of carbon tokens needed
      * @return sourceNeeded     Total source tokens needed for output amount
      */
-    function getSourceAmount(
-        address sourceToken,
-        address carbonToken,
-        uint amount
-    ) internal view returns (uint sourceNeeded) {
+    function getSourceAmount(address sourceToken, address carbonToken, uint256 amount)
+        internal
+        view
+        returns (uint256 sourceNeeded)
+    {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         uint8 wrapped;
@@ -278,33 +272,31 @@ library LibSwap {
 
         if (s.swap[carbonToken][sourceToken].swapDexes.length == 1) {
             if (wrapped == 0) {
-                return
-                    _getAmountIn(
-                        s.swap[carbonToken][sourceToken].swapDexes[0],
-                        s.swap[carbonToken][sourceToken].ammRouters[0],
-                        s.swap[carbonToken][sourceToken].swapPaths[0],
-                        amount
-                    );
+                return _getAmountIn(
+                    s.swap[carbonToken][sourceToken].swapDexes[0],
+                    s.swap[carbonToken][sourceToken].ammRouters[0],
+                    s.swap[carbonToken][sourceToken].swapPaths[0],
+                    amount
+                );
             }
 
-            return
-                LibKlima.toWrappedAmount(
-                    _getAmountIn(
-                        s.swap[carbonToken][sourceToken].swapDexes[0],
-                        s.swap[carbonToken][sourceToken].ammRouters[0],
-                        s.swap[carbonToken][sourceToken].swapPaths[0],
-                        amount
-                    )
-                );
+            return LibKlima.toWrappedAmount(
+                _getAmountIn(
+                    s.swap[carbonToken][sourceToken].swapDexes[0],
+                    s.swap[carbonToken][sourceToken].ammRouters[0],
+                    s.swap[carbonToken][sourceToken].swapPaths[0],
+                    amount
+                )
+            );
         } else if (s.swap[carbonToken][sourceToken].swapDexes.length > 1) {
             uint256[] memory amountsIn = getMultipleSourceAmount(sourceToken, carbonToken, amount);
             if (wrapped == 0) return amountsIn[0];
             return LibKlima.toWrappedAmount(amountsIn[0]);
         } else {
-            uint256 usdcAmount = getSourceAmount(C.usdc(), carbonToken, amount);
+            uint256 usdcAmount = getSourceAmount(C.usdc_bridged(), carbonToken, amount);
             address[] memory usdcPath = new address[](2);
             usdcPath[0] = sourceToken;
-            usdcPath[1] = C.usdc();
+            usdcPath[1] = C.usdc_bridged();
             // Swap to USDC on Sushiswap
             return _getAmountIn(0, C.sushiRouter(), usdcPath, usdcAmount);
         }
@@ -317,11 +309,11 @@ library LibSwap {
      * @param amount            Amount of carbon tokens needed
      * @return sourcesNeeded    Total source tokens needed for output amount
      */
-    function getMultipleSourceAmount(
-        address sourceToken,
-        address carbonToken,
-        uint amount
-    ) internal view returns (uint[] memory) {
+    function getMultipleSourceAmount(address sourceToken, address carbonToken, uint256 amount)
+        internal
+        view
+        returns (uint256[] memory)
+    {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         uint256[] memory sourcesNeeded = new uint256[](s.swap[carbonToken][sourceToken].swapDexes.length);
@@ -351,38 +343,40 @@ library LibSwap {
      * @param amount            Amount of carbon tokens needed
      * @return sourceNeeded     Total source tokens needed for output amount
      */
-     function getSourceAmountFromRetirementBond(
-        address sourceToken,
-        address carbonToken,
-        uint256 amount
-    ) internal view returns (uint256 sourceNeeded) {
+    function getSourceAmountFromRetirementBond(address sourceToken, address carbonToken, uint256 amount)
+        internal
+        view
+        returns (uint256 sourceNeeded)
+    {
         // Return the direct quote in KLIMA first
-        if (sourceToken == C.klima() || sourceToken == C.sKlima())
-            return LibTreasurySwap.getAmountIn(carbonToken,amount);
+        if (sourceToken == C.klima() || sourceToken == C.sKlima()) {
+            return LibTreasurySwap.getAmountIn(carbonToken, amount);
+        }
 
         // Wrap the amount if using wsKLIMA
-        if (sourceToken == C.wsKlima())
-            return LibKlima.toWrappedAmount(LibTreasurySwap.getAmountIn(carbonToken,amount));
+        if (sourceToken == C.wsKlima()) {
+            return LibKlima.toWrappedAmount(LibTreasurySwap.getAmountIn(carbonToken, amount));
+        }
 
         // Direct swap from USDC to KLIMA on Sushi
-        if (sourceToken == C.usdc()) {
-            uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken,amount);
-            
+        if (sourceToken == C.usdc_bridged()) {
+            uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken, amount);
+
             address[] memory path = new address[](2);
-            path[0] = C.usdc();
+            path[0] = C.usdc_bridged();
             path[1] = C.klima();
-            
+
             return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
         }
 
         // At this point we only have non USDC and not KLIMA tokens. Route through a source <> USDC pool on Sushi
-        uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken,amount);
-        
+        uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken, amount);
+
         address[] memory path = new address[](3);
         path[0] = sourceToken;
-        path[1] = C.usdc();
+        path[1] = C.usdc_bridged();
         path[2] = C.klima();
-            
+
         return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
     }
 
@@ -395,11 +389,11 @@ library LibSwap {
      * @param amount            Amount of carbon tokens needed
      * @return amountOut        Amount of carbonTokens recieved for the input amount
      */
-    function getDefaultAmountOut(
-        address sourceToken,
-        address carbonToken,
-        uint amount
-    ) internal view returns (uint amountOut) {
+    function getDefaultAmountOut(address sourceToken, address carbonToken, uint256 amount)
+        internal
+        view
+        returns (uint256 amountOut)
+    {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         amountOut = amount;
@@ -428,13 +422,10 @@ library LibSwap {
      * @param amount        Total pool tokens needed
      * @return amountOut    Total pool tokens swapped
      */
-    function _performToExactSwap(
-        uint8 dex,
-        address router,
-        address[] memory path,
-        uint maxAmountIn,
-        uint amount
-    ) private returns (uint amountOut) {
+    function _performToExactSwap(uint8 dex, address router, address[] memory path, uint256 maxAmountIn, uint256 amount)
+        private
+        returns (uint256 amountOut)
+    {
         // UniswapV2 is DEX ID 0
         if (dex == 0) {
             amountOut = LibUniswapV2Swap.swapTokensForExactTokens(router, path, maxAmountIn, amount);
@@ -460,22 +451,16 @@ library LibSwap {
      * @param amount        Amount of tokens to swap
      * @return amountOut    Total pool tokens swapped
      */
-    function _performExactSourceSwap(
-        uint8 dex,
-        address router,
-        address[] memory path,
-        uint amount
-    ) private returns (uint amountOut) {
+    function _performExactSourceSwap(uint8 dex, address router, address[] memory path, uint256 amount)
+        private
+        returns (uint256 amountOut)
+    {
         // UniswapV2 is DEX ID 0
         if (dex == 0) {
             amountOut = LibUniswapV2Swap.swapExactTokensForTokens(router, path, amount);
         } else if (dex == 1) {
             amountOut = LibTridentSwap.swapExactTokensForTokens(
-                router,
-                LibTridentSwap.getTridentPool(path[0], path[1]),
-                path[0],
-                amount,
-                1
+                router, LibTridentSwap.getTridentPool(path[0], path[1]), path[0], amount, 1
             );
         }
 
@@ -490,21 +475,16 @@ library LibSwap {
      * @param amount        Total pool tokens needed
      * @return amountIn     Total pool tokens swapped
      */
-    function _getAmountIn(
-        uint8 dex,
-        address router,
-        address[] memory path,
-        uint amount
-    ) private view returns (uint amountIn) {
+    function _getAmountIn(uint8 dex, address router, address[] memory path, uint256 amount)
+        private
+        view
+        returns (uint256 amountIn)
+    {
         if (dex == 0) {
             amountIn = LibUniswapV2Swap.getAmountIn(router, path, amount);
         } else if (dex == 1) {
-            amountIn = LibTridentSwap.getAmountIn(
-                LibTridentSwap.getTridentPool(path[0], path[1]),
-                path[0],
-                path[1],
-                amount
-            );
+            amountIn =
+                LibTridentSwap.getAmountIn(LibTridentSwap.getTridentPool(path[0], path[1]), path[0], path[1], amount);
         }
     }
 
@@ -516,21 +496,16 @@ library LibSwap {
      * @param amount        Total source tokens spent
      * @return amountOut    Total pool tokens swapped
      */
-    function _getAmountOut(
-        uint8 dex,
-        address router,
-        address[] memory path,
-        uint amount
-    ) private view returns (uint amountOut) {
+    function _getAmountOut(uint8 dex, address router, address[] memory path, uint256 amount)
+        private
+        view
+        returns (uint256 amountOut)
+    {
         if (dex == 0) {
             amountOut = LibUniswapV2Swap.getAmountOut(router, path, amount);
         } else if (dex == 1) {
-            amountOut = LibTridentSwap.getAmountOut(
-                LibTridentSwap.getTridentPool(path[0], path[1]),
-                path[0],
-                path[1],
-                amount
-            );
+            amountOut =
+                LibTridentSwap.getAmountOut(LibTridentSwap.getTridentPool(path[0], path[1]), path[0], path[1], amount);
         }
     }
 }
