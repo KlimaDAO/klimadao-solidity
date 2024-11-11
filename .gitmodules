@@ -21,3 +21,15 @@
 [submodule "lib/solidity-stringutils"]
 	path = lib/solidity-stringutils
 	url = https://github.com/Arachnid/solidity-stringutils
+[submodule "lib/axelar-gmp-sdk-solidity"]
+	path = lib/axelar-gmp-sdk-solidity
+	url = https://github.com/axelarnetwork/axelar-gmp-sdk-solidity
+[submodule "lib/axelar-cgp-solidity"]
+	path = lib/axelar-cgp-solidity
+	url = https://github.com/axelarnetwork/axelar-cgp-solidity
+[submodule "lib/axelar-its"]
+	path = lib/axelar-its
+	url = https://github.com/axelarnetwork/interchain-token-service
+[submodule "lib/openzeppelin-contracts-4-8-3"]
+	path = lib/openzeppelin-contracts-4-8-3
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

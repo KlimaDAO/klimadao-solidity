@@ -8,8 +8,8 @@
  */
 pragma solidity ^0.8.16;
 
-import "oz/token/ERC20/utils/SafeERC20.sol";
-import "oz/token/ERC1155/IERC1155.sol";
+import "oz-4-8-3/token/ERC20/utils/SafeERC20.sol";
+import "oz-4-8-3/token/ERC1155/IERC1155.sol";
 import "./LibBalance.sol";
 
 library LibTransfer {

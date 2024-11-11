@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "oz/token/ERC20/IERC20.sol";
+import "oz-4-8-3/token/ERC20/IERC20.sol";
 
 interface IwsKLIMA is IERC20 {
     function sKLIMA() external returns (address);

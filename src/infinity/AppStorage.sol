@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "oz/token/ERC20/IERC20.sol";
+import "oz-4-8-3/token/ERC20/IERC20.sol";
 import "./libraries/LibRetire.sol";
 
 /**
  * @author Cujo
  * @title App Storage defines the state object for Klima Infinity
  */
-
 contract Account {
     struct Retirement {
         address poolTokenAddress; // Pool token used
