@@ -14,8 +14,8 @@ contract RetireBondFundMarketTest is TestHelper, AssertionHelper, DeploymentHelp
     RetirementBondAllocator allocator;
     KlimaTreasury treasury;
 
-    event MarketOpened(address pool, uint amount);
-    event MarketClosed(address pool, uint amount);
+    event MarketOpened(address pool, uint256 amount);
+    event MarketClosed(address pool, uint256 amount);
 
     address POLICY = vm.envAddress("POLICY_MSIG");
     address TREASURY = vm.envAddress("KLIMA_TREASURY_ADDRESS");
@@ -95,7 +95,7 @@ contract RetireBondFundMarketTest is TestHelper, AssertionHelper, DeploymentHelp
         allocator.fundBonds(BCT, 15_000_000 * 1e18);
     }
 
-    function fundBonds(address token, uint amount) internal {
+    function fundBonds(address token, uint256 amount) internal {
         vm.startPrank(allocator.owner());
 
         if (amount > maxBondAmount(token, address(allocator))) {

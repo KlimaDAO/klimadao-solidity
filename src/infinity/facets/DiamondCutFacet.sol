@@ -7,7 +7,6 @@ pragma solidity ^0.8.0;
  * EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
  * /*****************************************************************************
  */
-
 import {IDiamondCut} from "../interfaces/IDiamondCut.sol";
 import {LibDiamond} from "../libraries/LibDiamond.sol";
 

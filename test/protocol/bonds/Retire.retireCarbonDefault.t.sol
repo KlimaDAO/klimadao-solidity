@@ -15,8 +15,8 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
     RetirementBondAllocator allocator;
     KlimaTreasury treasury;
 
-    event CarbonBonded(address pool, uint poolAmount);
-    event KlimaBonded(uint daoFee, uint klimaBurned);
+    event CarbonBonded(address pool, uint256 poolAmount);
+    event KlimaBonded(uint256 daoFee, uint256 klimaBurned);
 
     // Retirement details
     string beneficiary = "Test Beneficiary";
@@ -79,18 +79,19 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
         DEFAULT_PROJECT_NBO = IC3Pool(NBO).getFreeRedeemAddresses()[0];
     }
 
-    function test_protocol_retireBond_retireCarbonDefault_BCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_BCT_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(BCT).totalSupply());
         vm.assume(retireAmount < (IERC20(BCT).balanceOf(vm.envAddress("SUSHI_BCT_LP")) * 50) / 100);
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > IERC20(BCT).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if (retireAmount > IERC20(BCT).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else {
-            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, BCT);
-            uint daoFee = (klimaAmount * 3000) / 10000;
+        } else {
+            uint256 klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, BCT);
+            uint256 daoFee = (klimaAmount * 3000) / 10_000;
             vm.expectEmit(true, true, true, true);
             emit KlimaBonded(daoFee, klimaAmount - daoFee);
 
@@ -101,17 +102,18 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
         retireBond.retireCarbonDefault(BCT, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_protocol_retireBond_retireCarbonDefault_NCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_NCT_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(NCT).totalSupply());
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > IERC20(NCT).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if (retireAmount > IERC20(NCT).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else {
-            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NCT);
-            uint daoFee = (klimaAmount * 3000) / 10000;
+        } else {
+            uint256 klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NCT);
+            uint256 daoFee = (klimaAmount * 3000) / 10_000;
             vm.expectEmit(true, true, true, true);
             emit KlimaBonded(daoFee, klimaAmount - daoFee);
 
@@ -122,7 +124,7 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
         retireBond.retireCarbonDefault(NCT, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_protocol_retireBond_retireCarbonDefault_MCO2_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_MCO2_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(MCO2).totalSupply());
 
         // Policy wouldn't allocate more than the amount of tokens available in the LP supply
@@ -130,12 +132,13 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > IERC20(MCO2).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if (retireAmount > IERC20(MCO2).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else {
-            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, MCO2);
-            uint daoFee = (klimaAmount * 3000) / 10000;
+        } else {
+            uint256 klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, MCO2);
+            uint256 daoFee = (klimaAmount * 3000) / 10_000;
             vm.expectEmit(true, true, true, true);
             emit KlimaBonded(daoFee, klimaAmount - daoFee);
 
@@ -146,19 +149,20 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
         retireBond.retireCarbonDefault(MCO2, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_protocol_retireBond_retireCarbonDefault_UBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_UBO_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(UBO).totalSupply());
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > IERC20(UBO).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if (retireAmount > IERC20(UBO).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else if (retireAmount > IERC20(DEFAULT_PROJECT_UBO).balanceOf(UBO))
+        } else if (retireAmount > IERC20(DEFAULT_PROJECT_UBO).balanceOf(UBO)) {
             vm.expectRevert("Amount exceeds available tokens");
-        else {
-            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, UBO);
-            uint daoFee = (klimaAmount * 3000) / 10000;
+        } else {
+            uint256 klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, UBO);
+            uint256 daoFee = (klimaAmount * 3000) / 10_000;
             vm.expectEmit(true, true, true, true);
             emit KlimaBonded(daoFee, klimaAmount - daoFee);
 
@@ -169,19 +173,20 @@ contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper,
         retireBond.retireCarbonDefault(UBO, retireAmount, entity, beneficiaryAddress, beneficiary, message);
     }
 
-    function test_protocol_retireBond_retireCarbonDefault_NBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonDefault_NBO_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(NBO).totalSupply());
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if (retireAmount > IERC20(NBO).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if (retireAmount > IERC20(NBO).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else if (retireAmount > IERC20(DEFAULT_PROJECT_NBO).balanceOf(NBO))
+        } else if (retireAmount > IERC20(DEFAULT_PROJECT_NBO).balanceOf(NBO)) {
             vm.expectRevert("Amount exceeds available tokens");
-        else {
-            uint klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NBO);
-            uint daoFee = (klimaAmount * 3000) / 10000;
+        } else {
+            uint256 klimaAmount = retireBond.getKlimaAmount((retireAmount * 101) / 100, NBO);
+            uint256 daoFee = (klimaAmount * 3000) / 10_000;
             vm.expectEmit(true, true, true, true);
             emit KlimaBonded(daoFee, klimaAmount - daoFee);
 

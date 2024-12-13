@@ -1,10 +1,9 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-06-12
-*/
+ * Submitted for verification at Etherscan.io on 2021-06-12
+ */
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
-
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -162,13 +161,13 @@ library SafeMath {
     }
 
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
-    function sqrrt(uint256 a) internal pure returns (uint c) {
+    function sqrrt(uint256 a) internal pure returns (uint256 c) {
         if (a > 3) {
             c = a;
-            uint b = add( div( a, 2), 1 );
+            uint256 b = add(div(a, 2), 1);
             while (b < c) {
                 c = b;
-                b = div( add( div( a, b ), b), 2 );
+                b = div(add(div(a, b), b), 2);
             }
         } else if (a != 0) {
             c = 1;
@@ -178,19 +177,19 @@ library SafeMath {
     /*
      * Expects percentage to be trailed by 00,
     */
-    function percentageAmount( uint256 total_, uint8 percentage_ ) internal pure returns ( uint256 percentAmount_ ) {
-        return div( mul( total_, percentage_ ), 1000 );
+    function percentageAmount(uint256 total_, uint8 percentage_) internal pure returns (uint256 percentAmount_) {
+        return div(mul(total_, percentage_), 1000);
     }
 
     /*
      * Expects percentage to be trailed by 00,
     */
-    function substractPercentage( uint256 total_, uint8 percentageToSub_ ) internal pure returns ( uint256 result_ ) {
-        return sub( total_, div( mul( total_, percentageToSub_ ), 1000 ) );
+    function substractPercentage(uint256 total_, uint8 percentageToSub_) internal pure returns (uint256 result_) {
+        return sub(total_, div(mul(total_, percentageToSub_), 1000));
     }
 
-    function percentageOfTotal( uint256 part_, uint256 total_ ) internal pure returns ( uint256 percent_ ) {
-        return div( mul(part_, 100) , total_ );
+    function percentageOfTotal(uint256 part_, uint256 total_) internal pure returns (uint256 percent_) {
+        return div(mul(part_, 100), total_);
     }
 
     /**
@@ -203,12 +202,12 @@ library SafeMath {
         return (a / 2) + (b / 2) + ((a % 2 + b % 2) / 2);
     }
 
-    function quadraticPricing( uint256 payment_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return sqrrt( mul( multiplier_, payment_ ) );
+    function quadraticPricing(uint256 payment_, uint256 multiplier_) internal pure returns (uint256) {
+        return sqrrt(mul(multiplier_, payment_));
     }
 
-    function bondingCurve( uint256 supply_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return mul( multiplier_, supply_ );
+    function bondingCurve(uint256 supply_, uint256 multiplier_) internal pure returns (uint256) {
+        return mul(multiplier_, supply_);
     }
 }
 
@@ -237,7 +236,9 @@ library Address {
 
         uint256 size;
         // solhint-disable-next-line no-inline-assembly
-        assembly { size := extcodesize(account) }
+        assembly {
+            size := extcodesize(account)
+        }
         return size > 0;
     }
 
@@ -261,7 +262,7 @@ library Address {
         require(address(this).balance >= amount, "Address: insufficient balance");
 
         // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call{ value: amount }("");
+        (bool success,) = recipient.call{value: amount}("");
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 
@@ -293,7 +294,10 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+    function functionCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         return _functionCallWithValue(target, data, 0, errorMessage);
     }
 
@@ -322,20 +326,26 @@ library Address {
     //     require(address(this).balance >= value, "Address: insufficient balance for call");
     //     return _functionCallWithValue(target, data, value, errorMessage);
     // }
-    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
+    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         require(address(this).balance >= value, "Address: insufficient balance for call");
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: value }(data);
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage) private returns (bytes memory) {
+    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage)
+        private
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: weiValue }(data);
+        (bool success, bytes memory returndata) = target.call{value: weiValue}(data);
         if (success) {
             return returndata;
         } else {
@@ -355,11 +365,11 @@ library Address {
     }
 
     /**
-       * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-       * but performing a static call.
-       *
-       * _Available since v3.3._
-       */
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
     function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
         return functionStaticCall(target, data, "Address: low-level static call failed");
     }
@@ -370,7 +380,11 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {
+    function functionStaticCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        view
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: static call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -394,7 +408,10 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+    function functionDelegateCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: delegate call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -402,7 +419,11 @@ library Address {
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage)
+        private
+        pure
+        returns (bytes memory)
+    {
         if (success) {
             return returndata;
         } else {
@@ -421,21 +442,20 @@ library Address {
         }
     }
 
-    function addressToString(address _address) internal pure returns(string memory) {
+    function addressToString(address _address) internal pure returns (string memory) {
         bytes32 _bytes = bytes32(uint256(_address));
         bytes memory HEX = "0123456789abcdef";
         bytes memory _addr = new bytes(42);
 
-        _addr[0] = '0';
-        _addr[1] = 'x';
+        _addr[0] = "0";
+        _addr[1] = "x";
 
-        for(uint256 i = 0; i < 20; i++) {
-            _addr[2+i*2] = HEX[uint8(_bytes[i + 12] >> 4)];
-            _addr[3+i*2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
+        for (uint256 i = 0; i < 20; i++) {
+            _addr[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
+            _addr[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
         }
 
         return string(_addr);
-
     }
 }
 
@@ -510,21 +530,17 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-abstract contract ERC20
-is
-IERC20
-{
-
+abstract contract ERC20 is IERC20 {
     using SafeMath for uint256;
 
     // TODO comment actual hash value.
-    bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
+    bytes32 private constant ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256("ERC20Token");
 
     // Present in ERC777
-    mapping (address => uint256) internal _balances;
+    mapping(address => uint256) internal _balances;
 
     // Present in ERC777
-    mapping (address => mapping (address => uint256)) internal _allowances;
+    mapping(address => mapping(address => uint256)) internal _allowances;
 
     // Present in ERC777
     uint256 internal _totalSupply;
@@ -547,7 +563,7 @@ IERC20
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor (string memory name_, string memory symbol_, uint8 decimals_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) {
         _name = name_;
         _symbol = symbol_;
         _decimals = decimals_;
@@ -656,7 +672,9 @@ IERC20
     // Present in ERC777
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(
+            sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance")
+        );
         return true;
     }
 
@@ -692,7 +710,11 @@ IERC20
      * `subtractedValue`.
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        _approve(
+            msg.sender,
+            spender,
+            _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero")
+        );
         return true;
     }
 
@@ -721,7 +743,8 @@ IERC20
         emit Transfer(sender, recipient, amount);
     }
 
-    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+    /**
+     * @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
      *
      * Emits a {Transfer} event with `from` set to the zero address.
@@ -733,10 +756,10 @@ IERC20
     // Present in ERC777
     function _mint(address account_, uint256 ammount_) internal virtual {
         require(account_ != address(0), "ERC20: mint to the zero address");
-        _beforeTokenTransfer(address( this ), account_, ammount_);
+        _beforeTokenTransfer(address(this), account_, ammount_);
         _totalSupply = _totalSupply.add(ammount_);
         _balances[account_] = _balances[account_].add(ammount_);
-        emit Transfer(address( this ), account_, ammount_);
+        emit Transfer(address(this), account_, ammount_);
     }
 
     /**
@@ -810,7 +833,7 @@ IERC20
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
     // Present in ERC777
-    function _beforeTokenTransfer( address from_, address to_, uint256 amount_ ) internal virtual { }
+    function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal virtual {}
 }
 
 library Counters {
@@ -860,15 +883,8 @@ interface IERC2612Permit {
      * https://eips.ethereum.org/EIPS/eip-2612#specification[relevant EIP
      * section].
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+        external;
 
     /**
      * @dev Returns the current ERC2612 nonce for `owner`. This value must be
@@ -891,38 +907,35 @@ abstract contract ERC20Permit is ERC20, IERC2612Permit {
     bytes32 public DOMAIN_SEPARATOR;
 
     constructor() {
-
         uint256 chainID;
         assembly {
             chainID := chainid()
         }
 
-        DOMAIN_SEPARATOR = keccak256(abi.encode(
+        DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
                 keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
                 keccak256(bytes(name())),
                 keccak256(bytes("1")), // Version
                 chainID,
                 address(this)
-            ));
+            )
+        );
     }
 
     /**
      * @dev See {IERC2612Permit-permit}.
      *
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public virtual override {
+    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+        public
+        virtual
+        override
+    {
         require(block.timestamp <= deadline, "Permit: expired deadline");
 
         bytes32 hashStruct =
-        keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner].current(), deadline));
+            keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner].current(), deadline));
 
         bytes32 _hash = keccak256(abi.encodePacked(uint16(0x1901), DOMAIN_SEPARATOR, hashStruct));
 
@@ -946,22 +959,21 @@ interface IOwnable {
 
     function renounceManagement() external;
 
-    function pushManagement( address newOwner_ ) external;
+    function pushManagement(address newOwner_) external;
 
     function pullManagement() external;
 }
 
 contract Ownable is IOwnable {
-
     address internal _owner;
     address internal _newOwner;
 
     event OwnershipPushed(address indexed previousOwner, address indexed newOwner);
     event OwnershipPulled(address indexed previousOwner, address indexed newOwner);
 
-    constructor () {
+    constructor() {
         _owner = msg.sender;
-        emit OwnershipPushed( address(0), _owner );
+        emit OwnershipPushed(address(0), _owner);
     }
 
     function manager() public view override returns (address) {
@@ -969,71 +981,71 @@ contract Ownable is IOwnable {
     }
 
     modifier onlyManager() {
-        require( _owner == msg.sender, "Ownable: caller is not the owner" );
+        require(_owner == msg.sender, "Ownable: caller is not the owner");
         _;
     }
 
-    function renounceManagement() public virtual override onlyManager() {
-        emit OwnershipPushed( _owner, address(0) );
+    function renounceManagement() public virtual override onlyManager {
+        emit OwnershipPushed(_owner, address(0));
         _owner = address(0);
     }
 
-    function pushManagement( address newOwner_ ) public virtual override onlyManager() {
-        require( newOwner_ != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipPushed( _owner, newOwner_ );
+    function pushManagement(address newOwner_) public virtual override onlyManager {
+        require(newOwner_ != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipPushed(_owner, newOwner_);
         _newOwner = newOwner_;
     }
 
     function pullManagement() public virtual override {
-        require( msg.sender == _newOwner, "Ownable: must be new owner to pull");
-        emit OwnershipPulled( _owner, _newOwner );
+        require(msg.sender == _newOwner, "Ownable: must be new owner to pull");
+        emit OwnershipPulled(_owner, _newOwner);
         _owner = _newOwner;
     }
 }
 
 contract sKLIMAv2 is ERC20Permit, Ownable {
-
     using SafeMath for uint256;
 
     modifier onlyStakingContract() {
-        require( msg.sender == stakingContract );
+        require(msg.sender == stakingContract);
         _;
     }
 
     address public stakingContract;
     address public initializer;
 
-    event LogSupply(uint256 indexed epoch, uint256 timestamp, uint256 totalSupply );
-    event LogRebase( uint256 indexed epoch, uint256 rebase, uint256 index );
-    event LogStakingContractUpdated( address stakingContract );
+    event LogSupply(uint256 indexed epoch, uint256 timestamp, uint256 totalSupply);
+    event LogRebase(uint256 indexed epoch, uint256 rebase, uint256 index);
+    event LogStakingContractUpdated(address stakingContract);
 
     struct Rebase {
-        uint epoch;
-        uint rebase; // 18 decimals
-        uint totalStakedBefore;
-        uint totalStakedAfter;
-        uint amountRebased;
-        uint index;
-        uint blockNumberOccured;
+        uint256 epoch;
+        uint256 rebase; // 18 decimals
+        uint256 totalStakedBefore;
+        uint256 totalStakedAfter;
+        uint256 amountRebased;
+        uint256 index;
+        uint256 blockNumberOccured;
     }
+
     Rebase[] public rebases;
 
-    uint public INDEX;
+    uint256 public INDEX;
 
     uint256 private constant MAX_UINT256 = ~uint256(0);
-    uint256 private constant INITIAL_FRAGMENTS_SUPPLY = 5000000 * 10**9;
+    uint256 private constant INITIAL_FRAGMENTS_SUPPLY = 5_000_000 * 10 ** 9;
 
     // TOTAL_GONS is a multiple of INITIAL_FRAGMENTS_SUPPLY so that _gonsPerFragment is an integer.
     // Use the highest value that fits in a uint256 for max granularity.
     uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_FRAGMENTS_SUPPLY);
 
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
-    uint256 private constant MAX_SUPPLY = ~uint128(0);  // (2^128) - 1
+    uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
 
     uint256 private _gonsPerFragment;
     mapping(address => uint256) private _gonBalances;
 
-    mapping ( address => mapping ( address => uint256 ) ) private _allowedValue;
+    mapping(address => mapping(address => uint256)) private _allowedValue;
 
     constructor() ERC20("Staked Klima", "sKLIMA", 9) ERC20Permit() {
         initializer = msg.sender;
@@ -1041,154 +1053,156 @@ contract sKLIMAv2 is ERC20Permit, Ownable {
         _gonsPerFragment = TOTAL_GONS.div(_totalSupply);
     }
 
-    function initialize( address stakingContract_ ) external returns ( bool ) {
-        require( msg.sender == initializer );
-        require( stakingContract_ != address(0) );
+    function initialize(address stakingContract_) external returns (bool) {
+        require(msg.sender == initializer);
+        require(stakingContract_ != address(0));
         stakingContract = stakingContract_;
-        _gonBalances[ stakingContract ] = TOTAL_GONS;
+        _gonBalances[stakingContract] = TOTAL_GONS;
 
-        emit Transfer( address(0x0), stakingContract, _totalSupply );
-        emit LogStakingContractUpdated( stakingContract_ );
+        emit Transfer(address(0x0), stakingContract, _totalSupply);
+        emit LogStakingContractUpdated(stakingContract_);
 
         initializer = address(0);
         return true;
     }
 
-    function setIndex( uint _INDEX ) external onlyManager() returns ( bool ) {
-        require( INDEX == 0 );
-        INDEX = gonsForBalance( _INDEX );
+    function setIndex(uint256 _INDEX) external onlyManager returns (bool) {
+        require(INDEX == 0);
+        INDEX = gonsForBalance(_INDEX);
         return true;
     }
 
     /**
-        @notice increases sKLIMA supply to increase staking balances relative to profit_
-        @param profit_ uint256
-        @return uint256
+     * @notice increases sKLIMA supply to increase staking balances relative to profit_
+     *     @param profit_ uint256
+     *     @return uint256
      */
-    function rebase( uint256 profit_, uint epoch_ ) public onlyStakingContract() returns ( uint256 ) {
+    function rebase(uint256 profit_, uint256 epoch_) public onlyStakingContract returns (uint256) {
         uint256 rebaseAmount;
         uint256 circulatingSupply_ = circulatingSupply();
 
-        if ( profit_ == 0 ) {
-            emit LogSupply( epoch_, block.timestamp, _totalSupply );
-            emit LogRebase( epoch_, 0, index() );
+        if (profit_ == 0) {
+            emit LogSupply(epoch_, block.timestamp, _totalSupply);
+            emit LogRebase(epoch_, 0, index());
             return _totalSupply;
-        } else if ( circulatingSupply_ > 0 ){
-            rebaseAmount = profit_.mul( _totalSupply ).div( circulatingSupply_ );
+        } else if (circulatingSupply_ > 0) {
+            rebaseAmount = profit_.mul(_totalSupply).div(circulatingSupply_);
         } else {
             rebaseAmount = profit_;
         }
 
-        _totalSupply = _totalSupply.add( rebaseAmount );
+        _totalSupply = _totalSupply.add(rebaseAmount);
 
-        if ( _totalSupply > MAX_SUPPLY ) {
+        if (_totalSupply > MAX_SUPPLY) {
             _totalSupply = MAX_SUPPLY;
         }
 
-        _gonsPerFragment = TOTAL_GONS.div( _totalSupply );
+        _gonsPerFragment = TOTAL_GONS.div(_totalSupply);
 
-        _storeRebase( circulatingSupply_, profit_, epoch_ );
+        _storeRebase(circulatingSupply_, profit_, epoch_);
 
         return _totalSupply;
     }
 
     /**
-        @notice emits event with data about rebase
-        @param previousCirculating_ uint
-        @param profit_ uint
-        @param epoch_ uint
-        @return bool
+     * @notice emits event with data about rebase
+     *     @param previousCirculating_ uint
+     *     @param profit_ uint
+     *     @param epoch_ uint
+     *     @return bool
      */
-    function _storeRebase( uint previousCirculating_, uint profit_, uint epoch_ ) internal returns ( bool ) {
-        uint rebasePercent = profit_.mul( 1e18 ).div( previousCirculating_ );
+    function _storeRebase(uint256 previousCirculating_, uint256 profit_, uint256 epoch_) internal returns (bool) {
+        uint256 rebasePercent = profit_.mul(1e18).div(previousCirculating_);
 
-        rebases.push( Rebase ( {
-        epoch: epoch_,
-        rebase: rebasePercent, // 18 decimals
-        totalStakedBefore: previousCirculating_,
-        totalStakedAfter: circulatingSupply(),
-        amountRebased: profit_,
-        index: index(),
-        blockNumberOccured: block.number
-        }));
+        rebases.push(
+            Rebase({
+                epoch: epoch_,
+                rebase: rebasePercent, // 18 decimals
+                totalStakedBefore: previousCirculating_,
+                totalStakedAfter: circulatingSupply(),
+                amountRebased: profit_,
+                index: index(),
+                blockNumberOccured: block.number
+            })
+        );
 
-        emit LogSupply( epoch_, block.timestamp, _totalSupply );
-        emit LogRebase( epoch_, rebasePercent, index() );
+        emit LogSupply(epoch_, block.timestamp, _totalSupply);
+        emit LogRebase(epoch_, rebasePercent, index());
 
         return true;
     }
 
-    function balanceOf( address who ) public view override returns ( uint256 ) {
-        return _gonBalances[ who ].div( _gonsPerFragment );
+    function balanceOf(address who) public view override returns (uint256) {
+        return _gonBalances[who].div(_gonsPerFragment);
     }
 
-    function gonsForBalance( uint amount ) public view returns ( uint ) {
-        return amount.mul( _gonsPerFragment );
+    function gonsForBalance(uint256 amount) public view returns (uint256) {
+        return amount.mul(_gonsPerFragment);
     }
 
-    function balanceForGons( uint gons ) public view returns ( uint ) {
-        return gons.div( _gonsPerFragment );
+    function balanceForGons(uint256 gons) public view returns (uint256) {
+        return gons.div(_gonsPerFragment);
     }
 
     // Staking contract holds excess sKLIMA
-    function circulatingSupply() public view returns ( uint ) {
-        return _totalSupply.sub( balanceOf( stakingContract ) );
+    function circulatingSupply() public view returns (uint256) {
+        return _totalSupply.sub(balanceOf(stakingContract));
     }
 
-    function index() public view returns ( uint ) {
-        return balanceForGons( INDEX );
+    function index() public view returns (uint256) {
+        return balanceForGons(INDEX);
     }
 
-    function transfer( address to, uint256 value ) public override returns (bool) {
-        uint256 gonValue = value.mul( _gonsPerFragment );
-        _gonBalances[ msg.sender ] = _gonBalances[ msg.sender ].sub( gonValue );
-        _gonBalances[ to ] = _gonBalances[ to ].add( gonValue );
-        emit Transfer( msg.sender, to, value );
+    function transfer(address to, uint256 value) public override returns (bool) {
+        uint256 gonValue = value.mul(_gonsPerFragment);
+        _gonBalances[msg.sender] = _gonBalances[msg.sender].sub(gonValue);
+        _gonBalances[to] = _gonBalances[to].add(gonValue);
+        emit Transfer(msg.sender, to, value);
         return true;
     }
 
-    function allowance( address owner_, address spender ) public view override returns ( uint256 ) {
-        return _allowedValue[ owner_ ][ spender ];
+    function allowance(address owner_, address spender) public view override returns (uint256) {
+        return _allowedValue[owner_][spender];
     }
 
-    function transferFrom( address from, address to, uint256 value ) public override returns ( bool ) {
-        _allowedValue[ from ][ msg.sender ] = _allowedValue[ from ][ msg.sender ].sub( value );
-        emit Approval( from, msg.sender,  _allowedValue[ from ][ msg.sender ] );
+    function transferFrom(address from, address to, uint256 value) public override returns (bool) {
+        _allowedValue[from][msg.sender] = _allowedValue[from][msg.sender].sub(value);
+        emit Approval(from, msg.sender, _allowedValue[from][msg.sender]);
 
-        uint256 gonValue = gonsForBalance( value );
-        _gonBalances[ from ] = _gonBalances[from].sub( gonValue );
-        _gonBalances[ to ] = _gonBalances[to].add( gonValue );
-        emit Transfer( from, to, value );
+        uint256 gonValue = gonsForBalance(value);
+        _gonBalances[from] = _gonBalances[from].sub(gonValue);
+        _gonBalances[to] = _gonBalances[to].add(gonValue);
+        emit Transfer(from, to, value);
 
         return true;
     }
 
-    function approve( address spender, uint256 value ) public override returns (bool) {
-        _allowedValue[ msg.sender ][ spender ] = value;
-        emit Approval( msg.sender, spender, value );
+    function approve(address spender, uint256 value) public override returns (bool) {
+        _allowedValue[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
         return true;
     }
 
     // What gets called in a permit
-    function _approve( address owner, address spender, uint256 value ) internal override virtual {
+    function _approve(address owner, address spender, uint256 value) internal virtual override {
         _allowedValue[owner][spender] = value;
-        emit Approval( owner, spender, value );
+        emit Approval(owner, spender, value);
     }
 
-    function increaseAllowance( address spender, uint256 addedValue ) public override returns (bool) {
-        _allowedValue[ msg.sender ][ spender ] = _allowedValue[ msg.sender ][ spender ].add( addedValue );
-        emit Approval( msg.sender, spender, _allowedValue[ msg.sender ][ spender ] );
+    function increaseAllowance(address spender, uint256 addedValue) public override returns (bool) {
+        _allowedValue[msg.sender][spender] = _allowedValue[msg.sender][spender].add(addedValue);
+        emit Approval(msg.sender, spender, _allowedValue[msg.sender][spender]);
         return true;
     }
 
-    function decreaseAllowance( address spender, uint256 subtractedValue ) public override returns (bool) {
-        uint256 oldValue = _allowedValue[ msg.sender ][ spender ];
+    function decreaseAllowance(address spender, uint256 subtractedValue) public override returns (bool) {
+        uint256 oldValue = _allowedValue[msg.sender][spender];
         if (subtractedValue >= oldValue) {
-            _allowedValue[ msg.sender ][ spender ] = 0;
+            _allowedValue[msg.sender][spender] = 0;
         } else {
-            _allowedValue[ msg.sender ][ spender ] = oldValue.sub( subtractedValue );
+            _allowedValue[msg.sender][spender] = oldValue.sub(subtractedValue);
         }
-        emit Approval( msg.sender, spender, _allowedValue[ msg.sender ][ spender ] );
+        emit Approval(msg.sender, spender, _allowedValue[msg.sender][spender]);
         return true;
     }
 }

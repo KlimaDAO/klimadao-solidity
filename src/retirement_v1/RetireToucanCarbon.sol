@@ -28,7 +28,9 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         __Context_init();
     }
 
-    /** === State Variables and Mappings === */
+    /**
+     * === State Variables and Mappings ===
+     */
 
     /// @notice feeAmount represents the fee to be bonded for KLIMA. 0.1% increments. 10 = 1%
 
@@ -39,8 +41,9 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     address public toucanRegistry;
     uint256 public lastTokenId;
 
-    /** === Event Setup === */
-
+    /**
+     * === Event Setup ===
+     */
     event ToucanRetired(
         address indexed retiringAddress,
         address indexed beneficiaryAddress,
@@ -92,12 +95,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
 
         // Retire the tokens
         _retireCarbon(
-            _amount,
-            _retireEntityString,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _poolToken
+            _amount, _retireEntityString, _beneficiaryAddress, _beneficiaryString, _retirementMessage, _poolToken
         );
 
         // Send the fee to the treasury
@@ -125,13 +123,8 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         address _retiree
     ) internal returns (uint256, uint256) {
         // Transfer source tokens
-        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) = _transferSourceTokens(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            false
-        );
+        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) =
+            _transferSourceTokens(_sourceToken, _poolToken, _amount, _amountInCarbon, false);
 
         // Get the pool tokens
         if (_sourceToken != _poolToken) {
@@ -225,13 +218,8 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         bool _amountInCarbon,
         address _retiree
     ) internal returns (uint256, uint256) {
-        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) = _transferSourceTokens(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            true
-        );
+        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) =
+            _transferSourceTokens(_sourceToken, _poolToken, _amount, _amountInCarbon, true);
 
         // Get the pool tokens
 
@@ -298,11 +286,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
 
             //IToucanCarbonOffsets(listTCO2[i]).retire(amounts[i]);
             IToucanCarbonOffsets(listTCO2[i]).retireAndMintCertificate(
-                _retireEntityString,
-                _beneficiaryAddress,
-                _beneficiaryString,
-                _retirementMessage,
-                amounts[i]
+                _retireEntityString, _beneficiaryAddress, _beneficiaryString, _retirementMessage, amounts[i]
             );
 
             // Send the Certificate
@@ -310,11 +294,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
 
             // Save retirement in Klima storage
             IKlimaCarbonRetirements(retirementStorage).carbonRetired(
-                _beneficiaryAddress,
-                _poolToken,
-                amounts[i],
-                _beneficiaryString,
-                _retirementMessage
+                _beneficiaryAddress, _poolToken, amounts[i], _beneficiaryString, _retirementMessage
             );
             emit ToucanRetired(
                 msg.sender,
@@ -388,11 +368,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
 
                 //IToucanCarbonOffsets(_carbonList[i]).retire(redeemAmount[0]);
                 IToucanCarbonOffsets(_carbonList[i]).retireAndMintCertificate(
-                    _retireEntityString,
-                    _beneficiaryAddress,
-                    _beneficiaryString,
-                    _retirementMessage,
-                    redeemAmount[0]
+                    _retireEntityString, _beneficiaryAddress, _beneficiaryString, _retirementMessage, redeemAmount[0]
                 );
 
                 // Send the Certificate
@@ -400,11 +376,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
 
                 // Save retirement in Klima storage
                 IKlimaCarbonRetirements(retirementStorage).carbonRetired(
-                    _beneficiaryAddress,
-                    _poolToken,
-                    redeemAmount[0],
-                    _beneficiaryString,
-                    _retirementMessage
+                    _beneficiaryAddress, _poolToken, redeemAmount[0], _beneficiaryString, _retirementMessage
                 );
                 emit ToucanRetired(
                     msg.sender,
@@ -500,12 +472,11 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
      * @param _poolAmount Amount of tokens being retired.
      * @return Tuple of the total pool amount needed, followed by the fee.
      */
-    function getNeededBuyAmount(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _poolAmount,
-        bool _specificRetire
-    ) public view returns (uint256, uint256) {
+    function getNeededBuyAmount(address _sourceToken, address _poolToken, uint256 _poolAmount, bool _specificRetire)
+        public
+        view
+        returns (uint256, uint256)
+    {
         uint256 fee = (_poolAmount * feeAmount) / 1000;
         uint256 totalAmount = _poolAmount + fee;
 
@@ -611,11 +582,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         IERC20Upgradeable(path[0]).safeIncreaseAllowance(poolRouter[_poolToken], _amountIn);
 
         uint256[] memory amounts = IUniswapV2Router02(poolRouter[_poolToken]).swapTokensForExactTokens(
-            _carbonAmount,
-            _amountIn,
-            path,
-            address(this),
-            block.timestamp
+            _carbonAmount, _amountIn, path, address(this), block.timestamp
         );
 
         _returnTradeDust(amounts, _sourceToken, _amountIn, _retiree);
@@ -632,11 +599,10 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
      * @return Returns the resulting carbon amount to retire and the fee from the
      * results of the swap.
      */
-    function _swapExactForCarbon(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amountIn
-    ) internal returns (uint256, uint256) {
+    function _swapExactForCarbon(address _sourceToken, address _poolToken, uint256 _amountIn)
+        internal
+        returns (uint256, uint256)
+    {
         address[] memory path = getSwapPath(_sourceToken, _poolToken);
 
         uint256[] memory amountsOut = IUniswapV2Router02(poolRouter[_poolToken]).getAmountsOut(_amountIn, path);
@@ -646,11 +612,7 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(poolRouter[_poolToken], _amountIn);
 
         uint256[] memory amounts = IUniswapV2Router02(poolRouter[_poolToken]).swapExactTokensForTokens(
-            _amountIn,
-            (totalCarbon * 995) / 1000,
-            path,
-            address(this),
-            block.timestamp
+            _amountIn, (totalCarbon * 995) / 1000, path, address(this), block.timestamp
         );
 
         totalCarbon = amounts[amounts.length - 1] == 0 ? amounts[amounts.length - 2] : amounts[amounts.length - 1];
@@ -670,12 +632,9 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
      * @param _amountIn Total source tokens initially provided.
      * @param _retiree Address where to send the dust.
      */
-    function _returnTradeDust(
-        uint256[] memory _amounts,
-        address _sourceToken,
-        uint256 _amountIn,
-        address _retiree
-    ) internal {
+    function _returnTradeDust(uint256[] memory _amounts, address _sourceToken, uint256 _amountIn, address _retiree)
+        internal
+    {
         address KLIMA = IKlimaRetirementAggregator(masterAggregator).KLIMA();
         address sKLIMA = IKlimaRetirementAggregator(masterAggregator).sKLIMA();
         address wsKLIMA = IKlimaRetirementAggregator(masterAggregator).wsKLIMA();
@@ -700,14 +659,15 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         }
     }
 
-    /** === Toucan Certificate Functions === */
-
-    function onERC721Received(
-        address,
-        address,
-        uint256 tokenId,
-        bytes memory
-    ) external virtual override returns (bytes4) {
+    /**
+     * === Toucan Certificate Functions ===
+     */
+    function onERC721Received(address, address, uint256 tokenId, bytes memory)
+        external
+        virtual
+        override
+        returns (bytes4)
+    {
         // Update the last tokenId received so it can be transferred.
         lastTokenId = tokenId;
 
@@ -721,12 +681,14 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         IERC721Upgradeable(retireCert).safeTransferFrom(address(this), _beneficiary, lastTokenId);
     }
 
-    /** === Admin Functions === */
+    /**
+     * === Admin Functions ===
+     */
 
     /**
-        @notice Set the fee for the helper
-        @param _amount New fee amount, in .1% increments. 10 = 1%
-        @return bool
+     * @notice Set the fee for the helper
+     *     @param _amount New fee amount, in .1% increments. 10 = 1%
+     *     @return bool
      */
     function setFeeAmount(uint256 _amount) external onlyOwner returns (bool) {
         uint256 oldFee = feeAmount;
@@ -737,10 +699,10 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     }
 
     /**
-        @notice Update the router for an existing pool
-        @param _poolToken Pool being updated
-        @param _router New router address
-        @return bool
+     * @notice Update the router for an existing pool
+     *     @param _poolToken Pool being updated
+     *     @param _router New router address
+     *     @return bool
      */
     function setPoolRouter(address _poolToken, address _router) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -752,8 +714,8 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     }
 
     /**
-        @notice Update the Toucan Contract Registry
-        @param _registry New Registry Address
+     * @notice Update the Toucan Contract Registry
+     *     @param _registry New Registry Address
      */
     function setToucanRegistry(address _registry) external onlyOwner {
         require(_registry != address(0), "Registry cannot be zero");
@@ -764,10 +726,10 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     }
 
     /**
-        @notice Add a new carbon pool to retire with helper contract
-        @param _poolToken Pool being added
-        @param _router UniswapV2 router to route trades through for non-pool retirements
-        @return bool
+     * @notice Add a new carbon pool to retire with helper contract
+     *     @param _poolToken Pool being added
+     *     @param _router UniswapV2 router to route trades through for non-pool retirements
+     *     @return bool
      */
     function addPool(address _poolToken, address _router) external onlyOwner returns (bool) {
         require(!isPoolToken[_poolToken], "Pool already added");
@@ -781,9 +743,9 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     }
 
     /**
-        @notice Remove a carbon pool to retire with helper contract
-        @param _poolToken Pool being removed
-        @return bool
+     * @notice Remove a carbon pool to retire with helper contract
+     *     @param _poolToken Pool being removed
+     *     @return bool
      */
     function removePool(address _poolToken) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -795,9 +757,9 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     }
 
     /**
-        @notice Allow withdrawal of any tokens sent in error
-        @param _token Address of token to transfer
-        @param _recipient Address where to send tokens.
+     * @notice Allow withdrawal of any tokens sent in error
+     *     @param _token Address of token to transfer
+     *     @param _recipient Address where to send tokens.
      */
     function feeWithdraw(address _token, address _recipient) public onlyOwner returns (bool) {
         IERC20Upgradeable(_token).safeTransfer(_recipient, IERC20Upgradeable(_token).balanceOf(address(this)));
@@ -806,9 +768,9 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
     }
 
     /**
-        @notice Allow the contract owner to update the master aggregator proxy address used.
-        @param _newAddress New address for contract needing to be updated.
-        @return bool
+     * @notice Allow the contract owner to update the master aggregator proxy address used.
+     *     @param _newAddress New address for contract needing to be updated.
+     *     @return bool
      */
     function setMasterAggregator(address _newAddress) external onlyOwner returns (bool) {
         address oldAddress = masterAggregator;
@@ -823,17 +785,12 @@ contract RetireToucanCarbon is Initializable, ContextUpgradeable, OwnableUpgrade
         address retirementStorage = IKlimaRetirementAggregator(masterAggregator).klimaRetirementStorage();
 
         // Get the message info from the prior retirement.
-        (, uint256 amount, string memory beneficiaryString, string memory retirementMessage) = IKlimaCarbonRetirements(
-            retirementStorage
-        ).getRetirementIndexInfo(_beneficiary, _index);
+        (, uint256 amount, string memory beneficiaryString, string memory retirementMessage) =
+            IKlimaCarbonRetirements(retirementStorage).getRetirementIndexInfo(_beneficiary, _index);
 
         // Mint the legacy certificate
         IToucanCarbonOffsets(_carbonToken).mintCertificateLegacy(
-            "KlimaDAO Aggregator",
-            _beneficiary,
-            beneficiaryString,
-            retirementMessage,
-            amount
+            "KlimaDAO Aggregator", _beneficiary, beneficiaryString, retirementMessage, amount
         );
 
         // Transfer to beneficiary

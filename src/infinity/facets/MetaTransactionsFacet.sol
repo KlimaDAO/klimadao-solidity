@@ -45,7 +45,7 @@ contract MetaTransactionsFacet is ReentrancyGuard {
     ///@notice Query the latest nonce of an address
     ///@param user Address to query
     ///@return nonce_ The latest nonce for the address
-    function getNonce(address user) external view returns (uint nonce_) {
+    function getNonce(address user) external view returns (uint256 nonce_) {
         nonce_ = s.metaNonces[user];
     }
 
@@ -65,7 +65,7 @@ contract MetaTransactionsFacet is ReentrancyGuard {
      * He should call the desired function directly in that case.
      */
     struct MetaTransaction {
-        uint nonce;
+        uint256 nonce;
         address from;
         bytes functionSignature;
     }
@@ -79,7 +79,7 @@ contract MetaTransactionsFacet is ReentrancyGuard {
     ) public payable returns (bytes memory) {
         bytes4 destinationFunctionSig = convertBytesToBytes4(functionSignature);
         require(destinationFunctionSig != msg.sig, "functionSignature can not be of executeMetaTransaction method");
-        uint nonce = s.metaNonces[userAddress];
+        uint256 nonce = s.metaNonces[userAddress];
         MetaTransaction memory metaTx =
             MetaTransaction({nonce: nonce, from: userAddress, functionSignature: functionSignature});
         require(verify(userAddress, metaTx, sigR, sigS, sigV), "Signer and signature do not match");

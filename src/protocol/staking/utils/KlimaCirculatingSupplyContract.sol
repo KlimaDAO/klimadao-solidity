@@ -1,6 +1,6 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-04-14
-*/
+ * Submitted for verification at Etherscan.io on 2021-04-14
+ */
 
 // SPDX-License-Identifier: AGPL-3.0-or-later\
 pragma solidity 0.7.5;
@@ -161,13 +161,13 @@ library SafeMath {
     }
 
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
-    function sqrrt(uint256 a) internal pure returns (uint c) {
+    function sqrrt(uint256 a) internal pure returns (uint256 c) {
         if (a > 3) {
             c = a;
-            uint b = add( div( a, 2), 1 );
+            uint256 b = add(div(a, 2), 1);
             while (b < c) {
                 c = b;
-                b = div( add( div( a, b ), b), 2 );
+                b = div(add(div(a, b), b), 2);
             }
         } else if (a != 0) {
             c = 1;
@@ -177,19 +177,19 @@ library SafeMath {
     /*
      * Expects percentage to be trailed by 00,
     */
-    function percentageAmount( uint256 total_, uint8 percentage_ ) internal pure returns ( uint256 percentAmount_ ) {
-        return div( mul( total_, percentage_ ), 1000 );
+    function percentageAmount(uint256 total_, uint8 percentage_) internal pure returns (uint256 percentAmount_) {
+        return div(mul(total_, percentage_), 1000);
     }
 
     /*
      * Expects percentage to be trailed by 00,
     */
-    function substractPercentage( uint256 total_, uint8 percentageToSub_ ) internal pure returns ( uint256 result_ ) {
-        return sub( total_, div( mul( total_, percentageToSub_ ), 1000 ) );
+    function substractPercentage(uint256 total_, uint8 percentageToSub_) internal pure returns (uint256 result_) {
+        return sub(total_, div(mul(total_, percentageToSub_), 1000));
     }
 
-    function percentageOfTotal( uint256 part_, uint256 total_ ) internal pure returns ( uint256 percent_ ) {
-        return div( mul(part_, 100) , total_ );
+    function percentageOfTotal(uint256 part_, uint256 total_) internal pure returns (uint256 percent_) {
+        return div(mul(part_, 100), total_);
     }
 
     /**
@@ -202,12 +202,12 @@ library SafeMath {
         return (a / 2) + (b / 2) + ((a % 2 + b % 2) / 2);
     }
 
-    function quadraticPricing( uint256 payment_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return sqrrt( mul( multiplier_, payment_ ) );
+    function quadraticPricing(uint256 payment_, uint256 multiplier_) internal pure returns (uint256) {
+        return sqrrt(mul(multiplier_, payment_));
     }
 
-    function bondingCurve( uint256 supply_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return mul( multiplier_, supply_ );
+    function bondingCurve(uint256 supply_, uint256 multiplier_) internal pure returns (uint256) {
+        return mul(multiplier_, supply_);
     }
 }
 
@@ -286,7 +286,7 @@ interface IERC20 {
 }
 
 contract KlimaCirculatingSupplyContract {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     bool public isInitialized;
 
@@ -294,13 +294,13 @@ contract KlimaCirculatingSupplyContract {
     address public owner;
     address[] public nonCirculatingKLIMAAddresses;
 
-    constructor( address _owner ) {
+    constructor(address _owner) {
         owner = _owner;
     }
 
-    function initialize( address _klima ) external returns ( bool ) {
-        require( msg.sender == owner, "caller is not owner" );
-        require( isInitialized == false );
+    function initialize(address _klima) external returns (bool) {
+        require(msg.sender == owner, "caller is not owner");
+        require(isInitialized == false);
 
         KLIMA = _klima;
 
@@ -309,33 +309,33 @@ contract KlimaCirculatingSupplyContract {
         return true;
     }
 
-    function KLIMACirculatingSupply() external view returns ( uint ) {
-        uint _totalSupply = IERC20( KLIMA ).totalSupply();
+    function KLIMACirculatingSupply() external view returns (uint256) {
+        uint256 _totalSupply = IERC20(KLIMA).totalSupply();
 
-        uint _circulatingSupply = _totalSupply.sub( getNonCirculatingKLIMA() );
+        uint256 _circulatingSupply = _totalSupply.sub(getNonCirculatingKLIMA());
 
         return _circulatingSupply;
     }
 
-    function getNonCirculatingKLIMA() public view returns ( uint ) {
-        uint _nonCirculatingKLIMA;
+    function getNonCirculatingKLIMA() public view returns (uint256) {
+        uint256 _nonCirculatingKLIMA;
 
-        for( uint i=0; i < nonCirculatingKLIMAAddresses.length; i = i.add( 1 ) ) {
-            _nonCirculatingKLIMA = _nonCirculatingKLIMA.add( IERC20( KLIMA ).balanceOf( nonCirculatingKLIMAAddresses[i] ) );
+        for (uint256 i = 0; i < nonCirculatingKLIMAAddresses.length; i = i.add(1)) {
+            _nonCirculatingKLIMA = _nonCirculatingKLIMA.add(IERC20(KLIMA).balanceOf(nonCirculatingKLIMAAddresses[i]));
         }
 
         return _nonCirculatingKLIMA;
     }
 
-    function setNonCirculatingKLIMAAddresses( address[] calldata _nonCirculatingAddresses ) external returns ( bool ) {
-        require( msg.sender == owner, "Sender is not owner" );
+    function setNonCirculatingKLIMAAddresses(address[] calldata _nonCirculatingAddresses) external returns (bool) {
+        require(msg.sender == owner, "Sender is not owner");
         nonCirculatingKLIMAAddresses = _nonCirculatingAddresses;
 
         return true;
     }
 
-    function transferOwnership( address _owner ) external returns ( bool ) {
-        require( msg.sender == owner, "Sender is not owner" );
+    function transferOwnership(address _owner) external returns (bool) {
+        require(msg.sender == owner, "Sender is not owner");
 
         owner = _owner;
 

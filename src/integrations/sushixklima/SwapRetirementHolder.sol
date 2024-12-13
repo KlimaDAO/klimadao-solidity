@@ -82,14 +82,17 @@ contract SwapRetirementHolder is KeeperCompatibleInterface, Ownable {
         emit newCarbonTokenUpdated(sourceCarbonToken);
     }
 
-    function checkUpkeep(
-        bytes calldata /* checkData */
-    ) external view override returns (bool upkeepNeeded, bytes memory /* performData */) {
+    function checkUpkeep(bytes calldata /* checkData */ )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */ )
+    {
         upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
         // The checkData is defined when the Upkeep was registered.
     }
 
-    function performUpkeep(bytes calldata /* performData */) external override {
+    function performUpkeep(bytes calldata /* performData */ ) external override {
         if ((block.timestamp - lastTimeStamp) > interval && numPendingRetirementAddresses != 0) {
             //lastTimeStamp = block.timestamp;
 

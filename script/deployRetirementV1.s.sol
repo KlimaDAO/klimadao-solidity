@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-/******************************************************************************\
-* Author: Cujo <rawr@cujowolf.dev>
-
-* Script to deploy Retirement Aggregator V1 as Transparent Proxies.
-/******************************************************************************/
-
+/**
+ * \
+ * Author: Cujo <rawr@cujowolf.dev>
+ *
+ * Script to deploy Retirement Aggregator V1 as Transparent Proxies.
+ * /*****************************************************************************
+ */
 import "forge-std/Script.sol";
 
 import "oz/proxy/transparent/TransparentUpgradeableProxy.sol";
@@ -126,14 +127,10 @@ contract DeployRetirementV1 is Script {
         wrappedC3Proxy.initialize();
 
         wrappedC3Proxy.addPool(
-            UBO,
-            0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506,
-            0x5400A05B8B45EaF9105315B4F2e31F806AB706dE
+            UBO, 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506, 0x5400A05B8B45EaF9105315B4F2e31F806AB706dE
         );
         wrappedC3Proxy.addPool(
-            NBO,
-            0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506,
-            0x251cA6A70cbd93Ccd7039B6b708D4cb9683c266C
+            NBO, 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506, 0x251cA6A70cbd93Ccd7039B6b708D4cb9683c266C
         );
 
         wrappedC3Proxy.setMasterAggregator(address(masterProxy));

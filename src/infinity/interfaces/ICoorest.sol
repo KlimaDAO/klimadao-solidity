@@ -9,9 +9,8 @@ interface ICCO2 {
 }
 
 interface ICoorest {
-    function mintPOCC(
-        uint256 _amountCO2,
-        string memory _reason,
-        string memory _owner
-    ) external payable returns (uint256);
+    function mintPOCC(uint256 _amountCO2, string memory _reason, string memory _owner)
+        external
+        payable
+        returns (uint256);
 }

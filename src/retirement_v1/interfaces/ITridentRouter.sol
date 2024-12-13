@@ -12,7 +12,8 @@ interface ITridentRouter {
         bytes data;
     }
 
-    function exactInputSingleWithNativeToken(
-        ExactInputSingleParams calldata params
-    ) external payable returns (uint256 amountOut);
+    function exactInputSingleWithNativeToken(ExactInputSingleParams calldata params)
+        external
+        payable
+        returns (uint256 amountOut);
 }

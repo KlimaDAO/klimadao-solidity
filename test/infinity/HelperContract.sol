@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-/******************************************************************************\
-* Authors: Timo Neumann <timo@fyde.fi>
-* EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
-* Helper functions for the translation from the jest tests in the original repo
-* to solidity tests.
-/******************************************************************************/
-
+/**
+ * \
+ * Authors: Timo Neumann <timo@fyde.fi>
+ * EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
+ * Helper functions for the translation from the jest tests in the original repo
+ * to solidity tests.
+ * /*****************************************************************************
+ */
 import "../../lib/solidity-stringutils/strings.sol";
 import "../../src/infinity/interfaces/IDiamond.sol";
 import "../../src/infinity/interfaces/IDiamondLoupe.sol";
@@ -33,7 +34,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         strings.slice memory delim = ":".toSlice();
         strings.slice memory delim2 = ",".toSlice();
         selectors = new bytes4[]((s.count(delim)));
-        for (uint i = 0; i < selectors.length; i++) {
+        for (uint256 i = 0; i < selectors.length; i++) {
             s.split('"'.toSlice());
             selectors[i] = bytes4(s.split(delim).until('"'.toSlice()).keccak());
             s.split(delim2);
@@ -42,10 +43,10 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     }
 
     // helper to remove index from bytes4[] array
-    function removeElement(uint index, bytes4[] memory array) public pure returns (bytes4[] memory) {
+    function removeElement(uint256 index, bytes4[] memory array) public pure returns (bytes4[] memory) {
         bytes4[] memory newarray = new bytes4[](array.length - 1);
-        uint j = 0;
-        for (uint i = 0; i < array.length; i++) {
+        uint256 j = 0;
+        for (uint256 i = 0; i < array.length; i++) {
             if (i != index) {
                 newarray[j] = array[i];
                 j += 1;
@@ -56,7 +57,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
 
     // helper to remove value from bytes4[] array
     function removeElement(bytes4 el, bytes4[] memory array) public pure returns (bytes4[] memory) {
-        for (uint i = 0; i < array.length; i++) {
+        for (uint256 i = 0; i < array.length; i++) {
             if (array[i] == el) {
                 return removeElement(i, array);
             }
@@ -65,7 +66,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     }
 
     function containsElement(bytes4[] memory array, bytes4 el) public pure returns (bool) {
-        for (uint i = 0; i < array.length; i++) {
+        for (uint256 i = 0; i < array.length; i++) {
             if (array[i] == el) {
                 return true;
             }
@@ -75,7 +76,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     }
 
     function containsElement(address[] memory array, address el) public pure returns (bool) {
-        for (uint i = 0; i < array.length; i++) {
+        for (uint256 i = 0; i < array.length; i++) {
             if (array[i] == el) {
                 return true;
             }
@@ -88,7 +89,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         if (array1.length != array2.length) {
             return false;
         }
-        for (uint i = 0; i < array1.length; i++) {
+        for (uint256 i = 0; i < array1.length; i++) {
             if (containsElement(array1, array2[i])) {
                 return true;
             }
@@ -100,15 +101,15 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     function getAllSelectors(address diamondAddress) public view returns (bytes4[] memory) {
         Facet[] memory facetList = IDiamondLoupe(diamondAddress).facets();
 
-        uint len = 0;
-        for (uint i = 0; i < facetList.length; i++) {
+        uint256 len = 0;
+        for (uint256 i = 0; i < facetList.length; i++) {
             len += facetList[i].functionSelectors.length;
         }
 
-        uint pos = 0;
+        uint256 pos = 0;
         bytes4[] memory selectors = new bytes4[](len);
-        for (uint i = 0; i < facetList.length; i++) {
-            for (uint j = 0; j < facetList[i].functionSelectors.length; j++) {
+        for (uint256 i = 0; i < facetList.length; i++) {
+            for (uint256 j = 0; j < facetList[i].functionSelectors.length; j++) {
                 selectors[pos] = facetList[i].functionSelectors[j];
                 pos += 1;
             }
@@ -127,12 +128,10 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
 
     function facets() external view returns (Facet[] memory facets_) {}
 
-    function swipeERC20Tokens(
-        address token,
-        uint transferAmount,
-        address sender,
-        address receiver
-    ) public returns (uint newReceiverBalance) {
+    function swipeERC20Tokens(address token, uint256 transferAmount, address sender, address receiver)
+        public
+        returns (uint256 newReceiverBalance)
+    {
         uint256 initialSenderBalance = IERC20(token).balanceOf(sender);
         require(transferAmount <= initialSenderBalance);
 

@@ -42,9 +42,9 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
 
         vm.stopBroadcast();
 
-        // Given, all the following updates to the Klima Infinity will be 
-        // processed by a multiple, when we generate the calldata that will 
-        // be plugged to the safeSDK to propose multi-sign txn. 
+        // Given, all the following updates to the Klima Infinity will be
+        // processed by a multiple, when we generate the calldata that will
+        // be plugged to the safeSDK to propose multi-sign txn.
 
         // FacetCut array which contains the standard facet to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
@@ -73,12 +73,8 @@ contract UpgradeInfinityForNativeUsdc is Script, HelperContract {
         console2.log("Update Swap Paths Calldata");
         console2.logBytes(updateSwapPathsCalldata);
 
-        addNewRetireCarbonmarkFacetCalldata = abi.encodeWithSelector(
-            IDiamondCut.diamondCut.selector,
-            cut,
-            address(0),
-            ""
-        );
+        addNewRetireCarbonmarkFacetCalldata =
+            abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
 
         console2.log("New retireCarbonmarkF address");
         console2.logAddress(address(retireCarbonmarkF));

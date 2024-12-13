@@ -104,11 +104,11 @@ contract KlimaIDONFT is
         _unpause();
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721PausableUpgradeable) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        virtual
+        override(ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721PausableUpgradeable)
+    {
         if (hasRole(MINTER_ROLE, _msgSender())) {
             ERC721Upgradeable._beforeTokenTransfer(from, to, tokenId);
         } else {
@@ -119,9 +119,7 @@ contract KlimaIDONFT is
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    )
+    function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual

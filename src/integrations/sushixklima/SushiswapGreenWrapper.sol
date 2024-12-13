@@ -15,7 +15,6 @@ import "./interfaces/IUniswapV2Router02.sol";
  * @notice This contracts allows for a sushiswap swap to be offset in a 2nd txn triggered
  *
  */
-
 contract SushiswapGreenSwapWrapper is Initializable, ContextUpgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -36,7 +35,6 @@ contract SushiswapGreenSwapWrapper is Initializable, ContextUpgradeable, Ownable
      * @notice This function will do a retirement as well as a swap, while it is \
      * configurable, it can be pre-populated with default values from the Sushi UI
      */
-
     function GreenSwapTokensForTokens(
         uint256 amountIn,
         uint256 amountOutMin,

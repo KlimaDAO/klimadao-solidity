@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.5;
 
-/******************************************************************************\
-* Authors: Cujo <rawr@cujowolf.dev>
-
-* Script to deploy the Klima tokens and protocol contracts
-/******************************************************************************/
-
+/**
+ * \
+ * Authors: Cujo <rawr@cujowolf.dev>
+ *
+ * Script to deploy the Klima tokens and protocol contracts
+ * /*****************************************************************************
+ */
 import "forge-std/Script.sol";
 import {console2} from "forge-std/console2.sol";
 import {console} from "forge-std/console.sol";

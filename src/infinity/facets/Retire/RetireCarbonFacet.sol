@@ -15,7 +15,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         string retirementMessage,
         address indexed carbonPool,
         address poolToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /* ========== Default Redemption Retirements ========== */
@@ -36,17 +36,17 @@ contract RetireCarbonFacet is ReentrancyGuard {
     function retireExactCarbonDefault(
         address sourceToken,
         address poolToken,
-        uint maxAmountIn,
-        uint retireAmount,
+        uint256 maxAmountIn,
+        uint256 retireAmount,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external payable nonReentrant returns (uint retirementIndex) {
+    ) external payable nonReentrant returns (uint256 retirementIndex) {
         require(retireAmount > 0, "Cannot retire zero tonnes");
 
-        uint totalCarbon = LibRetire.getTotalCarbon(retireAmount);
+        uint256 totalCarbon = LibRetire.getTotalCarbon(retireAmount);
 
         if (sourceToken == poolToken) {
             require(totalCarbon == maxAmountIn, "Incorrect pool amount");
@@ -61,9 +61,11 @@ contract RetireCarbonFacet is ReentrancyGuard {
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
             uint256 carbonReceived;
-            if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+            if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon) {
                 carbonReceived = LibSwap.swapWithRetirementBonds(sourceToken, poolToken, maxAmountIn, totalCarbon);
-            else carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            } else {
+                carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            }
 
             require(carbonReceived >= totalCarbon, "Swap not enough");
             totalCarbon = carbonReceived;
@@ -110,17 +112,17 @@ contract RetireCarbonFacet is ReentrancyGuard {
         address sourceToken,
         address poolToken,
         address projectToken,
-        uint maxAmountIn,
-        uint retireAmount,
+        uint256 maxAmountIn,
+        uint256 retireAmount,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external payable nonReentrant returns (uint retirementIndex) {
+    ) external payable nonReentrant returns (uint256 retirementIndex) {
         require(retireAmount > 0, "Cannot retire zero tonnes");
 
-        uint totalCarbon = LibRetire.getTotalCarbonSpecific(poolToken, retireAmount);
+        uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(poolToken, retireAmount);
 
         if (sourceToken == poolToken) {
             require(totalCarbon == maxAmountIn, "Incorrect pool amount");
@@ -135,9 +137,11 @@ contract RetireCarbonFacet is ReentrancyGuard {
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
             uint256 carbonReceived;
-            if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+            if (IERC20(poolToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon) {
                 carbonReceived = LibSwap.swapWithRetirementBonds(sourceToken, poolToken, maxAmountIn, totalCarbon);
-            else carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            } else {
+                carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
+            }
 
             // Check for any trade dust and send back
             LibSwap.returnTradeDust(sourceToken, poolToken);
@@ -146,10 +150,10 @@ contract RetireCarbonFacet is ReentrancyGuard {
             totalCarbon = carbonReceived;
         }
 
-        uint redeemedPool = LibRetire.retireReceivedExactCarbonSpecific(
+        uint256 redeemedPool = LibRetire.retireReceivedExactCarbonSpecific(
             poolToken,
             projectToken,
-            retireAmount, // Note: Bridge specific fee gets added in this function call. 
+            retireAmount, // Note: Bridge specific fee gets added in this function call.
             msg.sender,
             retiringEntityString,
             beneficiaryAddress,

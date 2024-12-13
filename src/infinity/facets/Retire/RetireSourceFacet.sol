@@ -15,7 +15,7 @@ contract RetireSourceFacet is ReentrancyGuard {
         string retirementMessage,
         address indexed carbonPool,
         address poolToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /* ========== Default Redemption Retirements ========== */
@@ -35,19 +35,19 @@ contract RetireSourceFacet is ReentrancyGuard {
     function retireExactSourceDefault(
         address sourceToken,
         address poolToken,
-        uint maxAmountIn,
+        uint256 maxAmountIn,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external payable nonReentrant returns (uint retirementIndex) {
+    ) external payable nonReentrant returns (uint256 retirementIndex) {
         require(maxAmountIn > 0, "Cannot retire zero tonnes");
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         /// @dev Initial value set assuming source == pool.
-        uint totalCarbon = maxAmountIn;
+        uint256 totalCarbon = maxAmountIn;
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
@@ -60,7 +60,7 @@ contract RetireSourceFacet is ReentrancyGuard {
         }
 
         // Record the amount to retire based on the current fee.
-        uint retireAmount = totalCarbon - LibRetire.getFee(totalCarbon);
+        uint256 retireAmount = totalCarbon - LibRetire.getFee(totalCarbon);
 
         LibRetire.retireReceivedCarbon(
             poolToken,
@@ -99,19 +99,19 @@ contract RetireSourceFacet is ReentrancyGuard {
         address sourceToken,
         address poolToken,
         address projectToken,
-        uint maxAmountIn,
+        uint256 maxAmountIn,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
         string memory retirementMessage,
         LibTransfer.From fromMode
-    ) external payable nonReentrant returns (uint retirementIndex) {
+    ) external payable nonReentrant returns (uint256 retirementIndex) {
         require(maxAmountIn > 0, "Cannot retire zero tonnes");
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         /// @dev Initial value set assuming source == pool.
-        uint totalCarbon = maxAmountIn;
+        uint256 totalCarbon = maxAmountIn;
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
@@ -124,12 +124,12 @@ contract RetireSourceFacet is ReentrancyGuard {
         }
 
         // Record the amount to retire based on the current fee.
-        uint retireAmount = totalCarbon - LibRetire.getFee(totalCarbon);
+        uint256 retireAmount = totalCarbon - LibRetire.getFee(totalCarbon);
         if (s.poolBridge[poolToken] == LibRetire.CarbonBridge.C3) {
             retireAmount = LibC3Carbon.getExactSourceSpecificRetireAmount(poolToken, retireAmount);
         }
 
-        uint redeemedAmount = LibRetire.retireReceivedCarbonSpecificFromSource(
+        uint256 redeemedAmount = LibRetire.retireReceivedCarbonSpecificFromSource(
             poolToken,
             projectToken,
             retireAmount,
@@ -143,10 +143,7 @@ contract RetireSourceFacet is ReentrancyGuard {
         // Send any aggregator fees to treasury
         if (totalCarbon - redeemedAmount > 0) {
             LibTransfer.sendToken(
-                IERC20(poolToken),
-                totalCarbon - redeemedAmount,
-                C.treasury(),
-                LibTransfer.To.EXTERNAL
+                IERC20(poolToken), totalCarbon - redeemedAmount, C.treasury(), LibTransfer.To.EXTERNAL
             );
         }
 

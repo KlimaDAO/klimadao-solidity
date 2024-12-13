@@ -9,7 +9,6 @@ pragma solidity ^0.8.0;
  * Implementation of a diamond.
  * /*****************************************************************************
  */
-
 import {LibDiamond} from "../libraries/LibDiamond.sol";
 import {IDiamondLoupe} from "../interfaces/IDiamondLoupe.sol";
 import {IDiamondCut} from "../interfaces/IDiamondCut.sol";
@@ -27,7 +26,7 @@ import "../C.sol";
 contract DiamondInit {
     AppStorage internal s;
 
-    uint private constant MAX_INT = 2 ** 256 - 1;
+    uint256 private constant MAX_INT = 2 ** 256 - 1;
 
     // You can add parameters to this function in order to pass in
     // data to set your own state variables

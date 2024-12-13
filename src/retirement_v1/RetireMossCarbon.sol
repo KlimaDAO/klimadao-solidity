@@ -24,7 +24,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
         __Context_init();
     }
 
-    /** === State Variables and Mappings === */
+    /**
+     * === State Variables and Mappings ===
+     */
 
     /// @notice feeAmount represents the fee to be bonded for KLIMA. 0.1% increments. 10 = 1%
 
@@ -34,8 +36,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     mapping(address => bool) public isPoolToken;
     mapping(address => address) public poolRouter;
 
-    /** === Event Setup === */
-
+    /**
+     * === Event Setup ===
+     */
     event MossRetired(
         address indexed retiringAddress,
         address indexed beneficiaryAddress,
@@ -80,12 +83,8 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
 
         // Transfer source tokens
 
-        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) = _transferSourceTokens(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon
-        );
+        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) =
+            _transferSourceTokens(_sourceToken, _poolToken, _amount, _amountInCarbon);
 
         // Get the pool tokens
 
@@ -143,19 +142,10 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
         IERC20Upgradeable(_poolToken).safeIncreaseAllowance(carbonChain, _totalAmount);
         ICarbonChain(carbonChain).offsetCarbon(_totalAmount, _retirementMessage, _beneficiaryString);
         IKlimaCarbonRetirements(retirementStorage).carbonRetired(
-            _beneficiaryAddress,
-            _poolToken,
-            _totalAmount,
-            _beneficiaryString,
-            _retirementMessage
+            _beneficiaryAddress, _poolToken, _totalAmount, _beneficiaryString, _retirementMessage
         );
         emit MossRetired(
-            _msgSender(),
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _poolToken,
-            _totalAmount
+            _msgSender(), _beneficiaryAddress, _beneficiaryString, _retirementMessage, _poolToken, _totalAmount
         );
     }
 
@@ -168,12 +158,10 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
      *          carbon to offset or the total source to spend. See _amountInCarbon.
      * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
      */
-    function _transferSourceTokens(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amount,
-        bool _amountInCarbon
-    ) internal returns (uint256, uint256, uint256) {
+    function _transferSourceTokens(address _sourceToken, address _poolToken, uint256 _amount, bool _amountInCarbon)
+        internal
+        returns (uint256, uint256, uint256)
+    {
         address sKLIMA = IKlimaRetirementAggregator(masterAggregator).sKLIMA();
         address wsKLIMA = IKlimaRetirementAggregator(masterAggregator).wsKLIMA();
 
@@ -323,11 +311,7 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
         IERC20Upgradeable(path[0]).safeIncreaseAllowance(poolRouter[_poolToken], _amountIn);
 
         uint256[] memory amounts = IUniswapV2Router02(poolRouter[_poolToken]).swapTokensForExactTokens(
-            _carbonAmount,
-            _amountIn,
-            path,
-            address(this),
-            block.timestamp
+            _carbonAmount, _amountIn, path, address(this), block.timestamp
         );
 
         _returnTradeDust(amounts, _sourceToken, _amountIn, _retiree);
@@ -344,11 +328,10 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
      * @return Returns the resulting carbon amount to retire and the fee from the
      * results of the swap.
      */
-    function _swapExactForCarbon(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amountIn
-    ) internal returns (uint256, uint256) {
+    function _swapExactForCarbon(address _sourceToken, address _poolToken, uint256 _amountIn)
+        internal
+        returns (uint256, uint256)
+    {
         address[] memory path = getSwapPath(_sourceToken, _poolToken);
 
         uint256[] memory amountsOut = IUniswapV2Router02(poolRouter[_poolToken]).getAmountsOut(_amountIn, path);
@@ -358,11 +341,7 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
         IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(poolRouter[_poolToken], _amountIn);
 
         uint256[] memory amounts = IUniswapV2Router02(poolRouter[_poolToken]).swapExactTokensForTokens(
-            _amountIn,
-            (totalCarbon * 995) / 1000,
-            path,
-            address(this),
-            block.timestamp
+            _amountIn, (totalCarbon * 995) / 1000, path, address(this), block.timestamp
         );
 
         totalCarbon = amounts[amounts.length - 1] == 0 ? amounts[amounts.length - 2] : amounts[amounts.length - 1];
@@ -382,12 +361,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
      * @param _amountIn Total source tokens initially provided.
      * @param _retiree Address where to send the dust.
      */
-    function _returnTradeDust(
-        uint256[] memory _amounts,
-        address _sourceToken,
-        uint256 _amountIn,
-        address _retiree
-    ) internal {
+    function _returnTradeDust(uint256[] memory _amounts, address _sourceToken, uint256 _amountIn, address _retiree)
+        internal
+    {
         address KLIMA = IKlimaRetirementAggregator(masterAggregator).KLIMA();
         address sKLIMA = IKlimaRetirementAggregator(masterAggregator).sKLIMA();
         address wsKLIMA = IKlimaRetirementAggregator(masterAggregator).wsKLIMA();
@@ -413,9 +389,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Set the fee for the helper
-        @param _amount New fee amount, in .1% increments. 10 = 1%
-        @return bool
+     * @notice Set the fee for the helper
+     *     @param _amount New fee amount, in .1% increments. 10 = 1%
+     *     @return bool
      */
     function setFeeAmount(uint256 _amount) external onlyOwner returns (bool) {
         uint256 oldFee = feeAmount;
@@ -426,10 +402,10 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Update the router for an existing pool
-        @param _poolToken Pool being updated
-        @param _router New router address
-        @return bool
+     * @notice Update the router for an existing pool
+     *     @param _poolToken Pool being updated
+     *     @param _router New router address
+     *     @return bool
      */
     function setPoolRouter(address _poolToken, address _router) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -441,10 +417,10 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Add a new carbon pool to retire with helper contract
-        @param _poolToken Pool being added
-        @param _router UniswapV2 router to route trades through for non-pool retirements
-        @return bool
+     * @notice Add a new carbon pool to retire with helper contract
+     *     @param _poolToken Pool being added
+     *     @param _router UniswapV2 router to route trades through for non-pool retirements
+     *     @return bool
      */
     function addPool(address _poolToken, address _router) external onlyOwner returns (bool) {
         require(!isPoolToken[_poolToken], "Pool already added");
@@ -458,9 +434,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Remove a carbon pool to retire with helper contract
-        @param _poolToken Pool being removed
-        @return bool
+     * @notice Remove a carbon pool to retire with helper contract
+     *     @param _poolToken Pool being removed
+     *     @return bool
      */
     function removePool(address _poolToken) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -472,9 +448,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Allow withdrawal of any tokens sent in error
-        @param _token Address of token to transfer
-        @param _recipient Address where to send tokens.
+     * @notice Allow withdrawal of any tokens sent in error
+     *     @param _token Address of token to transfer
+     *     @param _recipient Address where to send tokens.
      */
     function feeWithdraw(address _token, address _recipient) public onlyOwner returns (bool) {
         IERC20Upgradeable(_token).safeTransfer(_recipient, IERC20Upgradeable(_token).balanceOf(address(this)));
@@ -483,9 +459,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Allow the contract owner to update the Moss CarbonChain Proxy address used.
-        @param _newAddress New address for contract needing to be updated.
-        @return bool
+     * @notice Allow the contract owner to update the Moss CarbonChain Proxy address used.
+     *     @param _newAddress New address for contract needing to be updated.
+     *     @return bool
      */
     function setCarbonChain(address _newAddress) external onlyOwner returns (bool) {
         address oldAddress = carbonChain;
@@ -497,9 +473,9 @@ contract RetireMossCarbon is Initializable, ContextUpgradeable, OwnableUpgradeab
     }
 
     /**
-        @notice Allow the contract owner to update the master aggregator proxy address used.
-        @param _newAddress New address for contract needing to be updated.
-        @return bool
+     * @notice Allow the contract owner to update the master aggregator proxy address used.
+     *     @param _newAddress New address for contract needing to be updated.
+     *     @return bool
      */
     function setMasterAggregator(address _newAddress) external onlyOwner returns (bool) {
         address oldAddress = masterAggregator;
