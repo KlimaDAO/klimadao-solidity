@@ -7,7 +7,8 @@ import {LibKlima} from "../../src/infinity/libraries/LibKlima.sol";
 import {LibToucanCarbon} from "../../src/infinity/libraries/Bridges/LibToucanCarbon.sol";
 import {LibTransfer} from "../../src/infinity/libraries/Token/LibTransfer.sol";
 import {IToucanPool} from "../../src/infinity/interfaces/IToucan.sol";
-
+import {LibAppStorage} from "../../src/infinity/libraries/LibAppStorage.sol";
+import { AppStorage} from "../../src/infinity/AppStorage.sol";
 import "./TestHelper.sol";
 import "../helpers/AssertionHelper.sol";
 
@@ -43,6 +44,8 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         KLIMA = constantsFacet.klima();
         BCT = constantsFacet.bct();
 
+        // set test Diamdond Storage fee for accurate tests
+        LibAppStorage.diamondStorage().fee = 1000;
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
         closeRetirementBonds(constantsFacet.klimaRetirementBond());
@@ -66,6 +69,7 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
 
         // Account for fees
         uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider);
+
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(USDC, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountDefaultRetirement(USDC, BCT, amount);
@@ -128,12 +132,12 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
     function test_infinity_retirementQuoter_specificRetire_noBonds_USDC_bridged(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
-        // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
-            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(BCT, amount);
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(USDC_BRIDGED, BCT, totalCarbon);
+
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(USDC_BRIDGED, BCT, amount);
+
 
         assertEq(swapResult, retireResult);
     }
@@ -141,12 +145,14 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
     function test_infinity_retirementQuoter_specificRetire_noBonds_Native_USDC(uint256 amount) public {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
+
         // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
-            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(BCT, amount);
+
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(USDC, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(USDC, BCT, amount);
+
 
         assertEq(swapResult, retireResult);
     }    
@@ -155,14 +161,10 @@ contract retireExactSourceSpecificToucan is TestHelper, AssertionHelper {
         vm.assume(amount > 0 && amount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
 
         // Account for fees
-        uint256 totalCarbon = amount + ((amount * infinityFee) / feeDivider)
-            + (((amount * feeDivider) / (feeDivider - bctRedeemFee)) - amount);
+        uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(BCT, amount);
 
         uint256 swapResult = quoterFacet.getSourceAmountSwapOnly(KLIMA, BCT, totalCarbon);
         uint256 retireResult = quoterFacet.getSourceAmountSpecificRetirement(KLIMA, BCT, amount);
-
-        console2.log("shit1 swapResult", swapResult);
-        console2.log("shit2 retireResult", retireResult);
 
         assertEq(swapResult, retireResult);
     }

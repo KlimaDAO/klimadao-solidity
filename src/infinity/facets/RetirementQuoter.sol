@@ -16,6 +16,7 @@ import "../../../lib/forge-std/src/console2.sol";
 
 contract RetirementQuoter {
     AppStorage internal s;
+
      function getSourceAmountSwapOnly(
         address sourceToken,
         address carbonToken,
@@ -44,10 +45,12 @@ contract RetirementQuoter {
 
         uint256 sourceAmount;
 
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon){
             sourceAmount = LibSwap.getSourceAmountFromRetirementBond(handledSourceToken, carbonToken, totalCarbon);
-        else
+        }
+        else{
             sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
+        }
 
         uint additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, sourceAmount);
 
@@ -66,8 +69,7 @@ contract RetirementQuoter {
         (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
 
         uint256 sourceAmount;
-
-        
+   
         if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon){
             sourceAmount = LibSwap.getSourceAmountFromRetirementBond(handledSourceToken, carbonToken, totalCarbon);
         } else {
