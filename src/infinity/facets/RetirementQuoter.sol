@@ -6,7 +6,9 @@ import "../libraries/LibRetire.sol";
 import "../libraries/TokenSwap/LibSwap.sol";
 import "../C.sol";
 import "../AppStorage.sol";
-
+import "../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "../../../lib/v3-periphery/contracts/interfaces/IQuoterView.sol";
+import "../../../lib/forge-std/src/console2.sol";
 /**
  * @author Cujo
  * @title RetirementQuoter provides source token amount information for default trade paths defined within Klima Infinity
@@ -14,13 +16,19 @@ import "../AppStorage.sol";
 
 contract RetirementQuoter {
     AppStorage internal s;
-
-    function getSourceAmountSwapOnly(
+     function getSourceAmountSwapOnly(
         address sourceToken,
         address carbonToken,
         uint amountOut
     ) public view returns (uint amountIn) {
-        return LibSwap.getSourceAmount(sourceToken, carbonToken, amountOut);
+
+        (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
+
+        uint256 swapSourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, amountOut);
+
+        uint additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, swapSourceAmount);
+
+        return swapSourceAmount + additionalSwapAmount;
     }
 
     function getSourceAmountDefaultRetirement(
@@ -32,10 +40,18 @@ contract RetirementQuoter {
 
         if (sourceToken == carbonToken) return totalCarbon;
 
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
-            return LibSwap.getSourceAmountFromRetirementBond(sourceToken, carbonToken, totalCarbon);
+        (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
 
-        return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
+        uint256 sourceAmount;
+
+        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
+            sourceAmount = LibSwap.getSourceAmountFromRetirementBond(handledSourceToken, carbonToken, totalCarbon);
+        else
+            sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
+
+        uint additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, sourceAmount);
+
+        return sourceAmount + additionalSwapAmount;
     }
 
     function getSourceAmountSpecificRetirement(
@@ -47,10 +63,20 @@ contract RetirementQuoter {
 
         if (sourceToken == carbonToken) return totalCarbon;
 
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon)
-            return LibSwap.getSourceAmountFromRetirementBond(sourceToken, carbonToken, totalCarbon);
+        (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
 
-        return LibSwap.getSourceAmount(sourceToken, carbonToken, totalCarbon);
+        uint256 sourceAmount;
+
+        
+        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon){
+            sourceAmount = LibSwap.getSourceAmountFromRetirementBond(handledSourceToken, carbonToken, totalCarbon);
+        } else {
+            sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
+        }
+
+        uint256 additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, sourceAmount);
+
+        return sourceAmount + additionalSwapAmount;
     }
 
     function getSourceAmountDefaultRedeem(
@@ -59,8 +85,14 @@ contract RetirementQuoter {
         uint redeemAmount
     ) public view returns (uint amountIn) {
         if (sourceToken == carbonToken) return redeemAmount;
+
+        (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
+
+        uint256 swapSourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, redeemAmount);
+
+        uint additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, swapSourceAmount);
         
-        return LibSwap.getSourceAmount(sourceToken, carbonToken, redeemAmount);
+        return swapSourceAmount + additionalSwapAmount;
     }
 
     function getSourceAmountSpecificRedeem(
@@ -81,7 +113,13 @@ contract RetirementQuoter {
             }
         }
         if (sourceToken != carbonToken) {
-            return LibSwap.getSourceAmount(sourceToken, carbonToken, amountIn);
+            (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
+
+            uint256 swapSourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, amountIn);
+
+            uint additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, swapSourceAmount);
+
+            return swapSourceAmount + additionalSwapAmount;
         }
     }
 
@@ -113,4 +151,41 @@ contract RetirementQuoter {
             amountOut = LibC3Carbon.getExactSourceSpecificRetireAmount(carbonToken, amountOut);
         }
     }
+
+    // USDC/USDC.e Uniswap Quote utils
+
+    function handleSourceToken(address sourceToken) internal view returns (address originalSourceToken, address handledSourceToken) {
+        originalSourceToken = sourceToken;
+        handledSourceToken = sourceToken;
+        if (sourceToken == C.usdc()) {
+            handledSourceToken = C.usdc_bridged();
+        }
+        return (originalSourceToken, handledSourceToken);
+    }
+
+    function calculateAdditionalSwapFee(
+        address originalSourceToken,
+        uint256 sourceAmount
+    ) internal view returns (uint256 additionalSwapAmount) {
+        additionalSwapAmount = 0;
+        if (originalSourceToken == C.usdc()) {
+                additionalSwapAmount = getUniswapV3Quote(C.usdc(), C.usdc_bridged(), sourceAmount);
+            }
+        }
+
+
+    function getUniswapV3Quote(address tokenIn, address tokenOut, uint256 amount) public view returns (uint256 additionalSwapAmount) {
+        IQuoterView.QuoteExactOutputSingleParams memory params = IQuoterView.QuoteExactOutputSingleParams({
+            tokenIn: tokenIn,
+            tokenOut: tokenOut,
+            amount: amount,
+            fee: 100,
+            sqrtPriceLimitX96: 0
+        });
+        (uint256 amountIn, , , ) = IQuoterView(C.uniswapV3Quoter()).quoteExactOutputSingle(params);
+        return amountIn - amount;
+    }
+
+
+
 }

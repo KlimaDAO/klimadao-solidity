@@ -4,6 +4,9 @@
   "description": "KlimaDAO Solidity contracts for the protocol",
   "main": "index.js",
   "scripts": {
+    "test-usdc-retire": "forge t -vvvv --ffi --fork-url http://localhost:8545 --match-test test_infinity_retireExactCarbonSpecific_BCT_USDC --summary > output.log",
+    "test-retirement-quoter": "forge t -vvvv --ffi --fork-url http://localhost:8545 --match-test test_infinity_retirementQuoter --summary > output.log",
+    "test-usdc-quoter": "forge t -vvvv --ffi --fork-url http://localhost:8545 --match-test test_infinity_retirementQuoter_specificRetire_withBonds_Native_USDC --summary > output.log",
     "test": "forge t -vvv --ffi --fork-url http://localhost:8545",
     "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test test_infinity --summary",
     "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test  test_protocol --summary",
@@ -37,6 +40,7 @@
   "dependencies": {
     "@safe-global/api-kit": "^2.4.6",
     "@safe-global/protocol-kit": "^4.1.1",
-    "@safe-global/safe-core-sdk-types": "^5.1.0"
+    "@safe-global/safe-core-sdk-types": "^5.1.0",
+    "@uniswap/v3-periphery": "^1.4.4"
   }
 }

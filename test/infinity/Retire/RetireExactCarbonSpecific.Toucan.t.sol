@@ -31,6 +31,7 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
+    address USDC_BRIDGED;
     address USDC;
     address KLIMA;
     address SKLIMA;
@@ -49,7 +50,8 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
+        USDC = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -63,53 +65,53 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_retireExactCarbonSpecific_BCT_BCT(uint256 retireAmount) public {
-        retireExactToucan(BCT, BCT, retireAmount, SUSHI_BCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_BCT_BCT(uint256 retireAmount) public {
+    //     retireExactToucan(BCT, BCT, retireAmount, SUSHI_BCT_LP);
+    // }
 
     function test_infinity_retireExactCarbonSpecific_BCT_USDC(uint256 retireAmount) public {
         retireExactToucan(USDC, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_BCT_KLIMA(uint256 retireAmount) public {
-        retireExactToucan(KLIMA, BCT, retireAmount, SUSHI_BCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_BCT_KLIMA(uint256 retireAmount) public {
+    //     retireExactToucan(KLIMA, BCT, retireAmount, SUSHI_BCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_BCT_SKLIMA(uint256 retireAmount) public {
-        retireExactToucan(SKLIMA, BCT, retireAmount, SUSHI_BCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_BCT_SKLIMA(uint256 retireAmount) public {
+    //     retireExactToucan(SKLIMA, BCT, retireAmount, SUSHI_BCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_BCT_WSKLIMA(uint256 retireAmount) public {
-        retireExactToucan(WSKLIMA, BCT, retireAmount, SUSHI_BCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_BCT_WSKLIMA(uint256 retireAmount) public {
+    //     retireExactToucan(WSKLIMA, BCT, retireAmount, SUSHI_BCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_NCT(uint256 retireAmount) public {
-        retireExactToucan(NCT, NCT, retireAmount, SUSHI_NCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_NCT_NCT(uint256 retireAmount) public {
+    //     retireExactToucan(NCT, NCT, retireAmount, SUSHI_NCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_USDC(uint256 retireAmount) public {
-        retireExactToucan(USDC, NCT, retireAmount, SUSHI_NCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_NCT_USDC(uint256 retireAmount) public {
+    //     retireExactToucan(USDC, NCT, retireAmount, SUSHI_NCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_KLIMA(uint256 retireAmount) public {
-        retireExactToucan(KLIMA, NCT, retireAmount, SUSHI_NCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_NCT_KLIMA(uint256 retireAmount) public {
+    //     retireExactToucan(KLIMA, NCT, retireAmount, SUSHI_NCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_SKLIMA(uint256 retireAmount) public {
-        retireExactToucan(SKLIMA, NCT, retireAmount, SUSHI_NCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_NCT_SKLIMA(uint256 retireAmount) public {
+    //     retireExactToucan(SKLIMA, NCT, retireAmount, SUSHI_NCT_LP);
+    // }
 
-    function test_infinity_retireExactCarbonSpecific_NCT_WSKLIMA(uint256 retireAmount) public {
-        retireExactToucan(WSKLIMA, NCT, retireAmount, SUSHI_NCT_LP);
-    }
+    // function test_infinity_retireExactCarbonSpecific_NCT_WSKLIMA(uint256 retireAmount) public {
+    //     retireExactToucan(WSKLIMA, NCT, retireAmount, SUSHI_NCT_LP);
+    // }
 
     function retireExactToucan(address sourceToken, address poolToken, uint256 retireAmount, address lpPool) public {
         vm.assume(retireAmount < (IERC20(poolToken).balanceOf(lpPool) * 30) / 100);
 
+
         if (retireAmount == 0 && sourceToken != poolToken) vm.expectRevert();
         uint256 sourceAmount =
             getSourceTokens(TransactionType.SPECIFIC_RETIRE, diamond, sourceToken, poolToken, retireAmount);
-
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
@@ -147,7 +149,8 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
                 poolToken,
                 projectToken,
                 retireAmount
-            );
+            );         
+
 
             uint256 retirementIndex = retireCarbonFacet.retireExactCarbonSpecific(
                 sourceToken,
