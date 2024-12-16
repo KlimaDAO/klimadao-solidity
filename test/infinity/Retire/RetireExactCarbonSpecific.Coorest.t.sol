@@ -32,7 +32,8 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
 
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
-    address USDC;
+    address USDC_NATIVE;
+    address USDC_BRIDGED;
     address KLIMA_TOKEN;
     address CCO2;
 
@@ -46,10 +47,12 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
 
         KLIMA_TREASURY = constantsFacet.treasury();
         KLIMA_TOKEN = constantsFacet.klima();
-        USDC = constantsFacet.usdc();
+        USDC_NATIVE = constantsFacet.usdc();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
         CCO2 = constantsFacet.coorestCCO2Token();
 
         // Mock Balance from StdUtils
+        deal(constantsFacet.usdc(), beneficiaryAddress, 100_000e6);
         deal(constantsFacet.usdc_bridged(), beneficiaryAddress, 100_000e6);
         deal(constantsFacet.klima(), beneficiaryAddress, 100_000e9);
 
@@ -58,12 +61,24 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
-    function test_infinity_retireExactCarbonSpecific_CCO2_USDC() public {
-        uint preTxBalance = IERC20(USDC).balanceOf(beneficiaryAddress);
+    function test_infinity_retireExactCarbonSpecific_CCO2_USDC_NATIVE() public {
+        uint preTxBalance = IERC20(USDC_NATIVE).balanceOf(beneficiaryAddress);
         uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
-        uint sourceAmount = retireExactCCO2(USDC, 100e18);
-        uint postTxBalance = IERC20(USDC).balanceOf(beneficiaryAddress);
+        uint sourceAmount = retireExactCCO2(USDC_NATIVE, 100e18);
+        uint postTxBalance = IERC20(USDC_NATIVE).balanceOf(beneficiaryAddress);
+        uint postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
+
+        assertEq(preTxBalance - postTxBalance, sourceAmount);
+        assertEq(postTxPoCCBalance - preTxPoCCBalance, 1);
+    }
+
+    function test_infinity_retireExactCarbonSpecific_CCO2_USDC_BRIDGED() public {
+        uint preTxBalance = IERC20(USDC_BRIDGED).balanceOf(beneficiaryAddress);
+        uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
+
+        uint sourceAmount = retireExactCCO2(USDC_BRIDGED, 100e18);
+        uint postTxBalance = IERC20(USDC_BRIDGED).balanceOf(beneficiaryAddress);
         uint postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
         assertEq(preTxBalance - postTxBalance, sourceAmount);
@@ -88,7 +103,7 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
 
         address sourceTarget;
 
-        if (sourceToken == USDC || sourceToken == KLIMA_TOKEN) sourceTarget = beneficiaryAddress;
+        if (sourceToken == USDC_NATIVE || sourceToken == USDC_BRIDGED || sourceToken == KLIMA_TOKEN) sourceTarget = beneficiaryAddress;
 
         vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
 

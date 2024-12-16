@@ -70,7 +70,7 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
     }
 
     function test_infinity_retireExactCarbonSpecific_UBO_USDC_NATIVE(uint256 retireAmount) public {
-        retireExactC3(USDC, UBO, retireAmount, SUSHI_UBO_LP);
+        retireExactC3(USDC_NATIVE, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
     function test_infinity_retireExactCarbonSpecific_UBO_USDC_BRIDGED(uint256 retireAmount) public {
