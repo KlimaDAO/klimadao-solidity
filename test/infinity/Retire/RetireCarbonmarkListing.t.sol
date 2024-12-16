@@ -85,7 +85,7 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         uint256 listingAmount = 1_250_000_000_000_000_000;
         uint256 retireAmount = 5e17;
         // create listing
-        swipeERC20Tokens(TCO2, listingAmount, PUBLIC_KEY, address(this));
+        deal(TCO2, address(this), listingAmount);
 
         IERC20(TCO2).approve(CARBONMARK, listingAmount);
 
@@ -107,7 +107,7 @@ contract RetireCarbonmarkListing is TestHelper, AssertionHelper {
         uint256 listingAmount = 1_250_000_000_000_000_000;
         uint256 retireAmount = 5e17;
         // create listing
-        swipeERC20Tokens(TCO2, listingAmount, PUBLIC_KEY, address(this));
+        deal(TCO2, address(this), listingAmount);
 
         IERC20(TCO2).approve(CARBONMARK, listingAmount);
 
