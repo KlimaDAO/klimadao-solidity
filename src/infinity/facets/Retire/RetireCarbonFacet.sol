@@ -5,6 +5,9 @@ import "../../libraries/LibRetire.sol";
 import "../../libraries/TokenSwap/LibSwap.sol";
 import "../../ReentrancyGuard.sol";
 
+// Import the Uniswap V3 interfaces
+import '../../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol';
+
 contract RetireCarbonFacet is ReentrancyGuard {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
@@ -106,6 +109,9 @@ contract RetireCarbonFacet is ReentrancyGuard {
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
+
+
+
     function retireExactCarbonSpecific(
         address sourceToken,
         address poolToken,
@@ -127,6 +133,12 @@ contract RetireCarbonFacet is ReentrancyGuard {
         }
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+
+        // after this point the contract had bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
