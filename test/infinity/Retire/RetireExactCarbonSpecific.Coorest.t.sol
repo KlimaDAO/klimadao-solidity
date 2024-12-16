@@ -57,7 +57,6 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
         deal(constantsFacet.klima(), beneficiaryAddress, 100_000e9);
 
         // Uncomment if there's dust sitting in the treasury.
-        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 

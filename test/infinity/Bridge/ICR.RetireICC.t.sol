@@ -38,7 +38,7 @@ contract RetireICRICCFacetTest is TestHelper, AssertionHelper {
     address diamond = vm.envAddress("INFINITY_ADDRESS");
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
 
-    address ICC = 0xaE63fBD056512fC4B1D15B58A98F9Aaea44b18a9;
+    address ICC = 0x77BE59Acfef85a1578A5996d06b48b6ee1BaC29C;
 
     function setUp() public {
         addConstantsGetter(diamond);
@@ -57,12 +57,12 @@ contract RetireICRICCFacetTest is TestHelper, AssertionHelper {
     }
 
     function test_infinity_icrRetireExactICC() public {
-        uint256 tokenId = 48;
+        uint256 tokenId = 1;
         uint256 retireAmount = 100e18;
-        mintERC1155Tokens(ICC, tokenId, retireAmount, address(this));
+        uint256 totalSupply = ICRProject(ICC).totalSupply(tokenId);
+        dealERC1155(ICC, address(this), tokenId, totalSupply);
 
-        // swipeERC20Tokens(DEFAULT_PROJECT, defaultCarbonRetireAmount, UBO, address(this));
-
+    
         IERC1155(ICC).setApprovalForAll(diamond, true);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
