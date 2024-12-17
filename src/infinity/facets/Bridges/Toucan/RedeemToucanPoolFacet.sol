@@ -77,6 +77,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
 
 
         uint totalCarbon;
+        address originalSourceToken = sourceToken;
 
         for (uint i; i < amounts.length; i++) {
             amounts[i] += LibToucanCarbon.getSpecificRedeemFee(poolToken, amounts[i]);
@@ -90,6 +91,8 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
             (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            // set the original source token to return trade dust in the correct token
+            originalSourceToken = C.usdc();
         }
 
         if (sourceToken != poolToken) {
@@ -101,7 +104,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
             receivedAmount = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
         }
 
         require(receivedAmount >= totalCarbon, "Not enough pool tokens");

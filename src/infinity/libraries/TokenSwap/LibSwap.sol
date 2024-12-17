@@ -180,6 +180,10 @@ library LibSwap {
             if (sourceToken == C.wsKlima()) dustBalance = LibKlima.wrapKlima(dustBalance);
             if (sourceToken == C.sKlima()) LibKlima.stakeKlima(dustBalance);
 
+            if (sourceToken == C.usdc()) {
+                (sourceToken, dustBalance) = _swapBridgedUsdcDustToNativeUsdcDust(dustBalance);
+            }
+
             LibTransfer.sendToken(IERC20(sourceToken), dustBalance, msg.sender, LibTransfer.To.EXTERNAL);
         }
     }
@@ -515,9 +519,6 @@ library LibSwap {
      */
     function _swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn) internal returns (address sourceToken, uint256 adjustedAmountOut) {
 
-        // Uniswap USDC/USDC.e pool fee
-        uint24 poolFee = 100;
-
         // In order to not restrict maxAmountIn, we need a swapFeeThreshold to roughly set amountOutMinimum
         // Miniscule swaps have higher % fees i.e. a swap of 2 has a fee of 1 (50%)
         // Here anything above 3000 is considered a regular swap and we subtract the poolFee of .01% in order to protect the amountOutMinimum
@@ -533,7 +534,7 @@ library LibSwap {
             ISwapRouter.ExactInputSingleParams({
             tokenIn: C.usdc(),
             tokenOut: C.usdc_bridged(),
-            fee: poolFee,
+            fee: C.uniswapV3UsdcNativeBridgedPoolFee(),
             recipient: address(this),
             deadline: block.timestamp,
             amountIn: maxAmountIn,
@@ -546,6 +547,29 @@ library LibSwap {
 
         sourceToken = C.usdc_bridged();
         return (sourceToken, maxAmountIn);
+    }
+
+    function _swapBridgedUsdcDustToNativeUsdcDust(uint256 amount) internal returns (address sourceToken, uint256 amountOut) {
+
+        // setting amountOutMinimum to zero ONLY because this transferrring dust.
+        // for an legitimate amount, as above, this should be handled so that an unlikely + unusual price on a swap doesn't decimate the amount
+
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+            tokenIn: C.usdc_bridged(),
+            tokenOut: C.usdc(),
+            fee: C.uniswapV3UsdcNativeBridgedPoolFee(),
+            recipient: address(this),
+            deadline: block.timestamp,
+            amountIn: amount,
+            amountOutMinimum: 0,
+            sqrtPriceLimitX96: 0
+        });
+
+        IERC20(C.usdc_bridged()).approve(C.uniswapV3Router(), amount);
+
+        amountOut = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
+        sourceToken = C.usdc();
     }
 
 }

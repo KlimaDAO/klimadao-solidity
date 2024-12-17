@@ -32,6 +32,9 @@ library C {
     address private constant SUSHI_BENTO = 0x0319000133d3AdA02600f0875d2cf03D442C3367;
     address private constant SUSHI_TRIDENT_POLYGON = 0xc5017BE80b4446988e8686168396289a9A62668E;
 
+    // Uniswap V3 USDC/USDC.e pool fee
+    uint24 private constant UNISWAPV3_NATIVE_USDC_BRIDGED_USDC_POOL_FEE = 100;
+
     // Marketplace contracts
     address private constant CARBONMARK = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821;
 
@@ -142,6 +145,10 @@ library C {
 
     function uniswapV3Quoter() internal pure returns (address) {
         return UNISWAP_V3_QUOTER;
+    }
+
+    function uniswapV3UsdcNativeBridgedPoolFee() internal pure returns (uint24) {
+        return UNISWAPV3_NATIVE_USDC_BRIDGED_USDC_POOL_FEE;
     }
 
     function klimaCarbonRetirements() internal pure returns (address) {

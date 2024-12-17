@@ -51,6 +51,8 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         uint totalCarbon = LibRetire.getTotalCarbon(retireAmount);
 
+        address originalSourceToken = sourceToken;
+
         if (sourceToken == poolToken) {
             require(totalCarbon == maxAmountIn, "Incorrect pool amount");
         }
@@ -60,6 +62,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
             (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            originalSourceToken = C.usdc();
         }
 
         if (sourceToken != poolToken) {
@@ -77,7 +80,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
             totalCarbon = carbonReceived;
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
         }
 
         LibRetire.retireReceivedCarbon(
@@ -133,6 +136,8 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         uint totalCarbon = LibRetire.getTotalCarbonSpecific(poolToken, retireAmount);
 
+        address originalSourceToken = sourceToken;
+
         if (sourceToken == poolToken) {
             require(totalCarbon == maxAmountIn, "Incorrect pool amount");
         }
@@ -143,6 +148,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
             (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            originalSourceToken = C.usdc();
         }
 
         if (sourceToken != poolToken) {
@@ -157,7 +163,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
             else carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
             // Check for any trade dust and send back. need to account for bridged --> native here
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
 
             require(carbonReceived >= totalCarbon, "Swap not enough");
             totalCarbon = carbonReceived;
