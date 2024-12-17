@@ -22,10 +22,6 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
     bytes public rollback_nativeUsdcUpdateCalldata;
 
 
-    function getCuts() public view returns (IDiamondCut.FacetCut[] memory) {
-        return cuts;
-    }
-
     function run() external {
 
 
@@ -48,7 +44,6 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
             })
         );
 
-        cuts.push(cut[0]);
 
         cut[1] = (
             IDiamondCut.FacetCut({
@@ -58,8 +53,6 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
             })
         );
 
-        cuts.push(cut[1]);
-
         cut[2] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(0x3eC904bF51f34D984748Bcefd6F132ccC12aCc7A),
@@ -68,8 +61,6 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
             })
         );
 
-        cuts.push(cut[2]);
-
         cut[3] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(0xf76015860Bfa5Fa0C82682DAeF5f0723f55443cD),
@@ -77,8 +68,6 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
                 functionSelectors: generateSelectors("RedeemC3PoolFacet")
             })
         );
-
-        cuts.push(cut[3]);
 
 
         rollback_nativeUsdcUpdateCalldata = abi.encodeWithSelector(
