@@ -4,16 +4,14 @@
   "description": "KlimaDAO Solidity contracts for the protocol",
   "main": "index.js",
   "scripts": {
-    "test-usdc-retire": "forge t -vvvv --ffi --fork-url http://localhost:8545 --match-test test_infinity_retireExactCarbonSpecific_BCT_USDC --summary > output.log",
-    "test-retirement-quoter": "forge t -vvvv --ffi --fork-url http://localhost:8545 --match-test test_infinity_retirementQuoter --summary > output.log",
-    "test-usdc-quoter": "forge t -vvvv --ffi --fork-url http://localhost:8545 --match-test test_infinity_retirementQuoter_specificRetire_withBonds_Native_USDC --summary > output.log",
-    "test": "forge t -vvv --ffi --fork-url http://localhost:8545",
+    "test": "forge t -vvv --ffi --fork-url http://localhost:8545 --summary",
     "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test test_infinity --summary",
     "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test  test_protocol --summary",
     "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
     "deploy-local-RB": "forge script script/deployRetirementBond.s.sol --fork-url http://localhost:8545 --broadcast --ffi",
     "upgrade-infinity-for-native-usdc": "forge script script/upgradeInfinityForNativeUsdc.sol --fork-url http://localhost:8545 --broadcast --ffi",
     "test:upgrade-native-usdc": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForNativeUsdcTest --summary",
+    "test:upgrade-native-usdc-revisions": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForNativeUsdcRevisionsTest --summary",
     "propose:01_update_swap_routes": "bun multisig-proposals/01-update-swap-routes.ts",
     "propose:02_update_retiremark_facet": "bun multisig-proposals/02-update-retirecarbonmark-facet.ts"
   },
