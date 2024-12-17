@@ -171,12 +171,12 @@ contract RetirementQuoter {
     ) internal view returns (uint256 additionalSwapAmount) {
         additionalSwapAmount = 0;
         if (originalSourceToken == C.usdc()) {
-                additionalSwapAmount = getUniswapV3Quote(C.usdc(), C.usdc_bridged(), sourceAmount);
+                additionalSwapAmount = _getUniswapV3Quote(C.usdc(), C.usdc_bridged(), sourceAmount);
             }
         }
 
 
-    function getUniswapV3Quote(address tokenIn, address tokenOut, uint256 amount) public view returns (uint256 additionalSwapAmount) {
+    function _getUniswapV3Quote(address tokenIn, address tokenOut, uint256 amount) internal view returns (uint256 additionalSwapAmount) {
         IQuoterView.QuoteExactOutputSingleParams memory params = IQuoterView.QuoteExactOutputSingleParams({
             tokenIn: tokenIn,
             tokenOut: tokenOut,

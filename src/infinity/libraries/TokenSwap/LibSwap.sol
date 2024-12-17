@@ -529,7 +529,7 @@ library LibSwap {
         /** In the RetirementQuoter we are using quoteExactOutputSingle 
         * to get the necessary amountIn for retirement amount
         * Therefore here we can optimistically use exactInputSingle */ 
-        uint256 adjustedAmountOutMinimum = maxAmountIn > swapFeeThreshold ? maxAmountIn - ((maxAmountIn * (poolFee * 1)) / 10000) : 0;
+        uint256 adjustedAmountOutMinimum = maxAmountIn > swapFeeThreshold ? maxAmountIn - ((maxAmountIn * (C.uniswapV3UsdcNativeBridgedPoolFee() * 1)) / 10000) : 0;
         ISwapRouter.ExactInputSingleParams memory params =
             ISwapRouter.ExactInputSingleParams({
             tokenIn: C.usdc(),
