@@ -11,7 +11,7 @@ import {KlimaTreasury} from "../../../src/protocol/staking/utils/KlimaTreasury.s
 import {IC3Pool} from "../../../src/infinity/interfaces/IC3.sol";
 import {IToucanPool} from "../../../src/infinity/interfaces/IToucan.sol";
 
-contract RetireBondRetireCarbonDefaultTest is AssertionHelper, DeploymentHelper, TestHelper {
+contract RetireBondRetireCarbonSpecificTest is AssertionHelper, DeploymentHelper, TestHelper {
     CarbonRetirementBondDepository retireBond;
     RetirementBondAllocator allocator;
     KlimaTreasury treasury;

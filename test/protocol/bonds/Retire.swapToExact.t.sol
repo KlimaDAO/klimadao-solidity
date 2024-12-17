@@ -61,7 +61,7 @@ contract RetireBondSwapToExactTest is AssertionHelper, DeploymentHelper, TestHel
 
     function test_protocol_RetireBond_swapToExact(uint retireAmount) public {
         // Limit the total amount for fuzzing to an amount that won't break UniV2 quoting
-        vm.assume(retireAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100);
+        vm.assume(retireAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100 && retireAmount < maxBctBond);
 
         // Set up and fund infinity contract with KLIMA
         uint klimaSupply = IERC20(klima).totalSupply();
@@ -74,6 +74,7 @@ contract RetireBondSwapToExactTest is AssertionHelper, DeploymentHelper, TestHel
         vm.startPrank(retireBond.INFINITY());
 
         IERC20(klima).approve(address(retireBond), daoKlima);
+
 
         if (retireAmount == 0) {
             vm.expectRevert("Cannot swap for zero tokens");
