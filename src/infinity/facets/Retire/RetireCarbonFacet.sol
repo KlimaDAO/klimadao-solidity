@@ -57,6 +57,11 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
+        // after this point the contract has bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+        }
+
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
                 maxAmountIn = LibKlima.unwrapKlima(maxAmountIn);
@@ -135,7 +140,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
 
-        // after this point the contract had bridged usdc
+        // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
             (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
         }
@@ -151,7 +156,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
                 carbonReceived = LibSwap.swapWithRetirementBonds(sourceToken, poolToken, maxAmountIn, totalCarbon);
             else carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
-            // Check for any trade dust and send back
+            // Check for any trade dust and send back. need to account for bridged --> native here
             LibSwap.returnTradeDust(sourceToken, poolToken);
 
             require(carbonReceived >= totalCarbon, "Swap not enough");

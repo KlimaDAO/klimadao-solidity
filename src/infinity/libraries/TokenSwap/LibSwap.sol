@@ -542,7 +542,7 @@ library LibSwap {
         });
 
         IERC20(C.usdc()).approve(C.uniswapV3Router(), maxAmountIn);
-        uint256 amountIn = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
+        ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
 
         sourceToken = C.usdc_bridged();
         return (sourceToken, maxAmountIn);

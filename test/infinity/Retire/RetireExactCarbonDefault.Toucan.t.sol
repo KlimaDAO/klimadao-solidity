@@ -31,7 +31,8 @@ contract RetireExactCarbonDefaultToucan is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
-    address USDC;
+    address USDC_BRIDGED;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -49,7 +50,8 @@ contract RetireExactCarbonDefaultToucan is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -67,8 +69,13 @@ contract RetireExactCarbonDefaultToucan is TestHelper, AssertionHelper {
         retireExactToucan(BCT, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_BCT_USDC(uint256 retireAmount) public {
-        retireExactToucan(USDC, BCT, retireAmount, SUSHI_BCT_LP);
+
+    function test_infinity_retireExactCarbonDefault_BCT_USDC_BRIDGED(uint256 retireAmount) public {
+        retireExactToucan(USDC_BRIDGED, BCT, retireAmount, SUSHI_BCT_LP);
+    }
+
+    function test_infinity_retireExactCarbonDefault_BCT_USDC_NATIVE(uint256 retireAmount) public {
+        retireExactToucan(USDC_NATIVE, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
     function test_infinity_retireExactCarbonDefault_BCT_KLIMA(uint256 retireAmount) public {
@@ -87,8 +94,12 @@ contract RetireExactCarbonDefaultToucan is TestHelper, AssertionHelper {
         retireExactToucan(NCT, NCT, retireAmount, SUSHI_NCT_LP);
     }
 
-    function test_infinity_retireExactCarbonDefault_NCT_USDC(uint256 retireAmount) public {
-        retireExactToucan(USDC, NCT, retireAmount, SUSHI_NCT_LP);
+    function test_infinity_retireExactCarbonDefault_NCT_USDC_BRIDGED(uint256 retireAmount) public {
+        retireExactToucan(USDC_BRIDGED, NCT, retireAmount, SUSHI_NCT_LP);
+    }
+
+    function test_infinity_retireExactCarbonDefault_NCT_USDC_NATIVE(uint256 retireAmount) public {
+        retireExactToucan(USDC_NATIVE, NCT, retireAmount, SUSHI_NCT_LP);
     }
 
     function test_infinity_retireExactCarbonDefault_NCT_KLIMA(uint256 retireAmount) public {

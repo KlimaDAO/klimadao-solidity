@@ -7,6 +7,7 @@ import "../../../libraries/LibRetire.sol";
 import "../../../libraries/TokenSwap/LibSwap.sol";
 import "../../../libraries/Bridges/LibToucanCarbon.sol";
 import "../../../ReentrancyGuard.sol";
+import "../../../libraries/TokenSwap/LibSwap.sol";
 
 contract RedeemToucanPoolFacet is ReentrancyGuard {
     /**
@@ -74,6 +75,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(projectTokens.length == amounts.length, "Array lengths not equal");
 
+
         uint totalCarbon;
 
         for (uint i; i < amounts.length; i++) {
@@ -84,6 +86,11 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
         require(totalCarbon > 0, "Cannot redeem zero tokens");
 
         uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+        // after this point the contract has bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {

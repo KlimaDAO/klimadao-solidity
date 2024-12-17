@@ -29,7 +29,8 @@ contract RetireExactCarbonDefaultMoss is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
-    address USDC;
+    address USDC_BRIDGED;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -44,7 +45,9 @@ contract RetireExactCarbonDefaultMoss is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
+
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -58,8 +61,12 @@ contract RetireExactCarbonDefaultMoss is TestHelper, AssertionHelper {
         retireExactMoss(MCO2, retireAmount);
     }
 
-    function test_infinity_retireExactCarbonDefault_MCO2_USDC(uint256 retireAmount) public {
-        retireExactMoss(USDC, retireAmount);
+    function test_infinity_retireExactCarbonDefault_MCO2_USDC_BRIDGED(uint256 retireAmount) public {
+        retireExactMoss(USDC_BRIDGED, retireAmount);
+    }
+
+    function test_infinity_retireExactCarbonDefault_MCO2_USDC_NATIVE(uint256 retireAmount) public {
+        retireExactMoss(USDC_NATIVE, retireAmount);
     }
 
     function test_infinity_retireExactCarbonDefault_MCO2_KLIMA(uint256 retireAmount) public {

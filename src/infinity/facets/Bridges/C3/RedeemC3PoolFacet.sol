@@ -3,6 +3,7 @@ pragma solidity ^0.8.16;
 
 import "../../../libraries/Bridges/LibC3Carbon.sol";
 import "../../../ReentrancyGuard.sol";
+import "../../../libraries/TokenSwap/LibSwap.sol";
 
 contract RedeemC3PoolFacet is ReentrancyGuard {
     /**
@@ -79,6 +80,10 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(totalCarbon > 0, "Cannot redeem zero tokens");
 
         uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
