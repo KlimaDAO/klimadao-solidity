@@ -181,7 +181,7 @@ library LibSwap {
             if (sourceToken == C.sKlima()) LibKlima.stakeKlima(dustBalance);
 
             if (sourceToken == C.usdc()) {
-                (sourceToken, dustBalance) = _swapBridgedUsdcDustToNativeUsdcDust(dustBalance);
+                (sourceToken, dustBalance) = swapBridgedUsdcDustToNativeUsdcDust(dustBalance);
             }
 
             LibTransfer.sendToken(IERC20(sourceToken), dustBalance, msg.sender, LibTransfer.To.EXTERNAL);
@@ -517,7 +517,7 @@ library LibSwap {
     /**
      * @notice swap native usdc to bridged usdc in uniswapV3
      */
-    function _swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn) internal returns (address sourceToken, uint256 adjustedAmountOut) {
+    function swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn) internal returns (address sourceToken, uint256 adjustedAmountOut) {
 
         // In order to not restrict maxAmountIn, we need a swapFeeThreshold to roughly set amountOutMinimum
         // Miniscule swaps have higher % fees i.e. a swap of 2 has a fee of 1 (50%)
@@ -549,7 +549,7 @@ library LibSwap {
         return (sourceToken, maxAmountIn);
     }
 
-    function _swapBridgedUsdcDustToNativeUsdcDust(uint256 amount) internal returns (address sourceToken, uint256 amountOut) {
+    function swapBridgedUsdcDustToNativeUsdcDust(uint256 amount) internal returns (address sourceToken, uint256 amountOut) {
 
         // setting amountOutMinimum to zero ONLY because this transferrring dust.
         // for an legitimate amount, as above, this should be handled so that an unlikely + unusual price on a swap doesn't decimate the amount

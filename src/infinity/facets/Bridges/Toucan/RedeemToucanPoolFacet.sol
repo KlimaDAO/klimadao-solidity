@@ -90,7 +90,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
 
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
-            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
             // set the original source token to return trade dust in the correct token
             originalSourceToken = C.usdc();
         }

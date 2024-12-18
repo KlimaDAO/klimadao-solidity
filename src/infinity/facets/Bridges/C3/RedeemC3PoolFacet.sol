@@ -83,7 +83,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         if (sourceToken == C.usdc()) {
-            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
             // set the original source token to return trade dust in the correct token
             originalSourceToken = C.usdc();
         }

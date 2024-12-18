@@ -6,7 +6,7 @@ import "../../libraries/TokenSwap/LibSwap.sol";
 import "../../ReentrancyGuard.sol";
 
 // Import the Uniswap V3 interfaces
-import '../../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol';
+import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 
 contract RetireCarbonFacet is ReentrancyGuard {
     event CarbonRetired(
@@ -61,7 +61,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
-            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
             originalSourceToken = C.usdc();
         }
 
@@ -147,7 +147,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {
-            (sourceToken, maxAmountIn) = LibSwap._swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
             originalSourceToken = C.usdc();
         }
 

@@ -6,9 +6,9 @@ import "../libraries/LibRetire.sol";
 import "../libraries/TokenSwap/LibSwap.sol";
 import "../C.sol";
 import "../AppStorage.sol";
-import "../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "../../../lib/v3-periphery/contracts/interfaces/IQuoterView.sol";
-import "../../../lib/forge-std/src/console2.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/IQuoterView.sol";
+
 /**
  * @author Cujo
  * @title RetirementQuoter provides source token amount information for default trade paths defined within Klima Infinity
@@ -171,12 +171,12 @@ contract RetirementQuoter {
     ) internal view returns (uint256 additionalSwapAmount) {
         additionalSwapAmount = 0;
         if (originalSourceToken == C.usdc()) {
-                additionalSwapAmount = _getUniswapV3Quote(C.usdc(), C.usdc_bridged(), sourceAmount);
+                additionalSwapAmount = getUniswapV3Quote(C.usdc(), C.usdc_bridged(), sourceAmount);
             }
         }
 
 
-    function _getUniswapV3Quote(address tokenIn, address tokenOut, uint256 amount) internal view returns (uint256 additionalSwapAmount) {
+    function getUniswapV3Quote(address tokenIn, address tokenOut, uint256 amount) internal view returns (uint256 additionalSwapAmount) {
         IQuoterView.QuoteExactOutputSingleParams memory params = IQuoterView.QuoteExactOutputSingleParams({
             tokenIn: tokenIn,
             tokenOut: tokenOut,
@@ -185,9 +185,8 @@ contract RetirementQuoter {
             sqrtPriceLimitX96: 0
         });
         (uint256 amountIn, , , ) = IQuoterView(C.uniswapV3Quoter()).quoteExactOutputSingle(params);
-        return amountIn - amount;
+        return amountIn > amount ? amountIn - amount: 0;
     }
-
 
 
 }
