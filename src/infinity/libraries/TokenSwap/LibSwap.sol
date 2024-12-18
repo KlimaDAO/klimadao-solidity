@@ -517,8 +517,8 @@ library LibSwap {
     /**
      * @notice swap native usdc to bridged usdc in uniswapV3
      * @param maxAmountIn the amount of native usdc to swap
-     * @return sourceToken. for this function it will always be C.usdc_bridged()
-     * @return adjustedAmountOut the amount of bridged usdc received
+     * @return sourceToken This will always be C.usdc_bridged()
+     * @return adjustedAmountOut The amount of bridged usdc received
      */
     function swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn) internal returns (address sourceToken, uint256 adjustedAmountOut) {
 
@@ -556,8 +556,8 @@ library LibSwap {
      * @notice swap bridged usdc to native usdc in uniswapV3
      * @dev Because the amountOutMinimum is set to 0, this function should only be used for dust in its current form
      * @param amount the amount of bridged usdc dust to swap
-     * @return sourceToken. for this function it will always be C.usdc()
-     * @return amountOut the amount of native usdc dust received
+     * @return sourceToken This will always be C.usdc()
+     * @return amountOut The amount of native usdc dust received
      */
     function swapBridgedUsdcDustToNativeUsdcDust(uint256 amount) internal returns (address sourceToken, uint256 amountOut) {
 
