@@ -46,10 +46,6 @@ contract UpgradeInfinityForNativeUsdcRevisions is Script, HelperContract {
 
         vm.stopBroadcast();
 
-        // Given, all the following updates to the Klima Infinity will be 
-        // processed by a multiple, when we generate the calldata that will 
-        // be plugged to the safeSDK to propose multi-sign txn. 
-
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](4);
 
         // Klima Infinity specific facets
