@@ -11,8 +11,8 @@ import "./AppStorage.sol";
  *
  */
 abstract contract ReentrancyGuard {
-    uint private constant _NOT_ENTERED = 1;
-    uint private constant _ENTERED = 2;
+    uint256 private constant _NOT_ENTERED = 1;
+    uint256 private constant _ENTERED = 2;
 
     AppStorage internal s;
 

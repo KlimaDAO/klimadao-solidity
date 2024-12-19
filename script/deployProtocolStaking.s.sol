@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.5;
 
-/******************************************************************************\
-* Authors: Cujo <rawr@cujowolf.dev>
-
-* Script to deploy the Klima protocol contracts
-/******************************************************************************/
-
+/**
+ * \
+ * Authors: Cujo <rawr@cujowolf.dev>
+ *
+ * Script to deploy the Klima protocol contracts
+ * /*****************************************************************************
+ */
 import "forge-std/Script.sol";
 import {console2} from "forge-std/console2.sol";
 import {console} from "forge-std/console.sol";
@@ -27,19 +28,14 @@ contract DeployKlimaStaking is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // epoch length in blocks
-        uint epochLength = 11520;
+        uint256 epochLength = 11_520;
         // first epoch number
-        uint firstEpochNumber = 0;
+        uint256 firstEpochNumber = 0;
         // first epoch block
-        uint firstEpochBlock = block.number;
+        uint256 firstEpochBlock = block.number;
 
-        KlimaStaking klimaStaking = new KlimaStaking(
-            klimaAddress,
-            sKlimaAddress,
-            epochLength,
-            firstEpochNumber,
-            firstEpochBlock
-        );
+        KlimaStaking klimaStaking =
+            new KlimaStaking(klimaAddress, sKlimaAddress, epochLength, firstEpochNumber, firstEpochBlock);
         console.log("Klima Staking deployed at: ", address(klimaStaking));
 
         StakingHelper stakingHelper = new StakingHelper(address(klimaStaking), klimaAddress);

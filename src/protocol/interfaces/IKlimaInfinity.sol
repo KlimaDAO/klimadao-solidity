@@ -53,21 +53,18 @@ interface IKlimaInfinity {
 
     /* Views */
 
-    function getSourceAmountDefaultRetirement(
-        address sourceToken,
-        address carbonToken,
-        uint256 retireAmount
-    ) external view returns (uint256 amountIn);
+    function getSourceAmountDefaultRetirement(address sourceToken, address carbonToken, uint256 retireAmount)
+        external
+        view
+        returns (uint256 amountIn);
 
-    function getSourceAmountSpecificRetirement(
-        address sourceToken,
-        address carbonToken,
-        uint256 retireAmount
-    ) external view returns (uint256 amountIn);
+    function getSourceAmountSpecificRetirement(address sourceToken, address carbonToken, uint256 retireAmount)
+        external
+        view
+        returns (uint256 amountIn);
 
-    function getSourceAmountSwapOnly(
-        address sourceToken,
-        address carbonToken,
-        uint256 amountOut
-    ) external view returns (uint256 amountIn);
+    function getSourceAmountSwapOnly(address sourceToken, address carbonToken, uint256 amountOut)
+        external
+        view
+        returns (uint256 amountIn);
 }

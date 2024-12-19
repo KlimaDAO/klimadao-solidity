@@ -11,20 +11,26 @@ pragma solidity 0.7.5;
  *  Provides a function to report the TWAP from the last epoch when passed a token address.
  */
 interface ITWAPOracle {
+    function uniV2CompPairAddressForLastEpochUpdateBlockTimstamp(address) external returns (uint32);
 
-    function uniV2CompPairAddressForLastEpochUpdateBlockTimstamp( address ) external returns ( uint32 );
+    function priceTokenAddressForPricingTokenAddressForLastEpochUpdateBlockTimstamp(
+        address tokenToPrice_,
+        address tokenForPriceComparison_,
+        uint256 epochPeriod_
+    ) external returns (uint32);
 
-    function priceTokenAddressForPricingTokenAddressForLastEpochUpdateBlockTimstamp( address tokenToPrice_, address tokenForPriceComparison_, uint epochPeriod_ ) external returns ( uint32 );
+    function pricedTokenForPricingTokenForEpochPeriodForPrice(address, address, uint256) external returns (uint256);
 
-    function pricedTokenForPricingTokenForEpochPeriodForPrice( address, address, uint ) external returns ( uint );
+    function pricedTokenForPricingTokenForEpochPeriodForLastEpochPrice(address, address, uint256)
+        external
+        returns (uint256);
 
-    function pricedTokenForPricingTokenForEpochPeriodForLastEpochPrice( address, address, uint ) external returns ( uint );
-
-    function updateTWAP( address uniV2CompatPairAddressToUpdate_, uint eopchPeriodToUpdate_ ) external returns ( bool );
+    function updateTWAP(address uniV2CompatPairAddressToUpdate_, uint256 eopchPeriodToUpdate_)
+        external
+        returns (bool);
 }
 
 library EnumerableSet {
-
     // To implement this library for multiple types with as little code
     // repetition as possible, we write it in terms of a generic Set type with
     // bytes32 values.
@@ -36,10 +42,9 @@ library EnumerableSet {
     struct Set {
         // Storage of set values
         bytes32[] _values;
-
         // Position of the value in the `values` array, plus 1 because index 0
         // means a value is not in the set.
-        mapping (bytes32 => uint256) _indexes;
+        mapping(bytes32 => uint256) _indexes;
     }
 
     /**
@@ -70,7 +75,8 @@ library EnumerableSet {
         // We read and store the value's index to prevent multiple reads from the same storage slot
         uint256 valueIndex = set._indexes[value];
 
-        if (valueIndex != 0) { // Equivalent to contains(set, value)
+        if (valueIndex != 0) {
+            // Equivalent to contains(set, value)
             // To delete an element from the _values array in O(1), we swap the element to delete with the last one in
             // the array, and then remove the last element (sometimes called as 'swap and pop').
             // This modifies the order of the array, as noted in {at}.
@@ -129,7 +135,7 @@ library EnumerableSet {
         return set._values[index];
     }
 
-    function _getValues( Set storage set_ ) private view returns ( bytes32[] storage ) {
+    function _getValues(Set storage set_) private view returns (bytes32[] storage) {
         return set_._values;
     }
 
@@ -138,12 +144,12 @@ library EnumerableSet {
     /**
      * Inserts new value by moving existing value at provided index to end of array and setting provided value at provided index
      */
-    function _insert(Set storage set_, uint256 index_, bytes32 valueToInsert_ ) private returns ( bool ) {
-        require(  set_._values.length > index_ );
-        require( !_contains( set_, valueToInsert_ ), "Remove value you wish to insert if you wish to reorder array." );
-        bytes32 existingValue_ = _at( set_, index_ );
+    function _insert(Set storage set_, uint256 index_, bytes32 valueToInsert_) private returns (bool) {
+        require(set_._values.length > index_);
+        require(!_contains(set_, valueToInsert_), "Remove value you wish to insert if you wish to reorder array.");
+        bytes32 existingValue_ = _at(set_, index_);
         set_._values[index_] = valueToInsert_;
-        return _add( set_, existingValue_);
+        return _add(set_, existingValue_);
     }
 
     struct Bytes4Set {
@@ -194,20 +200,20 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(Bytes4Set storage set, uint256 index) internal view returns ( bytes4 ) {
-        return bytes4( _at( set._inner, index ) );
+    function at(Bytes4Set storage set, uint256 index) internal view returns (bytes4) {
+        return bytes4(_at(set._inner, index));
     }
 
-    function getValues( Bytes4Set storage set_ ) internal view returns ( bytes4[] memory ) {
+    function getValues(Bytes4Set storage set_) internal view returns (bytes4[] memory) {
         bytes4[] memory bytes4Array_;
-        for( uint256 iteration_ = 0; _length( set_._inner ) > iteration_; iteration_++ ) {
-            bytes4Array_[iteration_] = bytes4( _at( set_._inner, iteration_ ) );
+        for (uint256 iteration_ = 0; _length(set_._inner) > iteration_; iteration_++) {
+            bytes4Array_[iteration_] = bytes4(_at(set_._inner, iteration_));
         }
         return bytes4Array_;
     }
 
-    function insert( Bytes4Set storage set_, uint256 index_, bytes4 valueToInsert_ ) internal returns ( bool ) {
-        return _insert( set_._inner, index_, valueToInsert_ );
+    function insert(Bytes4Set storage set_, uint256 index_, bytes4 valueToInsert_) internal returns (bool) {
+        return _insert(set_._inner, index_, valueToInsert_);
     }
 
     struct Bytes32Set {
@@ -258,22 +264,22 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(Bytes32Set storage set, uint256 index) internal view returns ( bytes32 ) {
+    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {
         return _at(set._inner, index);
     }
 
-    function getValues( Bytes32Set storage set_ ) internal view returns ( bytes4[] memory ) {
+    function getValues(Bytes32Set storage set_) internal view returns (bytes4[] memory) {
         bytes4[] memory bytes4Array_;
 
-        for( uint256 iteration_ = 0; _length( set_._inner ) >= iteration_; iteration_++ ){
-            bytes4Array_[iteration_] = bytes4( at( set_, iteration_ ) );
+        for (uint256 iteration_ = 0; _length(set_._inner) >= iteration_; iteration_++) {
+            bytes4Array_[iteration_] = bytes4(at(set_, iteration_));
         }
 
         return bytes4Array_;
     }
 
-    function insert( Bytes32Set storage set_, uint256 index_, bytes32 valueToInsert_ ) internal returns ( bool ) {
-        return _insert( set_._inner, index_, valueToInsert_ );
+    function insert(Bytes32Set storage set_, uint256 index_, bytes32 valueToInsert_) internal returns (bool) {
+        return _insert(set_._inner, index_, valueToInsert_);
     }
 
     // AddressSet
@@ -333,21 +339,19 @@ library EnumerableSet {
      * TODO Might require explicit conversion of bytes32[] to address[].
      *  Might require iteration.
      */
-    function getValues( AddressSet storage set_ ) internal view returns ( address[] memory ) {
-
+    function getValues(AddressSet storage set_) internal view returns (address[] memory) {
         address[] memory addressArray;
 
-        for( uint256 iteration_ = 0; _length(set_._inner) >= iteration_; iteration_++ ){
-            addressArray[iteration_] = at( set_, iteration_ );
+        for (uint256 iteration_ = 0; _length(set_._inner) >= iteration_; iteration_++) {
+            addressArray[iteration_] = at(set_, iteration_);
         }
 
         return addressArray;
     }
 
-    function insert(AddressSet storage set_, uint256 index_, address valueToInsert_ ) internal returns ( bool ) {
-        return _insert( set_._inner, index_, bytes32(uint256(valueToInsert_)) );
+    function insert(AddressSet storage set_, uint256 index_, address valueToInsert_) internal returns (bool) {
+        return _insert(set_._inner, index_, bytes32(uint256(valueToInsert_)));
     }
-
 
     // UintSet
 
@@ -670,13 +674,13 @@ library SafeMath {
     }
 
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
-    function sqrrt(uint256 a) internal pure returns (uint c) {
+    function sqrrt(uint256 a) internal pure returns (uint256 c) {
         if (a > 3) {
             c = a;
-            uint b = add( div( a, 2), 1 );
+            uint256 b = add(div(a, 2), 1);
             while (b < c) {
                 c = b;
-                b = div( add( div( a, b ), b), 2 );
+                b = div(add(div(a, b), b), 2);
             }
         } else if (a != 0) {
             c = 1;
@@ -686,19 +690,19 @@ library SafeMath {
     /*
      * Expects percentage to be trailed by 00,
     */
-    function percentageAmount( uint256 total_, uint8 percentage_ ) internal pure returns ( uint256 percentAmount_ ) {
-        return div( mul( total_, percentage_ ), 1000 );
+    function percentageAmount(uint256 total_, uint8 percentage_) internal pure returns (uint256 percentAmount_) {
+        return div(mul(total_, percentage_), 1000);
     }
 
     /*
      * Expects percentage to be trailed by 00,
     */
-    function substractPercentage( uint256 total_, uint8 percentageToSub_ ) internal pure returns ( uint256 result_ ) {
-        return sub( total_, div( mul( total_, percentageToSub_ ), 1000 ) );
+    function substractPercentage(uint256 total_, uint8 percentageToSub_) internal pure returns (uint256 result_) {
+        return sub(total_, div(mul(total_, percentageToSub_), 1000));
     }
 
-    function percentageOfTotal( uint256 part_, uint256 total_ ) internal pure returns ( uint256 percent_ ) {
-        return div( mul(part_, 100) , total_ );
+    function percentageOfTotal(uint256 part_, uint256 total_) internal pure returns (uint256 percent_) {
+        return div(mul(part_, 100), total_);
     }
 
     /**
@@ -711,30 +715,26 @@ library SafeMath {
         return (a / 2) + (b / 2) + ((a % 2 + b % 2) / 2);
     }
 
-    function quadraticPricing( uint256 payment_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return sqrrt( mul( multiplier_, payment_ ) );
+    function quadraticPricing(uint256 payment_, uint256 multiplier_) internal pure returns (uint256) {
+        return sqrrt(mul(multiplier_, payment_));
     }
 
-    function bondingCurve( uint256 supply_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return mul( multiplier_, supply_ );
+    function bondingCurve(uint256 supply_, uint256 multiplier_) internal pure returns (uint256) {
+        return mul(multiplier_, supply_);
     }
 }
 
-abstract contract ERC20
-is
-IERC20
-{
-
+abstract contract ERC20 is IERC20 {
     using SafeMath for uint256;
 
     // TODO comment actual hash value.
-    bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
+    bytes32 private constant ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256("ERC20Token");
 
     // Present in ERC777
-    mapping (address => uint256) internal _balances;
+    mapping(address => uint256) internal _balances;
 
     // Present in ERC777
-    mapping (address => mapping (address => uint256)) internal _allowances;
+    mapping(address => mapping(address => uint256)) internal _allowances;
 
     // Present in ERC777
     uint256 internal _totalSupply;
@@ -757,7 +757,7 @@ IERC20
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor (string memory name_, string memory symbol_, uint8 decimals_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) {
         _name = name_;
         _symbol = symbol_;
         _decimals = decimals_;
@@ -866,7 +866,9 @@ IERC20
     // Present in ERC777
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(
+            sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance")
+        );
         return true;
     }
 
@@ -902,7 +904,11 @@ IERC20
      * `subtractedValue`.
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        _approve(
+            msg.sender,
+            spender,
+            _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero")
+        );
         return true;
     }
 
@@ -931,7 +937,8 @@ IERC20
         emit Transfer(sender, recipient, amount);
     }
 
-    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+    /**
+     * @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
      *
      * Emits a {Transfer} event with `from` set to the zero address.
@@ -943,10 +950,10 @@ IERC20
     // Present in ERC777
     function _mint(address account_, uint256 amount_) internal virtual {
         require(account_ != address(0), "ERC20: mint to the zero address");
-        _beforeTokenTransfer(address( this ), account_, amount_);
+        _beforeTokenTransfer(address(this), account_, amount_);
         _totalSupply = _totalSupply.add(amount_);
         _balances[account_] = _balances[account_].add(amount_);
-        emit Transfer(address( this ), account_, amount_);
+        emit Transfer(address(this), account_, amount_);
     }
 
     /**
@@ -1020,7 +1027,7 @@ IERC20
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
     // Present in ERC777
-    function _beforeTokenTransfer( address from_, address to_, uint256 amount_ ) internal virtual { }
+    function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal virtual {}
 }
 
 library Counters {
@@ -1070,15 +1077,8 @@ interface IERC2612Permit {
      * https://eips.ethereum.org/EIPS/eip-2612#specification[relevant EIP
      * section].
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+        external;
 
     /**
      * @dev Returns the current ERC2612 nonce for `owner`. This value must be
@@ -1121,19 +1121,15 @@ abstract contract ERC20Permit is ERC20, IERC2612Permit {
      * @dev See {IERC2612Permit-permit}.
      *
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public virtual override {
+    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+        public
+        virtual
+        override
+    {
         require(block.timestamp <= deadline, "Permit: expired deadline");
 
         bytes32 hashStruct =
-        keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner].current(), deadline));
+            keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner].current(), deadline));
 
         bytes32 _hash = keccak256(abi.encodePacked(uint16(0x1901), DOMAIN_SEPARATOR, hashStruct));
 
@@ -1153,16 +1149,14 @@ abstract contract ERC20Permit is ERC20, IERC2612Permit {
 }
 
 interface IOwnable {
-
     function owner() external view returns (address);
 
     function renounceOwnership() external;
 
-    function transferOwnership( address newOwner_ ) external;
+    function transferOwnership(address newOwner_) external;
 }
 
 contract Ownable is IOwnable {
-
     address internal _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -1170,9 +1164,9 @@ contract Ownable is IOwnable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor () {
+    constructor() {
         _owner = msg.sender;
-        emit OwnershipTransferred( address(0), _owner );
+        emit OwnershipTransferred(address(0), _owner);
     }
 
     /**
@@ -1186,7 +1180,7 @@ contract Ownable is IOwnable {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require( _owner == msg.sender, "Ownable: caller is not the owner" );
+        require(_owner == msg.sender, "Ownable: caller is not the owner");
         _;
     }
 
@@ -1197,8 +1191,8 @@ contract Ownable is IOwnable {
      * NOTE: Renouncing ownership will leave the contract without an owner,
      * thereby removing any functionality that is only available to the owner.
      */
-    function renounceOwnership() public virtual override onlyOwner() {
-        emit OwnershipTransferred( _owner, address(0) );
+    function renounceOwnership() public virtual override onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
     }
 
@@ -1206,18 +1200,17 @@ contract Ownable is IOwnable {
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
      * Can only be called by the current owner.
      */
-    function transferOwnership( address newOwner_ ) public virtual override onlyOwner() {
-        require( newOwner_ != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipTransferred( _owner, newOwner_ );
+    function transferOwnership(address newOwner_) public virtual override onlyOwner {
+        require(newOwner_ != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner_);
         _owner = newOwner_;
     }
 }
 
 contract VaultOwned is Ownable {
-
     address internal _vault;
 
-    function setVault( address vault_ ) external onlyOwner() returns ( bool ) {
+    function setVault(address vault_) external onlyOwner returns (bool) {
         _vault = vault_;
 
         return true;
@@ -1234,89 +1227,77 @@ contract VaultOwned is Ownable {
      * @dev Throws if called by any account other than the vault.
      */
     modifier onlyVault() {
-        require( _vault == msg.sender, "VaultOwned: caller is not the Vault" );
+        require(_vault == msg.sender, "VaultOwned: caller is not the Vault");
         _;
     }
-
 }
 
 contract TWAPOracleUpdater is ERC20Permit, VaultOwned {
-
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    event TWAPOracleChanged( address indexed previousTWAPOracle, address indexed newTWAPOracle );
-    event TWAPEpochChanged( uint previousTWAPEpochPeriod, uint newTWAPEpochPeriod );
-    event TWAPSourceAdded( address indexed newTWAPSource );
-    event TWAPSourceRemoved( address indexed removedTWAPSource );
+    event TWAPOracleChanged(address indexed previousTWAPOracle, address indexed newTWAPOracle);
+    event TWAPEpochChanged(uint256 previousTWAPEpochPeriod, uint256 newTWAPEpochPeriod);
+    event TWAPSourceAdded(address indexed newTWAPSource);
+    event TWAPSourceRemoved(address indexed removedTWAPSource);
 
     EnumerableSet.AddressSet private _dexPoolsTWAPSources;
 
     ITWAPOracle public twapOracle;
 
-    uint public twapEpochPeriod;
+    uint256 public twapEpochPeriod;
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint8 decimals_
-    ) ERC20(name_, symbol_, decimals_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20(name_, symbol_, decimals_) {}
+
+    function changeTWAPOracle(address newTWAPOracle_) external onlyOwner {
+        emit TWAPOracleChanged(address(twapOracle), newTWAPOracle_);
+        twapOracle = ITWAPOracle(newTWAPOracle_);
     }
 
-    function changeTWAPOracle( address newTWAPOracle_ ) external onlyOwner() {
-        emit TWAPOracleChanged( address(twapOracle), newTWAPOracle_);
-        twapOracle = ITWAPOracle( newTWAPOracle_ );
-    }
-
-    function changeTWAPEpochPeriod( uint newTWAPEpochPeriod_ ) external onlyOwner() {
-        require( newTWAPEpochPeriod_ > 0, "TWAPOracleUpdater: TWAP Epoch period must be greater than 0." );
-        emit TWAPEpochChanged( twapEpochPeriod, newTWAPEpochPeriod_ );
+    function changeTWAPEpochPeriod(uint256 newTWAPEpochPeriod_) external onlyOwner {
+        require(newTWAPEpochPeriod_ > 0, "TWAPOracleUpdater: TWAP Epoch period must be greater than 0.");
+        emit TWAPEpochChanged(twapEpochPeriod, newTWAPEpochPeriod_);
         twapEpochPeriod = newTWAPEpochPeriod_;
     }
 
-    function addTWAPSource( address newTWAPSourceDexPool_ ) external onlyOwner() {
-        require( _dexPoolsTWAPSources.add( newTWAPSourceDexPool_ ), "KlimaERC20TOken: TWAP Source already stored." );
-        emit TWAPSourceAdded( newTWAPSourceDexPool_ );
+    function addTWAPSource(address newTWAPSourceDexPool_) external onlyOwner {
+        require(_dexPoolsTWAPSources.add(newTWAPSourceDexPool_), "KlimaERC20TOken: TWAP Source already stored.");
+        emit TWAPSourceAdded(newTWAPSourceDexPool_);
     }
 
-    function removeTWAPSource( address twapSourceToRemove_ ) external onlyOwner() {
-        require( _dexPoolsTWAPSources.remove( twapSourceToRemove_ ), "KlimaERC20TOken: TWAP source not present." );
-        emit TWAPSourceRemoved( twapSourceToRemove_ );
+    function removeTWAPSource(address twapSourceToRemove_) external onlyOwner {
+        require(_dexPoolsTWAPSources.remove(twapSourceToRemove_), "KlimaERC20TOken: TWAP source not present.");
+        emit TWAPSourceRemoved(twapSourceToRemove_);
     }
 
-    function _uodateTWAPOracle( address dexPoolToUpdateFrom_, uint twapEpochPeriodToUpdate_ ) internal {
-        if ( _dexPoolsTWAPSources.contains( dexPoolToUpdateFrom_ )) {
-            twapOracle.updateTWAP( dexPoolToUpdateFrom_, twapEpochPeriodToUpdate_ );
+    function _uodateTWAPOracle(address dexPoolToUpdateFrom_, uint256 twapEpochPeriodToUpdate_) internal {
+        if (_dexPoolsTWAPSources.contains(dexPoolToUpdateFrom_)) {
+            twapOracle.updateTWAP(dexPoolToUpdateFrom_, twapEpochPeriodToUpdate_);
         }
     }
 
-    function _beforeTokenTransfer( address from_, address to_, uint256 amount_ ) internal override virtual {
-        if( _dexPoolsTWAPSources.contains( from_ ) ) {
-            _uodateTWAPOracle( from_, twapEpochPeriod );
+    function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal virtual override {
+        if (_dexPoolsTWAPSources.contains(from_)) {
+            _uodateTWAPOracle(from_, twapEpochPeriod);
         } else {
-            if ( _dexPoolsTWAPSources.contains( to_ ) ) {
-                _uodateTWAPOracle( to_, twapEpochPeriod );
+            if (_dexPoolsTWAPSources.contains(to_)) {
+                _uodateTWAPOracle(to_, twapEpochPeriod);
             }
         }
     }
 }
 
 contract Divine is TWAPOracleUpdater {
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint8 decimals_
-    ) TWAPOracleUpdater(name_, symbol_, decimals_) {
-    }
+    constructor(string memory name_, string memory symbol_, uint8 decimals_)
+        TWAPOracleUpdater(name_, symbol_, decimals_)
+    {}
 }
 
 contract KlimaToken is Divine {
-
     using SafeMath for uint256;
 
-    constructor() Divine("Klima DAO", "KLIMA", 9) {
-    }
+    constructor() Divine("Klima DAO", "KLIMA", 9) {}
 
-    function mint(address account_, uint256 amount_) external onlyVault() {
+    function mint(address account_, uint256 amount_) external onlyVault {
         _mint(account_, amount_);
     }
 
@@ -1346,10 +1327,7 @@ contract KlimaToken is Divine {
 
     function _burnFrom(address account_, uint256 amount_) public virtual {
         uint256 decreasedAllowance_ =
-        allowance(account_, msg.sender).sub(
-            amount_,
-            "ERC20: burn amount exceeds allowance"
-        );
+            allowance(account_, msg.sender).sub(amount_, "ERC20: burn amount exceeds allowance");
 
         _approve(account_, msg.sender, decreasedAllowance_);
         _burn(account_, amount_);

@@ -23,10 +23,10 @@ contract PreKlimaTokenUpgradeableChild is ERC20PresetFixedSupplyUpgradeable, Own
         __PreKlimaTokenUpgradeableChild_init(_Klimadmin, _childChainManagerProxy);
     }
 
-    function __PreKlimaTokenUpgradeableChild_init(
-        address _Klimadmin,
-        address _childChainManagerProxy
-    ) internal initializer {
+    function __PreKlimaTokenUpgradeableChild_init(address _Klimadmin, address _childChainManagerProxy)
+        internal
+        initializer
+    {
         require(_childChainManagerProxy != address(0), "_childChainManagerProxy must not be null");
         requireSellerApproval = true;
         allowMinting = true;

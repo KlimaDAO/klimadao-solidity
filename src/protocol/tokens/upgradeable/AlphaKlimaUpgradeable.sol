@@ -13,6 +13,6 @@ contract AlphaKlimaUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableUpgr
 
     function __AlphaKlimaUpgradeable_init(address _Klimadmin) internal {
         __Ownable_init();
-        __ERC20PresetFixedSupply_init("AlphaKlima", "aKLIMA", 120000 * 1e18, _Klimadmin);
+        __ERC20PresetFixedSupply_init("AlphaKlima", "aKLIMA", 120_000 * 1e18, _Klimadmin);
     }
 }

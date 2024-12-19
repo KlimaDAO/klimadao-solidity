@@ -5,7 +5,6 @@ pragma solidity ^0.8.16;
  * @author Cujo
  * @title LibTridentSwap
  */
-
 import "../../interfaces/ITrident.sol";
 import "../Token/LibApprove.sol";
 import "../LibAppStorage.sol";
@@ -16,9 +15,9 @@ library LibTridentSwap {
         address router,
         address pool,
         address tokenIn,
-        uint amountIn,
-        uint minAmountOut
-    ) internal returns (uint amountOut) {
+        uint256 amountIn,
+        uint256 minAmountOut
+    ) internal returns (uint256 amountOut) {
         ITridentRouter.ExactInputSingleParams memory swapParams;
         swapParams.amountIn = amountIn;
         swapParams.amountOutMinimum = minAmountOut;
@@ -28,31 +27,28 @@ library LibTridentSwap {
         amountOut = ITridentRouter(router).exactInputSingleWithNativeToken(swapParams);
     }
 
-    function getAmountIn(
-        address pool,
-        address tokenIn,
-        address tokenOut,
-        uint amountOut
-    ) internal view returns (uint amountIn) {
-        uint shareAmount = ITridentPool(pool).getAmountIn(abi.encode(tokenOut, amountOut));
+    function getAmountIn(address pool, address tokenIn, address tokenOut, uint256 amountOut)
+        internal
+        view
+        returns (uint256 amountIn)
+    {
+        uint256 shareAmount = ITridentPool(pool).getAmountIn(abi.encode(tokenOut, amountOut));
         amountIn = IBentoBoxMinimal(C.sushiBento()).toAmount(IERC20(tokenIn), shareAmount, true);
     }
 
-    function getAmountOut(
-        address pool,
-        address tokenIn,
-        address tokenOut,
-        uint amountIn
-    ) internal view returns (uint amountOut) {
-        uint shareAmount = ITridentPool(pool).getAmountOut(abi.encode(tokenIn, amountIn));
+    function getAmountOut(address pool, address tokenIn, address tokenOut, uint256 amountIn)
+        internal
+        view
+        returns (uint256 amountOut)
+    {
+        uint256 shareAmount = ITridentPool(pool).getAmountOut(abi.encode(tokenIn, amountIn));
         amountOut = IBentoBoxMinimal(C.sushiBento()).toAmount(IERC20(tokenOut), shareAmount, true);
     }
 
     function getTridentPool(address tokenOne, address tokenTwo) internal view returns (address tridentPool) {
         AppStorage storage s = LibAppStorage.diamondStorage();
-        return
-            s.tridentPool[tokenOne][tokenTwo] == address(0)
-                ? s.tridentPool[tokenTwo][tokenOne]
-                : s.tridentPool[tokenOne][tokenTwo];
+        return s.tridentPool[tokenOne][tokenTwo] == address(0)
+            ? s.tridentPool[tokenTwo][tokenOne]
+            : s.tridentPool[tokenOne][tokenTwo];
     }
 }

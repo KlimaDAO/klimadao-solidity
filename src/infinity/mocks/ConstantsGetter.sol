@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
  * @author Cujo
  * @title Constants Getter helps pull values for tests
  */
-
 import "../C.sol";
 import "../AppStorage.sol";
 import "../libraries/LibAppStorage.sol";
@@ -111,7 +110,11 @@ contract ConstantsGetter {
         return C.coorestCCO2Token();
     }
 
-    function getSwapInfo(address poolToken, address sourceToken) external view returns (uint8[] memory swapDexes, address[] memory ammRouters, address[] memory swapPath) {
+    function getSwapInfo(address poolToken, address sourceToken)
+        external
+        view
+        returns (uint8[] memory swapDexes, address[] memory ammRouters, address[] memory swapPath)
+    {
         AppStorage storage s = LibAppStorage.diamondStorage();
 
         Storage.DefaultSwap storage defaultSwap = s.swap[poolToken][sourceToken];

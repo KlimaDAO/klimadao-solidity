@@ -5,12 +5,10 @@ import {IERC173} from "../interfaces/IERC173.sol";
 import "../AppStorage.sol";
 import "../C.sol";
 
-
-
 contract NativeUSDCInit {
     AppStorage internal s;
-    function init() external {
 
+    function init() external {
         /* Default BCT Swap setup */
         s.swap[C.bct()][C.usdc_bridged()].swapDexes = [0];
         s.swap[C.bct()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
@@ -36,12 +34,11 @@ contract NativeUSDCInit {
         s.swap[C.nbo()][C.usdc_bridged()].swapDexes = [0];
         s.swap[C.nbo()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
         s.swap[C.nbo()][C.usdc_bridged()].swapPaths[0] = [C.usdc_bridged(), C.klima(), C.nbo()];
-        
+
         /* Default Coorest CCO2 Swap Setup */
         s.swap[C.coorestCCO2Token()][C.usdc_bridged()].swapDexes = [0];
         s.swap[C.coorestCCO2Token()][C.usdc_bridged()].ammRouters = [C.sushiRouter()];
         s.swap[C.coorestCCO2Token()][C.usdc_bridged()].swapPaths[0] =
-        [C.usdc_bridged(), C.klima(), C.coorestCCO2Token()];
-
+            [C.usdc_bridged(), C.klima(), C.coorestCCO2Token()];
     }
 }

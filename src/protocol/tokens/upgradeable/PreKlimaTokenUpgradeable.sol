@@ -27,7 +27,7 @@ contract PreKlimaTokenUpgradeable is ERC20PresetFixedSupplyUpgradeable, OwnableU
         _addApprovedSeller(_Klimadmin);
         _addApprovedSeller(address(0x0000));
         __Ownable_init();
-        __ERC20PresetFixedSupply_init("PreKlima", "pKLIMA", 1000000000 * 1e18, _Klimadmin);
+        __ERC20PresetFixedSupply_init("PreKlima", "pKLIMA", 1_000_000_000 * 1e18, _Klimadmin);
     }
 
     function allowOpenTrading() external onlyOwner returns (bool) {

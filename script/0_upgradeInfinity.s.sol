@@ -5,11 +5,10 @@ pragma solidity ^0.8.0;
  * \
  * Authors: Cujo <rawr@cujowolf.dev>
  * EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
- * 
+ *
  * Script to upgrade Infinity diamond with new and revised facets
  * /*****************************************************************************
  */
-
 import "forge-std/Script.sol";
 import "../src/infinity/interfaces/IDiamondCut.sol";
 import {Diamond} from "../src/infinity/Diamond.sol";

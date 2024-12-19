@@ -8,7 +8,6 @@ import "./libraries/LibRetire.sol";
  * @author Cujo
  * @title App Storage defines the state object for Klima Infinity
  */
-
 contract Account {
     struct Retirement {
         address poolTokenAddress; // Pool token used

@@ -28,10 +28,8 @@ interface IRetireToucanCarbon {
         address[] memory _carbonList
     ) external;
 
-    function getNeededBuyAmount(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _poolAmount,
-        bool _retireSpecific
-    ) external view returns (uint256, uint256);
+    function getNeededBuyAmount(address _sourceToken, address _poolToken, uint256 _poolAmount, bool _retireSpecific)
+        external
+        view
+        returns (uint256, uint256);
 }

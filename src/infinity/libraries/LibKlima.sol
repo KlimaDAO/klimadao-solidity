@@ -5,7 +5,6 @@ pragma solidity ^0.8.16;
  * @author Cujo
  * @title LibKlima
  */
-
 import "../C.sol";
 import "./LibAppStorage.sol";
 import "../interfaces/IKlima.sol";
@@ -17,7 +16,7 @@ library LibKlima {
      * @param amount            sKLIMA provided
      * @return wrappedAmount    wsKLIMA amount
      */
-    function toWrappedAmount(uint amount) internal view returns (uint wrappedAmount) {
+    function toWrappedAmount(uint256 amount) internal view returns (uint256 wrappedAmount) {
         // @dev Account for rounding differences in wsKLIMA contract.
         return IwsKLIMA(C.wsKlima()).sKLIMATowKLIMA(amount) + 5;
     }
@@ -27,7 +26,7 @@ library LibKlima {
      * @param amount            wsKLIMA provided
      * @return unwrappedAmount    sKLIMA amount
      */
-    function toUnwrappedAmount(uint amount) internal view returns (uint unwrappedAmount) {
+    function toUnwrappedAmount(uint256 amount) internal view returns (uint256 unwrappedAmount) {
         // @dev Account for rounding differences in wsKLIMA contract.
         return IwsKLIMA(C.wsKlima()).wKLIMATosKLIMA(amount);
     }
@@ -37,7 +36,7 @@ library LibKlima {
      * @param amount            wsKLIMA provided
      * @return unwrappedAmount    Final KLIMA amount
      */
-    function unwrapKlima(uint amount) internal returns (uint unwrappedAmount) {
+    function unwrapKlima(uint256 amount) internal returns (uint256 unwrappedAmount) {
         unwrappedAmount = IwsKLIMA(C.wsKlima()).unwrap(amount);
         unstakeKlima(unwrappedAmount);
     }
@@ -46,7 +45,7 @@ library LibKlima {
      * @notice                  Unstakes provided sKLIMA amount
      * @param amount            sKLIMA provided
      */
-    function unstakeKlima(uint amount) internal {
+    function unstakeKlima(uint256 amount) internal {
         IStaking(C.staking()).unstake(amount, false);
     }
 
@@ -55,7 +54,7 @@ library LibKlima {
      * @param amount            KLIMA provided
      * @return wrappedAmount    Final wsKLIMA amount
      */
-    function wrapKlima(uint amount) internal returns (uint wrappedAmount) {
+    function wrapKlima(uint256 amount) internal returns (uint256 wrappedAmount) {
         stakeKlima(amount);
         wrappedAmount = IwsKLIMA(C.wsKlima()).wrap(amount);
     }
@@ -64,7 +63,7 @@ library LibKlima {
      * @notice                  Stakes provided KLIMA amount
      * @param amount            KLIMA provided
      */
-    function stakeKlima(uint amount) internal {
+    function stakeKlima(uint256 amount) internal {
         IStakingHelper(C.stakingHelper()).stake(amount);
     }
 }

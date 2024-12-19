@@ -11,7 +11,6 @@ import {IKlima, IKlimaTreasury, IKlimaRetirementBond} from "../interfaces/IKLIMA
  * @author Cujo
  * @notice A contract for allocating retirement bonds using excess reserves from the Klima Treasury.
  */
-
 contract RetirementBondAllocator is Ownable2Step {
     using SafeERC20 for IKlima;
 
@@ -89,11 +88,9 @@ contract RetirementBondAllocator is Ownable2Step {
      * @param _maxReservePercent The new maximum reserve percentage allowed. 500 = 5%.
      */
     function updateMaxReservePercent(uint256 _maxReservePercent) external onlyDAO {
-
         uint256 oldMax = maxReservePercent;
         maxReservePercent = _maxReservePercent;
 
         emit MaxPercentUpdated(oldMax, maxReservePercent);
     }
-
 }

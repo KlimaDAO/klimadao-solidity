@@ -1,10 +1,10 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-06-03
-*/
+ * Submitted for verification at Etherscan.io on 2021-06-03
+ */
 
 /**
- *Submitted for verification at Etherscan.io on 2021-04-14
-*/
+ * Submitted for verification at Etherscan.io on 2021-04-14
+ */
 
 // SPDX-License-Identifier: AGPL-3.0-or-later\
 pragma solidity 0.7.5;
@@ -42,7 +42,8 @@ library SafeERC20 {
         // or when resetting it to zero. To increase and decrease it, use
         // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
         // solhint-disable-next-line max-line-length
-        require((value == 0) || (token.allowance(address(this), spender) == 0),
+        require(
+            (value == 0) || (token.allowance(address(this), spender) == 0),
             "SafeERC20: approve from non-zero to non-zero allowance"
         );
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
@@ -54,7 +55,8 @@ library SafeERC20 {
     }
 
     function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal {
-        uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
+        uint256 newAllowance =
+            token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
@@ -70,7 +72,8 @@ library SafeERC20 {
         // the target address contains contract code and also asserts for success in the low-level call.
 
         bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
-        if (returndata.length > 0) { // Return data is optional
+        if (returndata.length > 0) {
+            // Return data is optional
             // solhint-disable-next-line max-line-length
             require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
         }
@@ -233,13 +236,13 @@ library SafeMath {
     }
 
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
-    function sqrrt(uint256 a) internal pure returns (uint c) {
+    function sqrrt(uint256 a) internal pure returns (uint256 c) {
         if (a > 3) {
             c = a;
-            uint b = add( div( a, 2), 1 );
+            uint256 b = add(div(a, 2), 1);
             while (b < c) {
                 c = b;
-                b = div( add( div( a, b ), b), 2 );
+                b = div(add(div(a, b), b), 2);
             }
         } else if (a != 0) {
             c = 1;
@@ -249,19 +252,19 @@ library SafeMath {
     /*
      * Expects percentage to be trailed by 00,
     */
-    function percentageAmount( uint256 total_, uint8 percentage_ ) internal pure returns ( uint256 percentAmount_ ) {
-        return div( mul( total_, percentage_ ), 1000 );
+    function percentageAmount(uint256 total_, uint8 percentage_) internal pure returns (uint256 percentAmount_) {
+        return div(mul(total_, percentage_), 1000);
     }
 
     /*
      * Expects percentage to be trailed by 00,
     */
-    function substractPercentage( uint256 total_, uint8 percentageToSub_ ) internal pure returns ( uint256 result_ ) {
-        return sub( total_, div( mul( total_, percentageToSub_ ), 1000 ) );
+    function substractPercentage(uint256 total_, uint8 percentageToSub_) internal pure returns (uint256 result_) {
+        return sub(total_, div(mul(total_, percentageToSub_), 1000));
     }
 
-    function percentageOfTotal( uint256 part_, uint256 total_ ) internal pure returns ( uint256 percent_ ) {
-        return div( mul(part_, 100) , total_ );
+    function percentageOfTotal(uint256 part_, uint256 total_) internal pure returns (uint256 percent_) {
+        return div(mul(part_, 100), total_);
     }
 
     /**
@@ -274,12 +277,12 @@ library SafeMath {
         return (a / 2) + (b / 2) + ((a % 2 + b % 2) / 2);
     }
 
-    function quadraticPricing( uint256 payment_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return sqrrt( mul( multiplier_, payment_ ) );
+    function quadraticPricing(uint256 payment_, uint256 multiplier_) internal pure returns (uint256) {
+        return sqrrt(mul(multiplier_, payment_));
     }
 
-    function bondingCurve( uint256 supply_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return mul( multiplier_, supply_ );
+    function bondingCurve(uint256 supply_, uint256 multiplier_) internal pure returns (uint256) {
+        return mul(multiplier_, supply_);
     }
 }
 
@@ -311,7 +314,9 @@ library Address {
 
         uint256 size;
         // solhint-disable-next-line no-inline-assembly
-        assembly { size := extcodesize(account) }
+        assembly {
+            size := extcodesize(account)
+        }
         return size > 0;
     }
 
@@ -335,7 +340,7 @@ library Address {
         require(address(this).balance >= amount, "Address: insufficient balance");
 
         // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call{ value: amount }("");
+        (bool success,) = recipient.call{value: amount}("");
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 
@@ -367,7 +372,10 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+    function functionCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         return _functionCallWithValue(target, data, 0, errorMessage);
     }
 
@@ -396,20 +404,26 @@ library Address {
     //     require(address(this).balance >= value, "Address: insufficient balance for call");
     //     return _functionCallWithValue(target, data, value, errorMessage);
     // }
-    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
+    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         require(address(this).balance >= value, "Address: insufficient balance for call");
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: value }(data);
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage) private returns (bytes memory) {
+    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage)
+        private
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: weiValue }(data);
+        (bool success, bytes memory returndata) = target.call{value: weiValue}(data);
         if (success) {
             return returndata;
         } else {
@@ -429,11 +443,11 @@ library Address {
     }
 
     /**
-       * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-       * but performing a static call.
-       *
-       * _Available since v3.3._
-       */
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
     function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
         return functionStaticCall(target, data, "Address: low-level static call failed");
     }
@@ -444,7 +458,11 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {
+    function functionStaticCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        view
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: static call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -468,7 +486,10 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+    function functionDelegateCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: delegate call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -476,7 +497,11 @@ library Address {
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage)
+        private
+        pure
+        returns (bytes memory)
+    {
         if (success) {
             return returndata;
         } else {
@@ -495,21 +520,20 @@ library Address {
         }
     }
 
-    function addressToString(address _address) internal pure returns(string memory) {
+    function addressToString(address _address) internal pure returns (string memory) {
         bytes32 _bytes = bytes32(uint256(_address));
         bytes memory HEX = "0123456789abcdef";
         bytes memory _addr = new bytes(42);
 
-        _addr[0] = '0';
-        _addr[1] = 'x';
+        _addr[0] = "0";
+        _addr[1] = "x";
 
-        for(uint256 i = 0; i < 20; i++) {
-            _addr[2+i*2] = HEX[uint8(_bytes[i + 12] >> 4)];
-            _addr[3+i*2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
+        for (uint256 i = 0; i < 20; i++) {
+            _addr[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
+            _addr[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
         }
 
         return string(_addr);
-
     }
 }
 
@@ -588,25 +612,25 @@ interface IERC20 {
 }
 
 interface ITreasury {
-    function deposit( uint _amount, address _token, uint _profit ) external returns ( uint );
+    function deposit(uint256 _amount, address _token, uint256 _profit) external returns (uint256);
 }
 
 interface IPKLIMA {
-    function burnFrom( address account_, uint256 amount_ ) external;
+    function burnFrom(address account_, uint256 amount_) external;
 }
 
 interface IOldClaimContract {
-    function amountClaimed( address _vester ) external view returns ( uint );
-    function maxAllowedToClaim( address _vester ) external view returns ( uint );
-    function percentCanVest( address _vester ) external view returns ( uint );
+    function amountClaimed(address _vester) external view returns (uint256);
+    function maxAllowedToClaim(address _vester) external view returns (uint256);
+    function percentCanVest(address _vester) external view returns (uint256);
 }
 
 interface ICirculatingKLIMA {
-    function KLIMACirculatingSupply() external view returns ( uint );
+    function KLIMACirculatingSupply() external view returns (uint256);
 }
 
 contract ExercisepKLIMA {
-    using SafeMath for uint;
+    using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     address public owner;
@@ -619,97 +643,100 @@ contract ExercisepKLIMA {
     address public immutable circulatingKLIMAContract;
 
     struct Term {
-        uint percent; // 4 decimals ( 5000 = 0.5% )
-        uint claimed;
-        uint max;
+        uint256 percent; // 4 decimals ( 5000 = 0.5% )
+        uint256 claimed;
+        uint256 max;
     }
-    mapping( address => Term ) public terms;
 
-    mapping( address => address ) public walletChange;
+    mapping(address => Term) public terms;
+
+    mapping(address => address) public walletChange;
 
     bool hasMigrated;
 
-    constructor( address _pKLIMA, address _KLIMA, address _BCT, address _treasury, address _circulatingKLIMAContract ) {
+    constructor(address _pKLIMA, address _KLIMA, address _BCT, address _treasury, address _circulatingKLIMAContract) {
         owner = msg.sender;
-        require( _pKLIMA != address(0) );
+        require(_pKLIMA != address(0));
         pKLIMA = _pKLIMA;
-        require( _KLIMA != address(0) );
+        require(_KLIMA != address(0));
         KLIMA = _KLIMA;
-        require( _BCT != address(0) );
+        require(_BCT != address(0));
         BCT = _BCT;
-        require( _treasury != address(0) );
+        require(_treasury != address(0));
         treasury = _treasury;
-        require( _circulatingKLIMAContract != address(0) );
+        require(_circulatingKLIMAContract != address(0));
         circulatingKLIMAContract = _circulatingKLIMAContract;
     }
 
     // Sets terms for a new wallet
-    function setTerms(address _vester, uint _amountCanClaim, uint _rate ) external returns ( bool ) {
-        require( msg.sender == owner, "Sender is not owner" );
-        require( _amountCanClaim >= terms[ _vester ].max, "cannot lower amount claimable" );
-        require( _rate >= terms[ _vester ].percent, "cannot lower vesting rate" );
+    function setTerms(address _vester, uint256 _amountCanClaim, uint256 _rate) external returns (bool) {
+        require(msg.sender == owner, "Sender is not owner");
+        require(_amountCanClaim >= terms[_vester].max, "cannot lower amount claimable");
+        require(_rate >= terms[_vester].percent, "cannot lower vesting rate");
 
-        terms[ _vester ].max = _amountCanClaim;
-        terms[ _vester ].percent = _rate;
+        terms[_vester].max = _amountCanClaim;
+        terms[_vester].percent = _rate;
 
         return true;
     }
 
     // Allows wallet to redeem pKLIMA for KLIMA
-    function exercise( uint _amount ) external returns ( bool ) {
-        Term memory info = terms[ msg.sender ];
-        require( redeemable( info ) >= _amount, 'Not enough vested' );
-        require( info.max.sub( info.claimed ) >= _amount, 'Claimed over max' );
+    function exercise(uint256 _amount) external returns (bool) {
+        Term memory info = terms[msg.sender];
+        require(redeemable(info) >= _amount, "Not enough vested");
+        require(info.max.sub(info.claimed) >= _amount, "Claimed over max");
 
-        IERC20( BCT ).safeTransferFrom( msg.sender, address( this ), _amount );
-        IPKLIMA( pKLIMA ).burnFrom( msg.sender, _amount );
+        IERC20(BCT).safeTransferFrom(msg.sender, address(this), _amount);
+        IPKLIMA(pKLIMA).burnFrom(msg.sender, _amount);
 
-        IERC20( BCT ).approve( treasury, _amount );
-        uint KLIMAToSend = ITreasury( treasury ).deposit( _amount, BCT, 0 );
+        IERC20(BCT).approve(treasury, _amount);
+        uint256 KLIMAToSend = ITreasury(treasury).deposit(_amount, BCT, 0);
 
-        terms[ msg.sender ].claimed = info.claimed.add( _amount );
+        terms[msg.sender].claimed = info.claimed.add(_amount);
 
-        IERC20( KLIMA ).safeTransfer( msg.sender, KLIMAToSend );
+        IERC20(KLIMA).safeTransfer(msg.sender, KLIMAToSend);
 
         return true;
     }
 
     // Allows wallet owner to transfer rights to a new address
-    function pushWalletChange( address _newWallet ) external returns ( bool ) {
-        require( terms[ msg.sender ].percent != 0 );
-        walletChange[ msg.sender ] = _newWallet;
+    function pushWalletChange(address _newWallet) external returns (bool) {
+        require(terms[msg.sender].percent != 0);
+        walletChange[msg.sender] = _newWallet;
         return true;
     }
 
     // Allows wallet to pull rights from an old address
-    function pullWalletChange( address _oldWallet ) external returns ( bool ) {
-        require( walletChange[ _oldWallet ] == msg.sender, "wallet did not push" );
+    function pullWalletChange(address _oldWallet) external returns (bool) {
+        require(walletChange[_oldWallet] == msg.sender, "wallet did not push");
 
-        walletChange[ _oldWallet ] = address(0);
-        terms[ msg.sender ] = terms[ _oldWallet ];
+        walletChange[_oldWallet] = address(0);
+        terms[msg.sender] = terms[_oldWallet];
         delete terms[ _oldWallet ];
 
         return true;
     }
 
     // Amount a wallet can redeem based on current supply
-    function redeemableFor( address _vester ) public view returns (uint) {
-        return redeemable( terms[ _vester ]);
+    function redeemableFor(address _vester) public view returns (uint256) {
+        return redeemable(terms[_vester]);
     }
 
-    function redeemable( Term memory _info ) internal view returns ( uint ) {
-        return ( ICirculatingKLIMA( circulatingKLIMAContract ).KLIMACirculatingSupply().mul( _info.percent ).mul( 1000 ) ).sub( _info.claimed );
+    function redeemable(Term memory _info) internal view returns (uint256) {
+        return (ICirculatingKLIMA(circulatingKLIMAContract).KLIMACirculatingSupply().mul(_info.percent).mul(1000)).sub(
+            _info.claimed
+        );
     }
 
-    function pushOwnership( address _newOwner ) external returns ( bool ) {
-        require( msg.sender == owner, "Sender is not owner" );
-        require( _newOwner != address(0) );
+    function pushOwnership(address _newOwner) external returns (bool) {
+        require(msg.sender == owner, "Sender is not owner");
+        require(_newOwner != address(0));
         newOwner = _newOwner;
         return true;
     }
 
-    function pullOwnership() external returns ( bool ) {
-        require( msg.sender == newOwner );
+    function pullOwnership() external returns (bool) {
+        require(msg.sender == newOwner);
         owner = newOwner;
         newOwner = address(0);
         return true;

@@ -15,42 +15,40 @@ contract LibCoorestCarbonTest is TestHelper {
         coorestLibraryMock = new CoorestLibraryMock();
     }
 
-    function test_infinity_coorestFee(uint amount) public {
+    function test_infinity_coorestFee(uint256 amount) public {
         vm.assume(amount > 0);
         vm.assume(amount < 1e30);
 
         vm.mockCall(
-            constantGetter.coorestCCO2Token(),
-            abi.encodeWithSelector(ICCO2.burningPercentage.selector),
-            abi.encode(20)
+            constantGetter.coorestCCO2Token(), abi.encodeWithSelector(ICCO2.burningPercentage.selector), abi.encode(20)
         );
 
         vm.mockCall(
             address(constantGetter.coorestCCO2Token()),
             abi.encodeWithSelector(ICCO2.decimalRatio.selector),
-            abi.encode(10000)
+            abi.encode(10_000)
         );
 
-        uint fee = coorestLibraryMock.getSpecificRetirementFee(constantGetter.coorestCCO2Token(), amount);
+        uint256 fee = coorestLibraryMock.getSpecificRetirementFee(constantGetter.coorestCCO2Token(), amount);
 
         vm.clearMockedCalls();
         assertLt(fee, amount);
     }
 
-    function test_infinity_coorestFeeFailsIfBpGtDivisor(uint amount) public {
+    function test_infinity_coorestFeeFailsIfBpGtDivisor(uint256 amount) public {
         vm.assume(amount > 0);
         vm.assume(amount < 1e30);
 
         vm.mockCall(
             address(constantGetter.coorestCCO2Token()),
             abi.encodeWithSelector(ICCO2.burningPercentage.selector),
-            abi.encode(20000)
+            abi.encode(20_000)
         );
 
         vm.mockCall(
             address(constantGetter.coorestCCO2Token()),
             abi.encodeWithSelector(ICCO2.decimalRatio.selector),
-            abi.encode(10000)
+            abi.encode(10_000)
         );
 
         address cco2 = constantGetter.coorestCCO2Token();
@@ -60,7 +58,7 @@ contract LibCoorestCarbonTest is TestHelper {
         vm.clearMockedCalls();
     }
 
-    function test_infinity_coorestFeeFailsIfDivisorZero(uint amount) public {
+    function test_infinity_coorestFeeFailsIfDivisorZero(uint256 amount) public {
         vm.assume(amount > 0);
         vm.assume(amount < 1e30);
 

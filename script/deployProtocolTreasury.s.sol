@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-/******************************************************************************\
-* Authors: Cujo <rawr@cujowolf.dev>
-
-* Script to deploy the Klima protocol contracts
-/******************************************************************************/
-
+/**
+ * \
+ * Authors: Cujo <rawr@cujowolf.dev>
+ *
+ * Script to deploy the Klima protocol contracts
+ * /*****************************************************************************
+ */
 import "forge-std/Script.sol";
 import {console2} from "forge-std/console2.sol";
 import {console} from "forge-std/console.sol";
@@ -25,7 +26,7 @@ contract DeployKlimaTreasury is Script {
         KlimaTreasury treasury = new KlimaTreasury(
             klimaAddress,
             bctAddress,
-            34560 // amount of blocks needed to queue txs before they can be executed
+            34_560 // amount of blocks needed to queue txs before they can be executed
         );
 
         console.log("Treasury deployed to :", address(treasury));
