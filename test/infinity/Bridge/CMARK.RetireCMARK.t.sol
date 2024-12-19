@@ -12,7 +12,7 @@ import {console2} from "../../../lib/forge-std/src/console2.sol";
 import "../TestHelper.sol";
 import "../../helpers/AssertionHelper.sol";
 
-contract RetireICRICCFacetTest is TestHelper, AssertionHelper {
+contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
         address indexed retiringAddress,
@@ -43,17 +43,16 @@ contract RetireICRICCFacetTest is TestHelper, AssertionHelper {
     function setUp() public {
         addConstantsGetter(diamond);
         constantsFacet = ConstantsGetter(diamond);
-        retireICRFacet = RetireICRFacet(diamond);
+        retireCMARKFacet = RetireCMARKFacet(diamond);
         quoterFacet = RetirementQuoter(diamond);
 
         upgradeCurrentDiamond(diamond);
     }
 
-    function test_infinity_cmarkRetireExactCMARK() public {
+    function test_infinity_cmarkRetireExactCarbon() public {
         uint256 tokenId = 1; // TODO: decide how to set this
         uint256 retireAmount = 100e18;
-        mintERC20Tokens(CMARK, retireAmount, address(this));
-
+        swipeERC20Tokens(CMARK, defaultCarbonRetireAmount, CMARK, address(this));
         IERC20(CMARK).setApprovalForAll(diamond, true);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
@@ -79,7 +78,7 @@ contract RetireICRICCFacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
-        uint256 retirementIndex = retireICRFacet.icrRetireExactCarbon(
+        uint256 retirementIndex = retireCMARKFacet.cmarkRetireExactCarbon(
             CMARK,
             tokenId,
             defaultCarbonRetireAmount,
