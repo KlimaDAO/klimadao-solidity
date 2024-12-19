@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../../../script/4_upgradeInifinityForNativeUSDCRevisions.s.sol"; // Updated script path
+import "../../../script/4_upgradeInfinityForNativeUSDCRevisions.s.sol"; // Updated script path
 import "../../../src/infinity/interfaces/IDiamondCut.sol";
 import "../../../src/infinity/facets/DiamondCutFacet.sol";
 import "../../../src/infinity/facets/DiamondLoupeFacet.sol";
