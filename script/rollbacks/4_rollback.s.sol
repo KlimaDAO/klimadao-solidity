@@ -18,21 +18,16 @@ import {console2} from "forge-std/console2.sol";
 import "../../test/infinity/HelperContract.sol";
 
 contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContract {
-
     bytes public rollback_nativeUsdcUpdateCalldata;
 
-
     function run() external {
-
-
         /**
-        * To Rollback 4_upgradeInifinityForNativeUSDCRevisions.s.sol:
-        * 1) check out commit: f40794f0c0185039f0f5ae1ec2487ba9b0976ad8
-        * 2) Create a multisig proposal based on previous templates
-        * 3) run this script and copy calldata into the multi sig txn
-        * 4) run the multisig script and complete txn in safe
-        */
-
+         * To Rollback 4_upgradeInifinityForNativeUSDCRevisions.s.sol:
+         * 1) check out commit: f40794f0c0185039f0f5ae1ec2487ba9b0976ad8
+         * 2) Create a multisig proposal based on previous templates
+         * 3) run this script and copy calldata into the multi sig txn
+         * 4) run the multisig script and complete txn in safe
+         */
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](4);
 
         // Klima Infinity specific facets
@@ -43,7 +38,6 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
                 functionSelectors: generateSelectors("RetirementQuoter")
             })
         );
-
 
         cut[1] = (
             IDiamondCut.FacetCut({
@@ -69,16 +63,9 @@ contract Rollback_UpgradeInfinityForNativeUsdcRevisions is Script, HelperContrac
             })
         );
 
-
-        rollback_nativeUsdcUpdateCalldata = abi.encodeWithSelector(
-            IDiamondCut.diamondCut.selector,
-            cut,
-            address(0),
-            ""
-        );
+        rollback_nativeUsdcUpdateCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
 
         console2.log("Rollback Native USDC Revisions Calldata");
         console2.logBytes(rollback_nativeUsdcUpdateCalldata);
-
     }
 }

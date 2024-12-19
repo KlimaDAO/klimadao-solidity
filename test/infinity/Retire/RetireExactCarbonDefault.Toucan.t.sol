@@ -69,7 +69,6 @@ contract RetireExactCarbonDefaultToucan is TestHelper, AssertionHelper {
         retireExactToucan(BCT, BCT, retireAmount, SUSHI_BCT_LP);
     }
 
-
     function test_infinity_retireExactCarbonDefault_BCT_USDC_BRIDGED(uint256 retireAmount) public {
         retireExactToucan(USDC_BRIDGED, BCT, retireAmount, SUSHI_BCT_LP);
     }

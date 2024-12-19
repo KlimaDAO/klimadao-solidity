@@ -62,7 +62,6 @@ contract RetireICRICCFacetTest is TestHelper, AssertionHelper {
         uint256 totalSupply = ICRProject(ICC).totalSupply(tokenId);
         dealERC1155(ICC, address(this), tokenId, totalSupply);
 
-    
         IERC1155(ICC).setApprovalForAll(diamond, true);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);

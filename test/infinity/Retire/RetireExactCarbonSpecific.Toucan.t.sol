@@ -76,7 +76,6 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
     function test_infinity_retireExactCarbonSpecific_BCT_USDC_BRIDGED(uint256 retireAmount) public {
         retireExactToucan(USDC_BRIDGED, BCT, retireAmount, SUSHI_BCT_LP);
     }
-    
 
     function test_infinity_retireExactCarbonSpecific_BCT_KLIMA(uint256 retireAmount) public {
         retireExactToucan(KLIMA, BCT, retireAmount, SUSHI_BCT_LP);
@@ -116,7 +115,6 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
 
     function retireExactToucan(address sourceToken, address poolToken, uint256 retireAmount, address lpPool) public {
         vm.assume(retireAmount < (IERC20(poolToken).balanceOf(lpPool) * 30) / 100);
-
 
         if (retireAmount == 0 && sourceToken != poolToken) vm.expectRevert();
         uint256 sourceAmount =
@@ -158,8 +156,7 @@ contract RetireExactCarbonSpecificToucan is TestHelper, AssertionHelper {
                 poolToken,
                 projectToken,
                 retireAmount
-            );         
-
+            );
 
             uint256 retirementIndex = retireCarbonFacet.retireExactCarbonSpecific(
                 sourceToken,

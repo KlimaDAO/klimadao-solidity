@@ -101,7 +101,6 @@ contract RetireExactCarbonDefaultC3 is TestHelper, AssertionHelper {
         retireExactC3(USDC_NATIVE, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-
     function test_infinity_retireExactCarbonDefault_NBO_KLIMA(uint256 retireAmount) public {
         retireExactC3(KLIMA, NBO, retireAmount, SUSHI_NBO_LP);
     }

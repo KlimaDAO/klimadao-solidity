@@ -54,7 +54,6 @@ contract UpgradeInfinityForNativeUsdcRevisionsTest is TestHelper {
         carbonmark = constantsFacet.carbonmark();
     }
 
-
     function testFacetsDeployments() public {
         upgradeScript.run();
 
@@ -72,36 +71,48 @@ contract UpgradeInfinityForNativeUsdcRevisionsTest is TestHelper {
         vm.prank(multisig);
         IDiamondCut(INFINITY_ADDRESS).diamondCut(cuts, address(0), "");
 
-
         // After the diamond cut, verify the facets are replaced correctly
         DiamondLoupeFacet loupe = DiamondLoupeFacet(INFINITY_ADDRESS);
-
 
         {
             bytes4 selector = RetirementQuoter.getSourceAmountSpecificRetirement.selector;
             address quoterFacetAddress = loupe.facetAddress(selector);
-            assertEq(quoterFacetAddress, address(upgradeScript.retirementQuoterF()), "RetirementQuoter facet not replaced correctly");
+            assertEq(
+                quoterFacetAddress,
+                address(upgradeScript.retirementQuoterF()),
+                "RetirementQuoter facet not replaced correctly"
+            );
         }
 
         {
             // Check a known selector
             bytes4 selector = RetireCarbonFacet.retireExactCarbonSpecific.selector;
             address retireCarbonFacetAddress = loupe.facetAddress(selector);
-            assertEq(retireCarbonFacetAddress, address(upgradeScript.retireCarbonF()), "RetireCarbonFacet not replaced correctly");
+            assertEq(
+                retireCarbonFacetAddress,
+                address(upgradeScript.retireCarbonF()),
+                "RetireCarbonFacet not replaced correctly"
+            );
         }
 
         {
             // Check a known selector
             bytes4 selector = RedeemToucanPoolFacet.toucanRedeemExactCarbonPoolSpecific.selector;
             address toucanRedeemFacetAddress = loupe.facetAddress(selector);
-            assertEq(toucanRedeemFacetAddress, address(upgradeScript.toucanRedeemF()), "RedeemToucanPoolFacet not replaced correctly");
+            assertEq(
+                toucanRedeemFacetAddress,
+                address(upgradeScript.toucanRedeemF()),
+                "RedeemToucanPoolFacet not replaced correctly"
+            );
         }
 
         {
             // Check a known selector
             bytes4 selector = RedeemC3PoolFacet.c3RedeemPoolSpecific.selector;
             address c3RedeemFacetAddress = loupe.facetAddress(selector);
-            assertEq(c3RedeemFacetAddress, address(upgradeScript.c3RedeemF()), "RedeemC3PoolFacet not replaced correctly");
+            assertEq(
+                c3RedeemFacetAddress, address(upgradeScript.c3RedeemF()), "RedeemC3PoolFacet not replaced correctly"
+            );
         }
     }
 }

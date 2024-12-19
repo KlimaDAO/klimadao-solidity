@@ -75,7 +75,6 @@ contract RetireBondSwapToExactTest is AssertionHelper, DeploymentHelper, TestHel
 
         IERC20(klima).approve(address(retireBond), daoKlima);
 
-
         if (retireAmount == 0) {
             vm.expectRevert("Cannot swap for zero tokens");
             retireBond.swapToExact(BCT, retireAmount);

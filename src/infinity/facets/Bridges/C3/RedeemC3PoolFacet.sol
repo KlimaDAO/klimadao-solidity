@@ -71,7 +71,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(projectTokens.length == amounts.length, "Array lengths not equal");
 
-        uint totalCarbon;
+        uint256 totalCarbon;
         address originalSourceToken = sourceToken;
 
         for (uint256 i; i < amounts.length; i++) {

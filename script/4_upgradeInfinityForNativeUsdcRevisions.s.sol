@@ -26,7 +26,6 @@ contract UpgradeInfinityForNativeUsdcRevisions is Script, HelperContract {
 
     bytes public nativeUsdcUpdateCalldata;
 
-
     function getCuts() public view returns (IDiamondCut.FacetCut[] memory) {
         return cuts;
     }
@@ -89,7 +88,6 @@ contract UpgradeInfinityForNativeUsdcRevisions is Script, HelperContract {
 
         cuts.push(cut[3]);
 
-
         console2.log("New C3 Redeem Facet address");
         console2.logAddress(address(c3RedeemF));
 
@@ -102,15 +100,9 @@ contract UpgradeInfinityForNativeUsdcRevisions is Script, HelperContract {
         console2.log("New Retire Carbon Facet address");
         console2.logAddress(address(retireCarbonF));
 
-        nativeUsdcUpdateCalldata = abi.encodeWithSelector(
-            IDiamondCut.diamondCut.selector,
-            cut,
-            address(0),
-            ""
-        );
+        nativeUsdcUpdateCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
 
         console2.log("Update Native USDC Revisions Calldata");
         console2.logBytes(nativeUsdcUpdateCalldata);
-
     }
 }

@@ -61,24 +61,24 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
     }
 
     function test_infinity_retireExactCarbonSpecific_CCO2_USDC_NATIVE() public {
-        uint preTxBalance = IERC20(USDC_NATIVE).balanceOf(beneficiaryAddress);
-        uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
+        uint256 preTxBalance = IERC20(USDC_NATIVE).balanceOf(beneficiaryAddress);
+        uint256 preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
-        uint sourceAmount = retireExactCCO2(USDC_NATIVE, 100e18);
-        uint postTxBalance = IERC20(USDC_NATIVE).balanceOf(beneficiaryAddress);
-        uint postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
+        uint256 sourceAmount = retireExactCCO2(USDC_NATIVE, 100e18);
+        uint256 postTxBalance = IERC20(USDC_NATIVE).balanceOf(beneficiaryAddress);
+        uint256 postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
         assertEq(preTxBalance - postTxBalance, sourceAmount);
         assertEq(postTxPoCCBalance - preTxPoCCBalance, 1);
     }
 
     function test_infinity_retireExactCarbonSpecific_CCO2_USDC_BRIDGED() public {
-        uint preTxBalance = IERC20(USDC_BRIDGED).balanceOf(beneficiaryAddress);
-        uint preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
+        uint256 preTxBalance = IERC20(USDC_BRIDGED).balanceOf(beneficiaryAddress);
+        uint256 preTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
-        uint sourceAmount = retireExactCCO2(USDC_BRIDGED, 100e18);
-        uint postTxBalance = IERC20(USDC_BRIDGED).balanceOf(beneficiaryAddress);
-        uint postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
+        uint256 sourceAmount = retireExactCCO2(USDC_BRIDGED, 100e18);
+        uint256 postTxBalance = IERC20(USDC_BRIDGED).balanceOf(beneficiaryAddress);
+        uint256 postTxPoCCBalance = IERC721(constantsFacet.coorestPoCCToken()).balanceOf(beneficiaryAddress);
 
         assertEq(preTxBalance - postTxBalance, sourceAmount);
         assertEq(postTxPoCCBalance - preTxPoCCBalance, 1);
@@ -102,7 +102,9 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
 
         address sourceTarget;
 
-        if (sourceToken == USDC_NATIVE || sourceToken == USDC_BRIDGED || sourceToken == KLIMA_TOKEN) sourceTarget = beneficiaryAddress;
+        if (sourceToken == USDC_NATIVE || sourceToken == USDC_BRIDGED || sourceToken == KLIMA_TOKEN) {
+            sourceTarget = beneficiaryAddress;
+        }
 
         vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
 

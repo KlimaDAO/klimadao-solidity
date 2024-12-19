@@ -255,7 +255,6 @@ abstract contract TestHelper is Test, HelperContract {
             })
         );
 
-
         cut[1] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(retireCarbonF),
@@ -279,7 +278,6 @@ abstract contract TestHelper is Test, HelperContract {
                 functionSelectors: generateSelectors("RedeemC3PoolFacet")
             })
         );
-
 
         // deploy diamond and perform diamondCut
         IDiamondCut(infinityDiamond).diamondCut(cut, address(0), "");
@@ -441,7 +439,6 @@ abstract contract TestHelper is Test, HelperContract {
             sourceAmount = quoterFacet.getSourceAmountSpecificRetirement(sourceToken, pool, amountOut);
         }
 
-
         address sourceTarget;
 
         if (sourceToken == constantsFacet.usdc()) {
@@ -463,7 +460,6 @@ abstract contract TestHelper is Test, HelperContract {
 
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
         IERC20(sourceToken).approve(diamond, sourceAmount);
-
     }
 
     //////////// EVM Helpers ////////////

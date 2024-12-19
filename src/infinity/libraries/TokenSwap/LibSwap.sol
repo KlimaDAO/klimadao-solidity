@@ -12,7 +12,7 @@ import "../Token/LibTransfer.sol";
 import "./LibUniswapV2Swap.sol";
 import "./LibTridentSwap.sol";
 import "./LibTreasurySwap.sol";
-import '../../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol';
+import "../../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
 library LibSwap {
     using LibTransfer for IERC20;
@@ -522,21 +522,26 @@ library LibSwap {
      * @return sourceToken This will always be C.usdc_bridged()
      * @return adjustedAmountOut The amount of bridged usdc received
      */
-    function swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn) internal returns (address sourceToken, uint256 adjustedAmountOut) {
-
+    function swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn)
+        internal
+        returns (address sourceToken, uint256 adjustedAmountOut)
+    {
         // In order to not restrict maxAmountIn, we need a swapFeeThreshold to roughly set amountOutMinimum
         // Miniscule swaps have higher % fees i.e. a swap of 2 has a fee of 1 (50%)
         // Here anything above 3000 is considered a regular swap and we subtract the poolFee of .01% in order to protect the amountOutMinimum
-        // If the swap is below 3000, we set amountOutMinimum. There is a possibility micro retirements will fail if 
+        // If the swap is below 3000, we set amountOutMinimum. There is a possibility micro retirements will fail if
         // there is price manipulation in the pool but unlikely in a usdc/uscd.e pool
         uint256 swapFeeThreshold = 3000;
 
-        /** In the RetirementQuoter we are using quoteExactOutputSingle 
-        * to get the necessary amountIn for retirement amount
-        * Therefore here we can optimistically use exactInputSingle */ 
-        uint256 adjustedAmountOutMinimum = maxAmountIn > swapFeeThreshold ? maxAmountIn - ((maxAmountIn * (C.uniswapV3UsdcNativeBridgedPoolFee() * 1)) / 10000) : 0;
-        ISwapRouter.ExactInputSingleParams memory params =
-            ISwapRouter.ExactInputSingleParams({
+        /**
+         * In the RetirementQuoter we are using quoteExactOutputSingle 
+         * to get the necessary amountIn for retirement amount
+         * Therefore here we can optimistically use exactInputSingle
+         */
+        uint256 adjustedAmountOutMinimum = maxAmountIn > swapFeeThreshold
+            ? maxAmountIn - ((maxAmountIn * (C.uniswapV3UsdcNativeBridgedPoolFee() * 1)) / 10_000)
+            : 0;
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
             tokenIn: C.usdc(),
             tokenOut: C.usdc_bridged(),
             fee: C.uniswapV3UsdcNativeBridgedPoolFee(),
@@ -561,13 +566,14 @@ library LibSwap {
      * @return sourceToken This will always be C.usdc()
      * @return amountOut The amount of native usdc dust received
      */
-    function swapBridgedUsdcDustToNativeUsdcDust(uint256 amount) internal returns (address sourceToken, uint256 amountOut) {
-
+    function swapBridgedUsdcDustToNativeUsdcDust(uint256 amount)
+        internal
+        returns (address sourceToken, uint256 amountOut)
+    {
         // setting amountOutMinimum to zero ONLY because this transferrring dust.
         // for an legitimate amount, as above, this should be handled so that an unlikely + unusual price on a swap doesn't decimate the amount
 
-        ISwapRouter.ExactInputSingleParams memory params =
-            ISwapRouter.ExactInputSingleParams({
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
             tokenIn: C.usdc_bridged(),
             tokenOut: C.usdc(),
             fee: C.uniswapV3UsdcNativeBridgedPoolFee(),
@@ -583,5 +589,4 @@ library LibSwap {
         amountOut = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
         sourceToken = C.usdc();
     }
-
 }
