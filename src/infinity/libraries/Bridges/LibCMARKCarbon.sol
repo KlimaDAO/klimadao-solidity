@@ -36,15 +36,17 @@ library LibCMARKCarbon {
      * @param retirementMessage    String message for this specific retirement
      */
     function retireCMARK(
+        address poolToken,
         address projectToken,
         uint amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
         string memory beneficiaryString,
-        string memory retirementMessage
+        string memory retirementMessage,
+        string memory consumptionCountryCode
     ) internal {
-        ICMARKProjectToken(projectToken).offsetFor(amount, beneficiaryAddress, beneficiaryString, retirementMessage);
+        ICMARKCreditToken(projectToken).retire(amount, beneficiaryAddress, beneficiaryString, retirementMessage);
 
         LibRetire.saveRetirementDetails(
             poolToken,
@@ -68,6 +70,6 @@ library LibCMARKCarbon {
     }
 
     function isValid(address token) internal returns (bool) {
-        return ICMARKProjectFactory(C.cMARKProjectFactory()).creditAddressToId(token) != '';
+        return ICMARKCreditTokenFactory(C.cMARKCreditFactory()).creditAddressToId(token) != '';
     }
 }
