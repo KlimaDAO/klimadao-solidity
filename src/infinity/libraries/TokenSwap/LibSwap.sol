@@ -5,7 +5,6 @@ pragma solidity ^0.8.16;
  * @author Cujo
  * @title LibSwap
  */
-
 import "../../C.sol";
 import "../LibAppStorage.sol";
 import "../LibKlima.sol";
@@ -129,7 +128,10 @@ library LibSwap {
             path[1] = C.usdc_bridged();
 
             amount = _performExactSourceSwap(
-                s.swap[carbonToken][C.usdc_bridged()].swapDexes[0], s.swap[carbonToken][C.usdc_bridged()].ammRouters[0], path, amount
+                s.swap[carbonToken][C.usdc_bridged()].swapDexes[0],
+                s.swap[carbonToken][C.usdc_bridged()].ammRouters[0],
+                path,
+                amount
             );
             // Now that we have USDC, set the sourceToken to USDC and proceed as normal.
             sourceToken = C.usdc_bridged();

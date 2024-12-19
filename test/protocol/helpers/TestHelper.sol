@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-/******************************************************************************\
-* Authors: Cujo <rawr@cujowolf.dev>
-* Helper functions for various protocol tests
-/******************************************************************************/
-
+/**
+ * \
+ * Authors: Cujo <rawr@cujowolf.dev>
+ * Helper functions for various protocol tests
+ * /*****************************************************************************
+ */
 import "forge-std/Test.sol";
 import "oz/token/ERC20/IERC20.sol";
 
@@ -20,10 +21,10 @@ abstract contract TestHelper is Test {
         RetirementBondAllocator allocator = RetirementBondAllocator(allocatorAddress);
 
         uint256 currentExcessReserves = IKlimaTreasury(treasury).excessReserves() * 1e9;
-        uint256 maxExcessReserves = (currentExcessReserves * allocator.maxReservePercent()) /
-            allocator.PERCENT_DIVISOR();
-        uint256 maxTreasuryHoldings = (IERC20(token).balanceOf(treasury) * allocator.maxReservePercent()) /
-            allocator.PERCENT_DIVISOR();
+        uint256 maxExcessReserves =
+            (currentExcessReserves * allocator.maxReservePercent()) / allocator.PERCENT_DIVISOR();
+        uint256 maxTreasuryHoldings =
+            (IERC20(token).balanceOf(treasury) * allocator.maxReservePercent()) / allocator.PERCENT_DIVISOR();
 
         maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }

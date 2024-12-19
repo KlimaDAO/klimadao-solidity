@@ -59,17 +59,17 @@ contract RetireBondSwapToExactTest is AssertionHelper, DeploymentHelper, TestHel
         retireBond.swapToExact(BCT, 1e18);
     }
 
-    function test_protocol_RetireBond_swapToExact(uint retireAmount) public {
+    function test_protocol_RetireBond_swapToExact(uint256 retireAmount) public {
         // Limit the total amount for fuzzing to an amount that won't break UniV2 quoting
         vm.assume(retireAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 50) / 100 && retireAmount < maxBctBond);
 
         // Set up and fund infinity contract with KLIMA
-        uint klimaSupply = IERC20(klima).totalSupply();
-        uint daoKlima = IERC20(klima).balanceOf(retireBond.DAO());
+        uint256 klimaSupply = IERC20(klima).totalSupply();
+        uint256 daoKlima = IERC20(klima).balanceOf(retireBond.DAO());
         fundInfinityWithKlima(daoKlima);
 
         if (retireAmount == 0) vm.expectRevert("UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT");
-        uint klimaNeeded = retireBond.getKlimaAmount(retireAmount, BCT);
+        uint256 klimaNeeded = retireBond.getKlimaAmount(retireAmount, BCT);
 
         vm.startPrank(retireBond.INFINITY());
 
@@ -87,13 +87,13 @@ contract RetireBondSwapToExactTest is AssertionHelper, DeploymentHelper, TestHel
 
             assertTokenBalance(BCT, address(retireBond), maxBctBond - retireAmount);
             assertTokenBalance(klima, retireBond.INFINITY(), (daoKlima) - klimaNeeded);
-            assertTokenBalance(klima, retireBond.DAO(), (klimaNeeded * 3000) / 10000);
-            assertEq(klimaSupply - (klimaNeeded - ((klimaNeeded * 3000) / 10000)), IERC20(klima).totalSupply());
+            assertTokenBalance(klima, retireBond.DAO(), (klimaNeeded * 3000) / 10_000);
+            assertEq(klimaSupply - (klimaNeeded - ((klimaNeeded * 3000) / 10_000)), IERC20(klima).totalSupply());
         }
         vm.stopPrank();
     }
 
-    function fundInfinityWithKlima(uint amount) internal {
+    function fundInfinityWithKlima(uint256 amount) internal {
         vm.prank(retireBond.DAO());
         IERC20(klima).transfer(infinityDiamond, amount);
     }

@@ -81,108 +81,90 @@ contract RetireBondRetireCarbonSpecificTest is AssertionHelper, DeploymentHelper
         projectsNct = IToucanPool(NCT).getScoredTCO2s();
     }
 
-    function test_protocol_retireBond_retireCarbonSpecific_BCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_BCT_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(BCT).totalSupply());
 
         getKlima();
 
-        uint poolBalance = IERC20(projectsBct[1]).balanceOf(BCT);
+        uint256 poolBalance = IERC20(projectsBct[1]).balanceOf(BCT);
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if ((retireAmount * 13333) / 10000 > IERC20(BCT).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if ((retireAmount * 13_333) / 10_000 > IERC20(BCT).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else if (retireAmount > poolBalance) vm.expectRevert();
+        } else if (retireAmount > poolBalance) {
+            vm.expectRevert();
+        }
 
         retireBond.retireCarbonSpecific(
-            BCT,
-            projectsBct[1],
-            retireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message
+            BCT, projectsBct[1], retireAmount, entity, beneficiaryAddress, beneficiary, message
         );
     }
 
-    function test_protocol_retireBond_retireCarbonSpecific_NCT_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_NCT_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(NCT).totalSupply());
 
         getKlima();
 
-        uint poolBalance = IERC20(projectsNct[1]).balanceOf(NCT);
+        uint256 poolBalance = IERC20(projectsNct[1]).balanceOf(NCT);
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if ((retireAmount * 11211) / 10000 > IERC20(NCT).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if ((retireAmount * 11_211) / 10_000 > IERC20(NCT).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else if (retireAmount > poolBalance) vm.expectRevert();
+        } else if (retireAmount > poolBalance) {
+            vm.expectRevert();
+        }
 
         retireBond.retireCarbonSpecific(
-            NCT,
-            projectsNct[1],
-            retireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message
+            NCT, projectsNct[1], retireAmount, entity, beneficiaryAddress, beneficiary, message
         );
     }
 
     function test_protocol_retireBond_retireCarbonSpecific_MCO2() public {
         getKlima();
 
-        uint retireAmount = 1e18;
+        uint256 retireAmount = 1e18;
 
         vm.expectRevert("Specific redeem not supported.");
         retireBond.retireCarbonSpecific(
-            MCO2,
-            address(0),
-            retireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message
+            MCO2, address(0), retireAmount, entity, beneficiaryAddress, beneficiary, message
         );
     }
 
-    function test_protocol_retireBond_retireCarbonSpecific_UBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_UBO_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(UBO).totalSupply());
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if ((retireAmount * 10225) / 10000 > IERC20(UBO).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if ((retireAmount * 10_225) / 10_000 > IERC20(UBO).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else if (retireAmount > IERC20(projectsUbo[1]).balanceOf(UBO)) vm.expectRevert("Not enough amount");
+        } else if (retireAmount > IERC20(projectsUbo[1]).balanceOf(UBO)) {
+            vm.expectRevert("Not enough amount");
+        }
 
         retireBond.retireCarbonSpecific(
-            UBO,
-            projectsUbo[1],
-            retireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message
+            UBO, projectsUbo[1], retireAmount, entity, beneficiaryAddress, beneficiary, message
         );
     }
 
-    function test_protocol_retireBond_retireCarbonSpecific_NBO_fuzz(uint retireAmount) public {
+    function test_protocol_retireBond_retireCarbonSpecific_NBO_fuzz(uint256 retireAmount) public {
         vm.assume(retireAmount <= IERC20(NBO).totalSupply());
 
         getKlima();
 
-        if (retireAmount == 0) vm.expectRevert("Cannot retire zero tokens");
-        else if ((retireAmount * 10225) / 10000 > IERC20(NBO).balanceOf(address(retireBond)))
+        if (retireAmount == 0) {
+            vm.expectRevert("Cannot retire zero tokens");
+        } else if ((retireAmount * 10_225) / 10_000 > IERC20(NBO).balanceOf(address(retireBond))) {
             vm.expectRevert("Not enough pool tokens to retire");
-        else if (retireAmount > IERC20(projectsNbo[1]).balanceOf(NBO)) vm.expectRevert("Not enough amount");
+        } else if (retireAmount > IERC20(projectsNbo[1]).balanceOf(NBO)) {
+            vm.expectRevert("Not enough amount");
+        }
 
         retireBond.retireCarbonSpecific(
-            NBO,
-            projectsNbo[1],
-            retireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message
+            NBO, projectsNbo[1], retireAmount, entity, beneficiaryAddress, beneficiary, message
         );
     }
 

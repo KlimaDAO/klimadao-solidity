@@ -24,11 +24,11 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
     function toucanRedeemExactCarbonPoolDefault(
         address sourceToken,
         address poolToken,
-        uint amount,
-        uint maxAmountIn,
+        uint256 amount,
+        uint256 maxAmountIn,
         LibTransfer.From fromMode,
         LibTransfer.To toMode
-    ) external nonReentrant returns (address[] memory projectTokens, uint[] memory amounts) {
+    ) external nonReentrant returns (address[] memory projectTokens, uint256[] memory amounts) {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(amount > 0, "Cannot redeem zero tokens");
 
@@ -40,7 +40,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
             }
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
-            uint carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, amount);
+            uint256 carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, amount);
 
             require(carbonReceived >= amount, "Swap not enough");
             amount = carbonReceived;
@@ -66,12 +66,12 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
     function toucanRedeemExactCarbonPoolSpecific(
         address sourceToken,
         address poolToken,
-        uint maxAmountIn,
+        uint256 maxAmountIn,
         address[] memory projectTokens,
-        uint[] memory amounts,
+        uint256[] memory amounts,
         LibTransfer.From fromMode,
         LibTransfer.To toMode
-    ) external nonReentrant returns (uint[] memory redeemedAmounts) {
+    ) external nonReentrant returns (uint256[] memory redeemedAmounts) {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(projectTokens.length == amounts.length, "Array lengths not equal");
 
@@ -79,14 +79,14 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
         uint totalCarbon;
         address originalSourceToken = sourceToken;
 
-        for (uint i; i < amounts.length; i++) {
+        for (uint256 i; i < amounts.length; i++) {
             amounts[i] += LibToucanCarbon.getSpecificRedeemFee(poolToken, amounts[i]);
             totalCarbon += amounts[i];
         }
 
         require(totalCarbon > 0, "Cannot redeem zero tokens");
 
-        uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+        uint256 receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         // after this point the contract has bridged usdc
         if (sourceToken == C.usdc()) {

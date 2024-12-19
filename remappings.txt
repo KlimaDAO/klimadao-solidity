@@ -2,5 +2,5 @@ oz/=lib/openzeppelin-contracts/contracts/
 oz-4-5-0/=lib/openzeppelin-contracts-4-5-0/contracts/
 ozu/=lib/openzeppelin-contracts-upgradeable/contracts
 ozu-4-5-1/=lib/openzeppelin-contracts-upgradeable-4-5-1/contracts
-@uniswap/v3-core/=lib/v3-core
-@uniswap/v3-periphery/=lib/v3-periphery
+@uniswap/v3-core/=lib/uniswap-v3-core/contracts
+@uniswap/v3-periphery/=lib/uniswap-v3-periphery/contracts

@@ -10,7 +10,6 @@ import "../../interfaces/IInternationalCarbonRegistry.sol";
  * @title LibICRCarbon
  * Handles interactions with ICR carbon credits
  */
-
 library LibICRCarbon {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,

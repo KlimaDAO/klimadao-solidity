@@ -28,7 +28,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
         __Context_init();
     }
 
-    /** === State Variables and Mappings === */
+    /**
+     * === State Variables and Mappings ===
+     */
 
     /// @notice feeAmount represents the fee to be bonded for KLIMA. 0.1% increments. 10 = 1%
 
@@ -40,8 +42,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     mapping(address => address) public poolRouter;
     mapping(address => address) public tridentPool;
 
-    /** === Event Setup === */
-
+    /**
+     * === Event Setup ===
+     */
     event C3Retired(
         address indexed retiringAddress,
         address indexed beneficiaryAddress,
@@ -55,15 +58,14 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     event PoolRemoved(address indexed carbonPool);
     event PoolRouterChanged(address indexed carbonPool, address indexed oldRouter, address indexed newRouter);
     event TridentChanged(
-        address indexed oldBento,
-        address indexed newBento,
-        address indexed oldTrident,
-        address newTrident
+        address indexed oldBento, address indexed newBento, address indexed oldTrident, address newTrident
     );
     event FeeUpdated(uint256 oldFee, uint256 newFee);
     event MasterAggregatorUpdated(address indexed oldAddress, address indexed newAddress);
 
-    /** === Free Redeem and Offset Functions === */
+    /**
+     * === Free Redeem and Offset Functions ===
+     */
 
     /**
      * @notice This function transfers source tokens if needed, swaps to the C3
@@ -94,13 +96,8 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
 
         // Transfer source tokens
 
-        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) = _transferSourceTokens(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            false
-        );
+        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) =
+            _transferSourceTokens(_sourceToken, _poolToken, _amount, _amountInCarbon, false);
 
         // Get the pool tokens
 
@@ -174,20 +171,10 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
 
             IC3ProjectToken(listC3T[i]).offsetFor(balance, _beneficiaryAddress, _beneficiaryString, _retirementMessage);
             IKlimaCarbonRetirements(retirementStorage).carbonRetired(
-                _beneficiaryAddress,
-                _poolToken,
-                balance,
-                _beneficiaryString,
-                _retirementMessage
+                _beneficiaryAddress, _poolToken, balance, _beneficiaryString, _retirementMessage
             );
             emit C3Retired(
-                msg.sender,
-                _beneficiaryAddress,
-                _beneficiaryString,
-                _retirementMessage,
-                _poolToken,
-                listC3T[i],
-                balance
+                msg.sender, _beneficiaryAddress, _beneficiaryString, _retirementMessage, _poolToken, listC3T[i], balance
             );
 
             _totalAmount -= balance;
@@ -196,7 +183,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
         require(_totalAmount == 0, "Total Retired != To Desired");
     }
 
-    /** === Taxed Redeem and Offset Functions === */
+    /**
+     * === Taxed Redeem and Offset Functions ===
+     */
 
     /**
      * @notice This function transfers source tokens if needed, swaps to the C3
@@ -235,12 +224,7 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
 
         // Retire the tokens
         _retireCarbonSpecific(
-            _amount,
-            _beneficiaryAddress,
-            _beneficiaryString,
-            _retirementMessage,
-            _poolToken,
-            _carbonList
+            _amount, _beneficiaryAddress, _beneficiaryString, _retirementMessage, _poolToken, _carbonList
         );
 
         // Send the fee to the treasury
@@ -272,13 +256,8 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
         bool _amountInCarbon,
         address _retiree
     ) internal returns (uint256, uint256) {
-        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) = _transferSourceTokens(
-            _sourceToken,
-            _poolToken,
-            _amount,
-            _amountInCarbon,
-            true
-        );
+        (uint256 sourceAmount, uint256 totalCarbon, uint256 fee) =
+            _transferSourceTokens(_sourceToken, _poolToken, _amount, _amountInCarbon, true);
 
         // Get the pool tokens
 
@@ -360,17 +339,10 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
                 redeemAmount[0] = IERC20Upgradeable(_carbonList[i]).balanceOf(address(this));
 
                 IC3ProjectToken(_carbonList[i]).offsetFor(
-                    redeemAmount[0],
-                    _beneficiaryAddress,
-                    _beneficiaryString,
-                    _retirementMessage
+                    redeemAmount[0], _beneficiaryAddress, _beneficiaryString, _retirementMessage
                 );
                 IKlimaCarbonRetirements(retirementStorage).carbonRetired(
-                    _beneficiaryAddress,
-                    _poolToken,
-                    redeemAmount[0],
-                    _beneficiaryString,
-                    _retirementMessage
+                    _beneficiaryAddress, _poolToken, redeemAmount[0], _beneficiaryString, _retirementMessage
                 );
                 emit C3Retired(
                     msg.sender,
@@ -387,7 +359,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
         require(_totalAmount == 0, "Not all pool tokens were burned.");
     }
 
-    /** === Internal helper functions === */
+    /**
+     * === Internal helper functions ===
+     */
 
     /**
      * @notice Transfers the needed source tokens from the caller to perform any needed
@@ -494,11 +468,7 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
             IERC20Upgradeable(path[0]).safeIncreaseAllowance(poolRouter[_poolToken], _amountIn);
 
             uint256[] memory amounts = IUniswapV2Router02(poolRouter[_poolToken]).swapTokensForExactTokens(
-                klimaAmount,
-                _amountIn,
-                path,
-                address(this),
-                block.timestamp
+                klimaAmount, _amountIn, path, address(this), block.timestamp
             );
 
             _returnTradeDust(amounts, _sourceToken, _amountIn, _retiree);
@@ -527,11 +497,10 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
      * @return Returns the resulting carbon amount to retire and the fee from the
      * results of the swap.
      */
-    function _swapExactForCarbon(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _amountIn
-    ) internal returns (uint256, uint256) {
+    function _swapExactForCarbon(address _sourceToken, address _poolToken, uint256 _amountIn)
+        internal
+        returns (uint256, uint256)
+    {
         address KLIMA = IKlimaRetirementAggregator(masterAggregator).KLIMA();
         address sKLIMA = IKlimaRetirementAggregator(masterAggregator).sKLIMA();
         address wsKLIMA = IKlimaRetirementAggregator(masterAggregator).wsKLIMA();
@@ -550,11 +519,7 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
             IERC20Upgradeable(_sourceToken).safeIncreaseAllowance(poolRouter[_poolToken], _amountIn);
 
             uint256[] memory amounts = IUniswapV2Router02(poolRouter[_poolToken]).swapExactTokensForTokens(
-                _amountIn,
-                (klimaAmount * 995) / 1000,
-                path,
-                address(this),
-                block.timestamp
+                _amountIn, (klimaAmount * 995) / 1000, path, address(this), block.timestamp
             );
 
             klimaAmount = amounts[amounts.length - 1] == 0 ? amounts[amounts.length - 2] : amounts[amounts.length - 1];
@@ -592,12 +557,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
      * @param _amountIn Total source tokens initially provided.
      * @param _retiree Address where to send the dust.
      */
-    function _returnTradeDust(
-        uint256[] memory _amounts,
-        address _sourceToken,
-        uint256 _amountIn,
-        address _retiree
-    ) internal {
+    function _returnTradeDust(uint256[] memory _amounts, address _sourceToken, uint256 _amountIn, address _retiree)
+        internal
+    {
         address KLIMA = IKlimaRetirementAggregator(masterAggregator).KLIMA();
         address sKLIMA = IKlimaRetirementAggregator(masterAggregator).sKLIMA();
         address wsKLIMA = IKlimaRetirementAggregator(masterAggregator).wsKLIMA();
@@ -629,14 +591,14 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
      * @param _amountInCarbon Bool indicating if _amount is in carbon or source.
      * @return poolFeeAmount Fee amount for specificly redeeming a ton.
      */
-    function _getSpecificCarbonFee(
-        address _poolToken,
-        uint256 _poolAmount,
-        bool _amountInCarbon
-    ) internal view returns (uint256) {
+    function _getSpecificCarbonFee(address _poolToken, uint256 _poolAmount, bool _amountInCarbon)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 poolFeeAmount;
         uint256 feeRedeem = IC3Pool(_poolToken).feeRedeem();
-        uint256 feeDivider = 10000; // This is hardcoded in current C3 contract.
+        uint256 feeDivider = 10_000; // This is hardcoded in current C3 contract.
 
         if (_amountInCarbon) {
             poolFeeAmount = ((_poolAmount * feeDivider) / (feeDivider - feeRedeem)) - _poolAmount;
@@ -646,7 +608,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
         return poolFeeAmount;
     }
 
-    /** === External views and helpful functions === */
+    /**
+     * === External views and helpful functions ===
+     */
 
     /**
      * @notice Call the UniswapV2 routers for needed amounts on token being retired.
@@ -656,12 +620,11 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
      * @param _poolAmount Amount of tokens being retired.
      * @return Tuple of the total pool amount needed, followed by the fee.
      */
-    function getNeededBuyAmount(
-        address _sourceToken,
-        address _poolToken,
-        uint256 _poolAmount,
-        bool _specificRetire
-    ) public view returns (uint256, uint256) {
+    function getNeededBuyAmount(address _sourceToken, address _poolToken, uint256 _poolAmount, bool _specificRetire)
+        public
+        view
+        returns (uint256, uint256)
+    {
         address KLIMA = IKlimaRetirementAggregator(masterAggregator).KLIMA();
         address sKLIMA = IKlimaRetirementAggregator(masterAggregator).sKLIMA();
         address wsKLIMA = IKlimaRetirementAggregator(masterAggregator).wsKLIMA();
@@ -730,12 +693,14 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
         return path;
     }
 
-    /** === Admin Functions === */
+    /**
+     * === Admin Functions ===
+     */
 
     /**
-        @notice Set the fee for the helper
-        @param _amount New fee amount, in .1% increments. 10 = 1%
-        @return bool
+     * @notice Set the fee for the helper
+     *     @param _amount New fee amount, in .1% increments. 10 = 1%
+     *     @return bool
      */
     function setFeeAmount(uint256 _amount) external onlyOwner returns (bool) {
         uint256 oldFee = feeAmount;
@@ -746,10 +711,10 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     /**
-        @notice Update the router for an existing pool
-        @param _poolToken Pool being updated
-        @param _router New router address
-        @return bool
+     * @notice Update the router for an existing pool
+     *     @param _poolToken Pool being updated
+     *     @param _router New router address
+     *     @return bool
      */
     function setPoolRouter(address _poolToken, address _router) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -762,10 +727,10 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     /**
-        @notice Add a new carbon pool to retire with helper contract
-        @param _poolToken Pool being added
-        @param _router UniswapV2 router to route trades through for non-pool retirements
-        @return bool
+     * @notice Add a new carbon pool to retire with helper contract
+     *     @param _poolToken Pool being added
+     *     @param _router UniswapV2 router to route trades through for non-pool retirements
+     *     @return bool
      */
     function addPool(address _poolToken, address _router, address _tridentPool) external onlyOwner returns (bool) {
         require(!isPoolToken[_poolToken], "Pool already added");
@@ -780,9 +745,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     /**
-        @notice Remove a carbon pool to retire with helper contract
-        @param _poolToken Pool being removed
-        @return bool
+     * @notice Remove a carbon pool to retire with helper contract
+     *     @param _poolToken Pool being removed
+     *     @return bool
      */
     function removePool(address _poolToken) external onlyOwner returns (bool) {
         require(isPoolToken[_poolToken], "Pool not added");
@@ -794,9 +759,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     /**
-        @notice Allow withdrawal of any tokens sent in error
-        @param _token Address of token to transfer
-        @param _recipient Address where to send tokens.
+     * @notice Allow withdrawal of any tokens sent in error
+     *     @param _token Address of token to transfer
+     *     @param _recipient Address where to send tokens.
      */
     function feeWithdraw(address _token, address _recipient) public onlyOwner returns (bool) {
         IERC20Upgradeable(_token).safeTransfer(_recipient, IERC20Upgradeable(_token).balanceOf(address(this)));
@@ -805,9 +770,9 @@ contract RetireC3Carbon is Initializable, ContextUpgradeable, OwnableUpgradeable
     }
 
     /**
-        @notice Allow the contract owner to update the master aggregator proxy address used.
-        @param _newAddress New address for contract needing to be updated.
-        @return bool
+     * @notice Allow the contract owner to update the master aggregator proxy address used.
+     *     @param _newAddress New address for contract needing to be updated.
+     *     @return bool
      */
     function setMasterAggregator(address _newAddress) external onlyOwner returns (bool) {
         address oldAddress = masterAggregator;

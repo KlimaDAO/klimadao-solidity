@@ -14,18 +14,17 @@ import "../LibAppStorage.sol";
  * Largely inspired by Balancer's Vault
  *
  */
-
 library LibBalance {
     using SafeERC20 for IERC20;
-    using SafeCast for uint;
+    using SafeCast for uint256;
 
     /**
      * @dev Emitted when a account's Internal Balance changes, through interacting using Internal Balance.
      *
      */
-    event InternalBalanceChanged(address indexed account, IERC20 indexed token, int delta);
+    event InternalBalanceChanged(address indexed account, IERC20 indexed token, int256 delta);
 
-    function getBalance(address account, IERC20 token) internal view returns (uint combined_balance) {
+    function getBalance(address account, IERC20 token) internal view returns (uint256 combined_balance) {
         combined_balance = token.balanceOf(account) + getInternalBalance(account, token);
         return combined_balance;
     }
@@ -33,9 +32,9 @@ library LibBalance {
     /**
      * @dev Increases `account`'s Internal Balance for `token` by `amount`.
      */
-    function increaseInternalBalance(address account, IERC20 token, uint amount) internal {
-        uint currentBalance = getInternalBalance(account, token);
-        uint newBalance = currentBalance + amount;
+    function increaseInternalBalance(address account, IERC20 token, uint256 amount) internal {
+        uint256 currentBalance = getInternalBalance(account, token);
+        uint256 newBalance = currentBalance + amount;
         setInternalBalance(account, token, newBalance, amount.toInt256());
     }
 
@@ -44,17 +43,17 @@ library LibBalance {
      * doesn't revert if `account` doesn't have enough balance, and sets it to zero and returns the deducted amount
      * instead.
      */
-    function decreaseInternalBalance(address account, IERC20 token, uint amount, bool allowPartial)
+    function decreaseInternalBalance(address account, IERC20 token, uint256 amount, bool allowPartial)
         internal
-        returns (uint deducted)
+        returns (uint256 deducted)
     {
-        uint currentBalance = getInternalBalance(account, token);
+        uint256 currentBalance = getInternalBalance(account, token);
         require(allowPartial || (currentBalance >= amount), "Balance: Insufficient internal balance");
 
         deducted = Math.min(currentBalance, amount);
         // By construction, `deducted` is lower or equal to `currentBalance`, so we don't need to use checked
         // arithmetic.
-        uint newBalance = currentBalance - deducted;
+        uint256 newBalance = currentBalance - deducted;
         setInternalBalance(account, token, newBalance, -(deducted.toInt256()));
     }
 
@@ -65,7 +64,7 @@ library LibBalance {
      * (if positive) or decreased (if negative). To avoid reading the current balance in order to compute the delta,
      * this function relies on the caller providing it directly.
      */
-    function setInternalBalance(address account, IERC20 token, uint newBalance, int delta) private {
+    function setInternalBalance(address account, IERC20 token, uint256 newBalance, int256 delta) private {
         AppStorage storage s = LibAppStorage.diamondStorage();
         s.internalTokenBalance[account][token] = newBalance;
         emit InternalBalanceChanged(account, token, delta);
@@ -74,7 +73,7 @@ library LibBalance {
     /**
      * @dev Returns `account`'s Internal Balance for `token`.
      */
-    function getInternalBalance(address account, IERC20 token) internal view returns (uint) {
+    function getInternalBalance(address account, IERC20 token) internal view returns (uint256) {
         AppStorage storage s = LibAppStorage.diamondStorage();
         return s.internalTokenBalance[account][token];
     }

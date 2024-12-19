@@ -10,7 +10,6 @@ import "../LibAppStorage.sol";
  * @title LibMatic
  *
  */
-
 library LibMatic {
     function refundMatic() internal {
         //AppStorage storage s = LibAppStorage.diamondStorage();

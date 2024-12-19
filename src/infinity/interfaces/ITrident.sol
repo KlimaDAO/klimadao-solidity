@@ -15,14 +15,14 @@ interface IBentoBoxMinimal {
         bytes32 s
     ) external;
 
-    function toAmount(IERC20 token, uint share, bool roundUp) external view returns (uint amount);
+    function toAmount(IERC20 token, uint256 share, bool roundUp) external view returns (uint256 amount);
 }
 
 /// @notice Trident pool router interface.
 interface ITridentRouter {
     struct ExactInputSingleParams {
-        uint amountIn;
-        uint amountOutMinimum;
+        uint256 amountIn;
+        uint256 amountOutMinimum;
         address pool;
         address tokenIn;
         bytes data;
@@ -31,7 +31,7 @@ interface ITridentRouter {
     function exactInputSingleWithNativeToken(ExactInputSingleParams calldata params)
         external
         payable
-        returns (uint amountOut);
+        returns (uint256 amountOut);
 }
 
 /// @notice Trident pool interface.
@@ -40,11 +40,11 @@ interface ITridentPool {
     /// @dev The pool does not need to include a trade simulator directly in itself - it can use a library.
     /// @param data ABI-encoded params that the pool requires.
     /// @return finalAmountOut The amount of output tokens that will be sent to the user if the trade is executed.
-    function getAmountOut(bytes calldata data) external view returns (uint finalAmountOut);
+    function getAmountOut(bytes calldata data) external view returns (uint256 finalAmountOut);
 
     /// @notice Simulates a trade and returns the expected output.
     /// @dev The pool does not need to include a trade simulator directly in itself - it can use a library.
     /// @param data ABI-encoded params that the pool requires.
     /// @return finalAmountIn The amount of input tokens that are required from the user if the trade is executed.
-    function getAmountIn(bytes calldata data) external view returns (uint finalAmountIn);
+    function getAmountIn(bytes calldata data) external view returns (uint256 finalAmountIn);
 }

@@ -20,11 +20,11 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
     function c3RedeemPoolDefault(
         address sourceToken,
         address poolToken,
-        uint amount,
-        uint maxAmountIn,
+        uint256 amount,
+        uint256 maxAmountIn,
         LibTransfer.From fromMode,
         LibTransfer.To toMode
-    ) external nonReentrant returns (address[] memory projectTokens, uint[] memory amounts) {
+    ) external nonReentrant returns (address[] memory projectTokens, uint256[] memory amounts) {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(amount > 0, "Cannot redeem zero tokens");
 
@@ -36,7 +36,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
             }
             if (sourceToken == C.sKlima()) LibKlima.unstakeKlima(maxAmountIn);
 
-            uint carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, amount);
+            uint256 carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, amount);
 
             require(carbonReceived >= amount, "Swap not enough");
             amount = carbonReceived;
@@ -62,25 +62,25 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
     function c3RedeemPoolSpecific(
         address sourceToken,
         address poolToken,
-        uint maxAmountIn,
+        uint256 maxAmountIn,
         address[] memory projectTokens,
-        uint[] memory amounts,
+        uint256[] memory amounts,
         LibTransfer.From fromMode,
         LibTransfer.To toMode
-    ) external nonReentrant returns (uint[] memory redeemedAmounts) {
+    ) external nonReentrant returns (uint256[] memory redeemedAmounts) {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(projectTokens.length == amounts.length, "Array lengths not equal");
 
         uint totalCarbon;
         address originalSourceToken = sourceToken;
 
-        for (uint i; i < amounts.length; i++) {
+        for (uint256 i; i < amounts.length; i++) {
             totalCarbon += amounts[i] + LibC3Carbon.getExactCarbonSpecificRedeemFee(poolToken, amounts[i]);
         }
 
         require(totalCarbon > 0, "Cannot redeem zero tokens");
 
-        uint receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+        uint256 receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         if (sourceToken == C.usdc()) {
             (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
@@ -107,8 +107,9 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         // Check for any redeem dust and send to the treasury
         /// @dev This is due to the fact that you can't swap for an exact token amount in Trident
 
-        uint poolBalance = IERC20(poolToken).balanceOf(address(this));
-        if (poolBalance > 0)
+        uint256 poolBalance = IERC20(poolToken).balanceOf(address(this));
+        if (poolBalance > 0) {
             LibTransfer.sendToken(IERC20(poolToken), poolBalance, C.treasury(), LibTransfer.To.EXTERNAL);
+        }
     }
 }

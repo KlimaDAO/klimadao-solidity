@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
  * @author Cujo
  * @title C holds the constants for Klima Infinity
  */
-
 library C {
     // Chain
     uint256 private constant CHAIN_ID = 137; // Polygon

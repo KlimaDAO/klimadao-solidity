@@ -346,7 +346,5 @@ contract UpgradeInfinityForNativeUsdcTest is TestHelper, ListingsHelper {
 
         vm.prank(multisig);
         IDiamondCut(INFINITY_ADDRESS).diamondCut(cut, address(0), "");
-        
-        
     }
 }

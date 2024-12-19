@@ -12,10 +12,7 @@ interface IToucanContractRegistry {
 
     function carbonProjectVintagesAddress() external view returns (address);
 
-    function toucanCarbonOffsetsFactoryAddress()
-        external
-        view
-        returns (address);
+    function toucanCarbonOffsetsFactoryAddress() external view returns (address);
 
     function carbonOffsetBadgesAddress() external view returns (address);
 

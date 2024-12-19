@@ -10,7 +10,6 @@ import "../../interfaces/ICarbonChain.sol";
  * @author Cujo
  * @title LibMossCarbon
  */
-
 library LibMossCarbon {
     using LibApprove for IERC20;
 
@@ -23,7 +22,7 @@ library LibMossCarbon {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /**
@@ -38,7 +37,7 @@ library LibMossCarbon {
      */
     function offsetCarbon(
         address poolToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,

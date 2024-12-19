@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.5;
 
-
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -158,13 +157,13 @@ library SafeMath {
     }
 
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
-    function sqrrt(uint256 a) internal pure returns (uint c) {
+    function sqrrt(uint256 a) internal pure returns (uint256 c) {
         if (a > 3) {
             c = a;
-            uint b = add( div( a, 2), 1 );
+            uint256 b = add(div(a, 2), 1);
             while (b < c) {
                 c = b;
-                b = div( add( div( a, b ), b), 2 );
+                b = div(add(div(a, b), b), 2);
             }
         } else if (a != 0) {
             c = 1;
@@ -174,19 +173,19 @@ library SafeMath {
     /*
      * Expects percentage to be trailed by 00,
     */
-    function percentageAmount( uint256 total_, uint8 percentage_ ) internal pure returns ( uint256 percentAmount_ ) {
-        return div( mul( total_, percentage_ ), 1000 );
+    function percentageAmount(uint256 total_, uint8 percentage_) internal pure returns (uint256 percentAmount_) {
+        return div(mul(total_, percentage_), 1000);
     }
 
     /*
      * Expects percentage to be trailed by 00,
     */
-    function substractPercentage( uint256 total_, uint8 percentageToSub_ ) internal pure returns ( uint256 result_ ) {
-        return sub( total_, div( mul( total_, percentageToSub_ ), 1000 ) );
+    function substractPercentage(uint256 total_, uint8 percentageToSub_) internal pure returns (uint256 result_) {
+        return sub(total_, div(mul(total_, percentageToSub_), 1000));
     }
 
-    function percentageOfTotal( uint256 part_, uint256 total_ ) internal pure returns ( uint256 percent_ ) {
-        return div( mul(part_, 100) , total_ );
+    function percentageOfTotal(uint256 part_, uint256 total_) internal pure returns (uint256 percent_) {
+        return div(mul(part_, 100), total_);
     }
 
     /**
@@ -199,12 +198,12 @@ library SafeMath {
         return (a / 2) + (b / 2) + ((a % 2 + b % 2) / 2);
     }
 
-    function quadraticPricing( uint256 payment_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return sqrrt( mul( multiplier_, payment_ ) );
+    function quadraticPricing(uint256 payment_, uint256 multiplier_) internal pure returns (uint256) {
+        return sqrrt(mul(multiplier_, payment_));
     }
 
-    function bondingCurve( uint256 supply_, uint256 multiplier_ ) internal pure returns (uint256) {
-        return mul( multiplier_, supply_ );
+    function bondingCurve(uint256 supply_, uint256 multiplier_) internal pure returns (uint256) {
+        return mul(multiplier_, supply_);
     }
 }
 
@@ -233,7 +232,9 @@ library Address {
 
         uint256 size;
         // solhint-disable-next-line no-inline-assembly
-        assembly { size := extcodesize(account) }
+        assembly {
+            size := extcodesize(account)
+        }
         return size > 0;
     }
 
@@ -257,7 +258,7 @@ library Address {
         require(address(this).balance >= amount, "Address: insufficient balance");
 
         // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call{ value: amount }("");
+        (bool success,) = recipient.call{value: amount}("");
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 
@@ -289,7 +290,10 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+    function functionCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         return _functionCallWithValue(target, data, 0, errorMessage);
     }
 
@@ -318,20 +322,26 @@ library Address {
     //     require(address(this).balance >= value, "Address: insufficient balance for call");
     //     return _functionCallWithValue(target, data, value, errorMessage);
     // }
-    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {
+    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         require(address(this).balance >= value, "Address: insufficient balance for call");
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: value }(data);
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage) private returns (bytes memory) {
+    function _functionCallWithValue(address target, bytes memory data, uint256 weiValue, string memory errorMessage)
+        private
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{ value: weiValue }(data);
+        (bool success, bytes memory returndata) = target.call{value: weiValue}(data);
         if (success) {
             return returndata;
         } else {
@@ -351,11 +361,11 @@ library Address {
     }
 
     /**
-       * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-       * but performing a static call.
-       *
-       * _Available since v3.3._
-       */
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
     function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
         return functionStaticCall(target, data, "Address: low-level static call failed");
     }
@@ -366,7 +376,11 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {
+    function functionStaticCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        view
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: static call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -390,7 +404,10 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {
+    function functionDelegateCall(address target, bytes memory data, string memory errorMessage)
+        internal
+        returns (bytes memory)
+    {
         require(isContract(target), "Address: delegate call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
@@ -398,7 +415,11 @@ library Address {
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {
+    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage)
+        private
+        pure
+        returns (bytes memory)
+    {
         if (success) {
             return returndata;
         } else {
@@ -417,35 +438,32 @@ library Address {
         }
     }
 
-    function addressToString(address _address) internal pure returns(string memory) {
+    function addressToString(address _address) internal pure returns (string memory) {
         bytes32 _bytes = bytes32(uint256(_address));
         bytes memory HEX = "0123456789abcdef";
         bytes memory _addr = new bytes(42);
 
-        _addr[0] = '0';
-        _addr[1] = 'x';
+        _addr[0] = "0";
+        _addr[1] = "x";
 
-        for(uint256 i = 0; i < 20; i++) {
-            _addr[2+i*2] = HEX[uint8(_bytes[i + 12] >> 4)];
-            _addr[3+i*2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
+        for (uint256 i = 0; i < 20; i++) {
+            _addr[2 + i * 2] = HEX[uint8(_bytes[i + 12] >> 4)];
+            _addr[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
         }
 
         return string(_addr);
-
     }
 }
 
 interface IOwnable {
-
     function owner() external view returns (address);
 
     function renounceOwnership() external;
 
-    function transferOwnership( address newOwner_ ) external;
+    function transferOwnership(address newOwner_) external;
 }
 
 contract Ownable is IOwnable {
-
     address internal _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -453,9 +471,9 @@ contract Ownable is IOwnable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor () {
+    constructor() {
         _owner = msg.sender;
-        emit OwnershipTransferred( address(0), _owner );
+        emit OwnershipTransferred(address(0), _owner);
     }
 
     /**
@@ -469,7 +487,7 @@ contract Ownable is IOwnable {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require( _owner == msg.sender, "Ownable: caller is not the owner" );
+        require(_owner == msg.sender, "Ownable: caller is not the owner");
         _;
     }
 
@@ -480,8 +498,8 @@ contract Ownable is IOwnable {
      * NOTE: Renouncing ownership will leave the contract without an owner,
      * thereby removing any functionality that is only available to the owner.
      */
-    function renounceOwnership() public virtual override onlyOwner() {
-        emit OwnershipTransferred( _owner, address(0) );
+    function renounceOwnership() public virtual override onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
         _owner = address(0);
     }
 
@@ -489,9 +507,9 @@ contract Ownable is IOwnable {
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
      * Can only be called by the current owner.
      */
-    function transferOwnership( address newOwner_ ) public virtual override onlyOwner() {
-        require( newOwner_ != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipTransferred( _owner, newOwner_ );
+    function transferOwnership(address newOwner_) public virtual override onlyOwner {
+        require(newOwner_ != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner_);
         _owner = newOwner_;
     }
 }
@@ -567,21 +585,17 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-abstract contract ERC20
-is
-IERC20
-{
-
+abstract contract ERC20 is IERC20 {
     using SafeMath for uint256;
 
     // TODO comment actual hash value.
-    bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
+    bytes32 private constant ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256("ERC20Token");
 
     // Present in ERC777
-    mapping (address => uint256) internal _balances;
+    mapping(address => uint256) internal _balances;
 
     // Present in ERC777
-    mapping (address => mapping (address => uint256)) internal _allowances;
+    mapping(address => mapping(address => uint256)) internal _allowances;
 
     // Present in ERC777
     uint256 internal _totalSupply;
@@ -604,7 +618,7 @@ IERC20
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor (string memory name_, string memory symbol_, uint8 decimals_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) {
         _name = name_;
         _symbol = symbol_;
         _decimals = decimals_;
@@ -713,7 +727,9 @@ IERC20
     // Present in ERC777
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        _approve(
+            sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance")
+        );
         return true;
     }
 
@@ -749,7 +765,11 @@ IERC20
      * `subtractedValue`.
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        _approve(
+            msg.sender,
+            spender,
+            _allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero")
+        );
         return true;
     }
 
@@ -778,7 +798,8 @@ IERC20
         emit Transfer(sender, recipient, amount);
     }
 
-    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+    /**
+     * @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
      *
      * Emits a {Transfer} event with `from` set to the zero address.
@@ -790,10 +811,10 @@ IERC20
     // Present in ERC777
     function _mint(address account_, uint256 ammount_) internal virtual {
         require(account_ != address(0), "ERC20: mint to the zero address");
-        _beforeTokenTransfer(address( this ), account_, ammount_);
+        _beforeTokenTransfer(address(this), account_, ammount_);
         _totalSupply = _totalSupply.add(ammount_);
         _balances[account_] = _balances[account_].add(ammount_);
-        emit Transfer(address( this ), account_, ammount_);
+        emit Transfer(address(this), account_, ammount_);
     }
 
     /**
@@ -867,7 +888,7 @@ IERC20
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
     // Present in ERC777
-    function _beforeTokenTransfer( address from_, address to_, uint256 amount_ ) internal virtual { }
+    function _beforeTokenTransfer(address from_, address to_, uint256 amount_) internal virtual {}
 }
 
 library Counters {
@@ -917,15 +938,8 @@ interface IERC2612Permit {
      * https://eips.ethereum.org/EIPS/eip-2612#specification[relevant EIP
      * section].
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
+    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+        external;
 
     /**
      * @dev Returns the current ERC2612 nonce for `owner`. This value must be
@@ -968,19 +982,15 @@ abstract contract ERC20Permit is ERC20, IERC2612Permit {
      * @dev See {IERC2612Permit-permit}.
      *
      */
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) public virtual override {
+    function permit(address owner, address spender, uint256 amount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+        public
+        virtual
+        override
+    {
         require(block.timestamp <= deadline, "Permit: expired deadline");
 
         bytes32 hashStruct =
-        keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner].current(), deadline));
+            keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner].current(), deadline));
 
         bytes32 _hash = keccak256(abi.encodePacked(uint16(0x1901), DOMAIN_SEPARATOR, hashStruct));
 
@@ -1000,7 +1010,6 @@ abstract contract ERC20Permit is ERC20, IERC2612Permit {
 }
 
 contract sKlima is ERC20Permit, Ownable {
-
     using SafeMath for uint256;
 
     event LogRebase(uint256 indexed epoch, uint256 totalSupply);
@@ -1023,21 +1032,21 @@ contract sKlima is ERC20Permit, Ownable {
     }
 
     uint256 private constant MAX_UINT256 = ~uint256(0);
-    uint256 private constant INITIAL_FRAGMENTS_SUPPLY = 500000 * 10**9;
+    uint256 private constant INITIAL_FRAGMENTS_SUPPLY = 500_000 * 10 ** 9;
 
     // TOTAL_GONS is a multiple of INITIAL_FRAGMENTS_SUPPLY so that _gonsPerFragment is an integer.
     // Use the highest value that fits in a uint256 for max granularity.
     uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_FRAGMENTS_SUPPLY);
 
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
-    uint256 private constant MAX_SUPPLY = ~uint128(0);  // (2^128) - 1
+    uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
 
     uint256 private _gonsPerFragment;
     mapping(address => uint256) private _gonBalances;
 
     // This is denominated in Fragments, because the gons-fragments conversion might change before
     // it's fully paid.
-    mapping (address => mapping (address => uint256)) private _allowedFragments;
+    mapping(address => mapping(address => uint256)) private _allowedFragments;
 
     constructor() ERC20("Staked Klima", "sKLIMA", 9) {
         _totalSupply = INITIAL_FRAGMENTS_SUPPLY;
@@ -1046,17 +1055,17 @@ contract sKlima is ERC20Permit, Ownable {
         emit Transfer(address(0x0), msg.sender, _totalSupply);
     }
 
-    function setStakingContract( address newStakingContract_ ) external onlyOwner() {
+    function setStakingContract(address newStakingContract_) external onlyOwner {
         stakingContract = newStakingContract_;
         _gonBalances[stakingContract] = TOTAL_GONS;
     }
 
-    function setMonetaryPolicy(address monetaryPolicy_) external onlyOwner() {
+    function setMonetaryPolicy(address monetaryPolicy_) external onlyOwner {
         monetaryPolicy = monetaryPolicy_;
         emit LogMonetaryPolicyUpdated(monetaryPolicy_);
     }
 
-    function rebase(uint256 olyProfit) public onlyMonetaryPolicy() returns (uint256) {
+    function rebase(uint256 olyProfit) public onlyMonetaryPolicy returns (uint256) {
         uint256 _rebase;
 
         if (olyProfit == 0) {
@@ -1064,16 +1073,13 @@ contract sKlima is ERC20Permit, Ownable {
             return _totalSupply;
         }
 
-        if(circulatingSupply() > 0 ){
+        if (circulatingSupply() > 0) {
             _rebase = olyProfit.mul(_totalSupply).div(circulatingSupply());
-        }
-
-        else {
+        } else {
             _rebase = olyProfit;
         }
 
         _totalSupply = _totalSupply.add(_rebase);
-
 
         if (_totalSupply > MAX_SUPPLY) {
             _totalSupply = MAX_SUPPLY;
@@ -1089,12 +1095,12 @@ contract sKlima is ERC20Permit, Ownable {
         return _gonBalances[who].div(_gonsPerFragment);
     }
 
-    function circulatingSupply() public view returns (uint) {
+    function circulatingSupply() public view returns (uint256) {
         return _totalSupply.sub(balanceOf(stakingContract));
     }
 
     function transfer(address to, uint256 value) public override validRecipient(to) returns (bool) {
-        require(msg.sender == stakingContract, 'transfer not from staking contract');
+        require(msg.sender == stakingContract, "transfer not from staking contract");
 
         uint256 gonValue = value.mul(_gonsPerFragment);
         _gonBalances[msg.sender] = _gonBalances[msg.sender].sub(gonValue);
@@ -1108,7 +1114,7 @@ contract sKlima is ERC20Permit, Ownable {
     }
 
     function transferFrom(address from, address to, uint256 value) public override validRecipient(to) returns (bool) {
-        require(stakingContract == to, 'transfer from not to staking contract');
+        require(stakingContract == to, "transfer from not to staking contract");
 
         _allowedFragments[from][msg.sender] = _allowedFragments[from][msg.sender].sub(value);
 
@@ -1127,14 +1133,13 @@ contract sKlima is ERC20Permit, Ownable {
     }
 
     // What gets called in a permit
-    function _approve(address owner, address spender, uint256 value) internal override virtual {
+    function _approve(address owner, address spender, uint256 value) internal virtual override {
         _allowedFragments[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public override returns (bool) {
-        _allowedFragments[msg.sender][spender] =
-        _allowedFragments[msg.sender][spender].add(addedValue);
+        _allowedFragments[msg.sender][spender] = _allowedFragments[msg.sender][spender].add(addedValue);
         emit Approval(msg.sender, spender, _allowedFragments[msg.sender][spender]);
         return true;
     }

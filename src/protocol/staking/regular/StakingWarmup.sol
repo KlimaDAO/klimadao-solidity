@@ -1,10 +1,9 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-06-12
-*/
+ * Submitted for verification at Etherscan.io on 2021-06-12
+ */
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
-
 
 interface IERC20 {
     function decimals() external view returns (uint8);
@@ -79,19 +78,18 @@ interface IERC20 {
 }
 
 contract StakingWarmup {
-
     address public immutable staking;
     address public immutable sKLIMA;
 
-    constructor ( address _staking, address _sKLIMA ) {
-        require( _staking != address(0) );
+    constructor(address _staking, address _sKLIMA) {
+        require(_staking != address(0));
         staking = _staking;
-        require( _sKLIMA != address(0) );
+        require(_sKLIMA != address(0));
         sKLIMA = _sKLIMA;
     }
 
-    function retrieve( address _staker, uint _amount ) external {
-        require( msg.sender == staking );
-        IERC20( sKLIMA ).transfer( _staker, _amount );
+    function retrieve(address _staker, uint256 _amount) external {
+        require(msg.sender == staking);
+        IERC20(sKLIMA).transfer(_staker, _amount);
     }
 }

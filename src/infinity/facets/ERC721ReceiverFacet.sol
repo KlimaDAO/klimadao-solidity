@@ -5,7 +5,7 @@ import "../interfaces/IERC721Receiver.sol";
 import "../ReentrancyGuard.sol";
 
 contract ERC721ReceiverFacet is ReentrancyGuard, IERC721Receiver {
-    function onERC721Received(address, address, uint tokenId, bytes memory)
+    function onERC721Received(address, address, uint256 tokenId, bytes memory)
         external
         virtual
         override

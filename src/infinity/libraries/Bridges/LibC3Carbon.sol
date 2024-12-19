@@ -12,7 +12,6 @@ import "lib/forge-std/src/console.sol";
  * @author Cujo
  * @title LibC3Carbon
  */
-
 library LibC3Carbon {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
@@ -23,7 +22,7 @@ library LibC3Carbon {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /**
@@ -38,7 +37,7 @@ library LibC3Carbon {
      */
     function freeRedeemAndRetire(
         address poolToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
@@ -51,8 +50,8 @@ library LibC3Carbon {
         IC3Pool(poolToken).freeRedeem(amount);
 
         // Retire C3T
-        for (uint i = 0; i < projectTokens.length && amount > 0; i++) {
-            uint balance = IERC20(projectTokens[i]).balanceOf(address(this));
+        for (uint256 i = 0; i < projectTokens.length && amount > 0; i++) {
+            uint256 balance = IERC20(projectTokens[i]).balanceOf(address(this));
             // Skip over any C3Ts returned that were not actually redeemed.
             if (balance == 0) continue;
 
@@ -87,7 +86,7 @@ library LibC3Carbon {
     function redeemSpecificAndRetire(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
@@ -102,7 +101,7 @@ library LibC3Carbon {
         address[] memory projectTokens = new address[](1);
         projectTokens[0] = projectToken;
 
-        uint[] memory amounts = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
         amounts[0] = amount;
 
         IC3Pool(poolToken).taxedRedeem(projectTokens, amounts);
@@ -134,7 +133,7 @@ library LibC3Carbon {
     function retireC3T(
         address poolToken,
         address projectToken,
-        uint amount,
+        uint256 amount,
         address retiringAddress,
         string memory retiringEntityString,
         address beneficiaryAddress,
@@ -144,12 +143,7 @@ library LibC3Carbon {
         IC3ProjectToken(projectToken).offsetFor(amount, beneficiaryAddress, beneficiaryString, retirementMessage);
 
         LibRetire.saveRetirementDetails(
-            poolToken,
-            projectToken,
-            amount,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
+            poolToken, projectToken, amount, beneficiaryAddress, beneficiaryString, retirementMessage
         );
 
         emit CarbonRetired(
@@ -171,12 +165,13 @@ library LibC3Carbon {
      * @param amount               Amount of tokens to redeem and retire
      * @return poolFeeAmount       Additional C3 pool tokens needed for the redemption
      */
-    function getExactCarbonSpecificRedeemFee(
-        address poolToken,
-        uint amount
-    ) internal view returns (uint poolFeeAmount) {
-        uint feeRedeem = IC3Pool(poolToken).feeRedeem();
-        uint feeDivider = 10_000; // This is hardcoded in current C3 contract.
+    function getExactCarbonSpecificRedeemFee(address poolToken, uint256 amount)
+        internal
+        view
+        returns (uint256 poolFeeAmount)
+    {
+        uint256 feeRedeem = IC3Pool(poolToken).feeRedeem();
+        uint256 feeDivider = 10_000; // This is hardcoded in current C3 contract.
 
         poolFeeAmount = (amount * feeRedeem) / feeDivider;
     }
@@ -187,13 +182,14 @@ library LibC3Carbon {
      * @param amount               Amount of tokens to redeem and retire
      * @return retireAmount        Amount of C3T that can be specifically redeemed from a given pool amount
      */
-    function getExactSourceSpecificRetireAmount(
-        address poolToken,
-        uint amount
-    ) internal view returns (uint retireAmount) {
+    function getExactSourceSpecificRetireAmount(address poolToken, uint256 amount)
+        internal
+        view
+        returns (uint256 retireAmount)
+    {
         // Backing into a redemption amount from a total pool token amount
-        uint feeRedeem = IC3Pool(poolToken).feeRedeem();
-        uint feeDivider = 10_000; // This is hardcoded in current C3 contract.
+        uint256 feeRedeem = IC3Pool(poolToken).feeRedeem();
+        uint256 feeDivider = 10_000; // This is hardcoded in current C3 contract.
 
         retireAmount = (amount * feeDivider) / (feeDivider + feeRedeem);
     }
@@ -206,19 +202,18 @@ library LibC3Carbon {
      * @return allProjectTokens    Default redeem C3T list from the pool
      * @return amounts             Amount of C3T that was redeemed from the pool
      */
-    function redeemPoolAuto(
-        address poolToken,
-        uint amount,
-        LibTransfer.To toMode
-    ) internal returns (address[] memory allProjectTokens, uint[] memory amounts) {
+    function redeemPoolAuto(address poolToken, uint256 amount, LibTransfer.To toMode)
+        internal
+        returns (address[] memory allProjectTokens, uint256[] memory amounts)
+    {
         allProjectTokens = IC3Pool(poolToken).getFreeRedeemAddresses();
         amounts = new uint256[](allProjectTokens.length);
 
         // Redeem pool tokens
         IC3Pool(poolToken).freeRedeem(amount);
 
-        for (uint i = 0; i < allProjectTokens.length && amount > 0; i++) {
-            uint balance = IERC20(allProjectTokens[i]).balanceOf(address(this));
+        for (uint256 i = 0; i < allProjectTokens.length && amount > 0; i++) {
+            uint256 balance = IERC20(allProjectTokens[i]).balanceOf(address(this));
             // Skip over any C3Ts returned that were not actually redeemed.
             if (balance == 0) continue;
 
@@ -242,18 +237,18 @@ library LibC3Carbon {
     function redeemPoolSpecific(
         address poolToken,
         address[] memory projectTokens,
-        uint[] memory amounts,
+        uint256[] memory amounts,
         LibTransfer.To toMode
-    ) internal returns (uint[] memory) {
-        uint[] memory beforeBalances = new uint256[](projectTokens.length);
-        uint[] memory redeemedAmounts = new uint256[](projectTokens.length);
-        for (uint i; i < projectTokens.length; i++) {
+    ) internal returns (uint256[] memory) {
+        uint256[] memory beforeBalances = new uint256[](projectTokens.length);
+        uint256[] memory redeemedAmounts = new uint256[](projectTokens.length);
+        for (uint256 i; i < projectTokens.length; i++) {
             beforeBalances[i] = IERC20(projectTokens[i]).balanceOf(address(this));
         }
 
         IC3Pool(poolToken).taxedRedeem(projectTokens, amounts);
 
-        for (uint i; i < projectTokens.length; i++) {
+        for (uint256 i; i < projectTokens.length; i++) {
             redeemedAmounts[i] = IERC20(projectTokens[i]).balanceOf(address(this)) - beforeBalances[i];
             LibTransfer.sendToken(IERC20(projectTokens[i]), redeemedAmounts[i], msg.sender, toMode);
         }

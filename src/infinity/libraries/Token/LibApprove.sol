@@ -10,12 +10,11 @@ import "oz/token/ERC20/utils/SafeERC20.sol";
  * @title LibApproval handles approval other ERC-20 tokens.
  *
  */
-
 library LibApprove {
     using SafeERC20 for IERC20;
 
-    function approveToken(IERC20 token, address spender, uint amount) internal {
-        if (token.allowance(address(this), spender) == type(uint).max) return;
+    function approveToken(IERC20 token, address spender, uint256 amount) internal {
+        if (token.allowance(address(this), spender) == type(uint256).max) return;
         token.safeIncreaseAllowance(spender, amount);
     }
 }
