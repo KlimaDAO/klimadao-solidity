@@ -11,6 +11,7 @@ import {LibMeta} from "./LibMeta.sol";
 import "./Bridges/LibToucanCarbon.sol";
 import "./Bridges/LibMossCarbon.sol";
 import "./Bridges/LibC3Carbon.sol";
+import "./Bridges/LibCMARKCarbon.sol";
 import "./Bridges/LibICRCarbon.sol";
 import "./Bridges/LibCoorestCarbon.sol";
 import "./Token/LibTransfer.sol";
@@ -28,7 +29,8 @@ library LibRetire {
         MOSS,
         C3,
         ICR,
-        COOREST
+        COOREST,
+        CMARK
     }
 
     struct RetireDetails {
@@ -234,6 +236,23 @@ library LibRetire {
                 amount,
                 details
             );
+        } else if (LibCMARKCarbon.isValid(creditToken)) {
+            RetireDetails memory details;
+
+            details.retiringAddress = retiringAddress;
+            details.retiringEntityString = retiringEntityString;
+            details.beneficiaryAddress = beneficiaryAddress;
+            details.beneficiaryString = beneficiaryString;
+            details.retirementMessage = retirementMessage;
+
+            // Retire the carbon
+            LibCMARKCarbon.retireCMARK(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                tokenId,
+                amount,
+                details
+            );
         }
     }
 
@@ -279,6 +298,15 @@ library LibRetire {
         } else if (LibICRCarbon.isValid(creditToken)) {
             // Retire the carbon
             LibICRCarbon.retireICC(
+                address(0), // Direct retirement, no pool token
+                creditToken,
+                tokenId,
+                amount,
+                details
+            );
+        } else if (LibCMARKCarbon.isValid(creditToken)) {
+            // Retire the carbon
+            LibCMARKCarbon.retireCMARK(
                 address(0), // Direct retirement, no pool token
                 creditToken,
                 tokenId,
