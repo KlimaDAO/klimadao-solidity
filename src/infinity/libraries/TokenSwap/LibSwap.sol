@@ -172,8 +172,12 @@ library LibSwap {
         if (sourceToken == C.wsKlima() || sourceToken == C.sKlima()) {
             dustToken = C.klima();
         } else if (s.swap[poolToken][sourceToken].swapDexes.length == 0) {
-            dustToken = C.usdc_bridged();
-            sourceToken = C.usdc_bridged();
+            if (sourceToken == C.usdc()) {
+                dustToken = C.usdc_bridged();
+            } else {
+                dustToken = C.usdc_bridged();
+                sourceToken = C.usdc_bridged();
+            }
         }
 
         uint256 dustBalance = IERC20(dustToken).balanceOf(address(this));
@@ -534,7 +538,7 @@ library LibSwap {
         uint256 swapFeeThreshold = 3000;
 
         /**
-         * In the RetirementQuoter we are using quoteExactOutputSingle 
+         * In the RetirementQuoter we are using quoteExactOutputSingle
          * to get the necessary amountIn for retirement amount
          * Therefore here we can optimistically use exactInputSingle
          */
