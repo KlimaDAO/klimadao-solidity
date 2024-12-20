@@ -162,7 +162,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
                 carbonReceived = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
             }
 
-            // Check for any trade dust and send back. need to account for bridged --> native here
+            // Check for any trade dust and send back
             LibSwap.returnTradeDust(originalSourceToken, poolToken);
 
             require(carbonReceived >= totalCarbon, "Swap not enough");
