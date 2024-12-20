@@ -134,6 +134,10 @@ contract RetireExactCarbonDefaultMoss is TestHelper, AssertionHelper {
 
             // No tokens left in contract
             assertZeroTokenBalance(sourceToken, diamond);
+            // if source token was native, we need to also confirm bridged dust has been returned
+            if (sourceToken == USDC_NATIVE) {
+                assertZeroTokenBalance(USDC_BRIDGED, diamond);
+            }
             assertZeroTokenBalance(MCO2, diamond);
 
             // Return value matches

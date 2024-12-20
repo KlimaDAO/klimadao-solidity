@@ -158,6 +158,10 @@ contract RetireExactCarbonSpecificCoorest is TestHelper, AssertionHelper {
 
         // // No source token left in contract
         assertZeroTokenBalance(sourceToken, diamond);
+        // if source token was native, we need to also confirm bridged dust has been returned
+        if (sourceToken == USDC_NATIVE) {
+            assertZeroTokenBalance(USDC_BRIDGED, diamond);
+        }
         // only cco2 tokens that were in the contract before the txn should remain
         assertTokenBalance(CCO2, diamond, preTxBalance);
 
