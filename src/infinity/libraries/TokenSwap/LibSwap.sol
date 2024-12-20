@@ -12,6 +12,7 @@ import "../Token/LibTransfer.sol";
 import "./LibUniswapV2Swap.sol";
 import "./LibTridentSwap.sol";
 import "./LibTreasurySwap.sol";
+import "../../../../lib/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
 library LibSwap {
     using LibTransfer for IERC20;
@@ -171,8 +172,12 @@ library LibSwap {
         if (sourceToken == C.wsKlima() || sourceToken == C.sKlima()) {
             dustToken = C.klima();
         } else if (s.swap[poolToken][sourceToken].swapDexes.length == 0) {
-            dustToken = C.usdc_bridged();
-            sourceToken = C.usdc_bridged();
+            if (sourceToken == C.usdc()) {
+                dustToken = C.usdc_bridged();
+            } else {
+                dustToken = C.usdc_bridged();
+                sourceToken = C.usdc_bridged();
+            }
         }
 
         uint256 dustBalance = IERC20(dustToken).balanceOf(address(this));
@@ -180,6 +185,10 @@ library LibSwap {
         if (dustBalance != 0) {
             if (sourceToken == C.wsKlima()) dustBalance = LibKlima.wrapKlima(dustBalance);
             if (sourceToken == C.sKlima()) LibKlima.stakeKlima(dustBalance);
+
+            if (sourceToken == C.usdc()) {
+                (sourceToken, dustBalance) = swapBridgedUsdcDustToNativeUsdcDust(dustBalance);
+            }
 
             LibTransfer.sendToken(IERC20(sourceToken), dustBalance, msg.sender, LibTransfer.To.EXTERNAL);
         }
@@ -296,6 +305,7 @@ library LibSwap {
             return LibKlima.toWrappedAmount(amountsIn[0]);
         } else {
             uint256 usdcAmount = getSourceAmount(C.usdc_bridged(), carbonToken, amount);
+
             address[] memory usdcPath = new address[](2);
             usdcPath[0] = sourceToken;
             usdcPath[1] = C.usdc_bridged();
@@ -360,7 +370,7 @@ library LibSwap {
             return LibKlima.toWrappedAmount(LibTreasurySwap.getAmountIn(carbonToken, amount));
         }
 
-        // Direct swap from USDC to KLIMA on Sushi
+        // Direct swap from USDC.e to KLIMA on Sushi
         if (sourceToken == C.usdc_bridged()) {
             uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken, amount);
 
@@ -370,7 +380,6 @@ library LibSwap {
 
             return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
         }
-
         // At this point we only have non USDC and not KLIMA tokens. Route through a source <> USDC pool on Sushi
         uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken, amount);
 
@@ -509,5 +518,79 @@ library LibSwap {
             amountOut =
                 LibTridentSwap.getAmountOut(LibTridentSwap.getTridentPool(path[0], path[1]), path[0], path[1], amount);
         }
+    }
+
+    /**
+     * @notice swap native usdc to bridged usdc in uniswapV3
+     * @param maxAmountIn the amount of native usdc to swap
+     * @return sourceToken This will always be C.usdc_bridged()
+     * @return adjustedAmountOut The amount of bridged usdc received
+     */
+    function swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn)
+        internal
+        returns (address sourceToken, uint256 adjustedAmountOut)
+    {
+        // In order to not restrict maxAmountIn, we need a swapFeeThreshold to roughly set amountOutMinimum
+        // Miniscule swaps have higher % fees i.e. a swap of 2 has a fee of 1 (50%)
+        // Here anything above 3000 is considered a regular swap and we subtract the poolFee of .01% in order to protect the amountOutMinimum
+        // If the swap is below 3000, we set amountOutMinimum. There is a possibility micro retirements will fail if
+        // there is price manipulation in the pool but unlikely in a usdc/uscd.e pool
+        uint256 swapFeeThreshold = 3000;
+
+        /**
+         * In the RetirementQuoter we are using quoteExactOutputSingle
+         * to get the necessary amountIn for retirement amount
+         * Therefore here we can optimistically use exactInputSingle
+         */
+        uint256 adjustedAmountOutMinimum = maxAmountIn > swapFeeThreshold
+            ? maxAmountIn - ((maxAmountIn * (C.uniswapV3UsdcNativeBridgedPoolFee() * 1)) / 10_000)
+            : 0;
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+            tokenIn: C.usdc(),
+            tokenOut: C.usdc_bridged(),
+            fee: C.uniswapV3UsdcNativeBridgedPoolFee(),
+            recipient: address(this),
+            deadline: block.timestamp,
+            amountIn: maxAmountIn,
+            amountOutMinimum: adjustedAmountOutMinimum,
+            sqrtPriceLimitX96: 0
+        });
+
+        IERC20(C.usdc()).approve(C.uniswapV3Router(), maxAmountIn);
+        ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
+
+        sourceToken = C.usdc_bridged();
+        return (sourceToken, maxAmountIn);
+    }
+
+    /**
+     * @notice swap bridged usdc to native usdc in uniswapV3
+     * @dev Because the amountOutMinimum is set to 0, this function should only be used for dust in its current form
+     * @param amount the amount of bridged usdc dust to swap
+     * @return sourceToken This will always be C.usdc()
+     * @return amountOut The amount of native usdc dust received
+     */
+    function swapBridgedUsdcDustToNativeUsdcDust(uint256 amount)
+        internal
+        returns (address sourceToken, uint256 amountOut)
+    {
+        // setting amountOutMinimum to zero ONLY because this transferrring dust.
+        // for an legitimate amount, as above, this should be handled so that an unlikely + unusual price on a swap doesn't decimate the amount
+
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+            tokenIn: C.usdc_bridged(),
+            tokenOut: C.usdc(),
+            fee: C.uniswapV3UsdcNativeBridgedPoolFee(),
+            recipient: address(this),
+            deadline: block.timestamp,
+            amountIn: amount,
+            amountOutMinimum: 0,
+            sqrtPriceLimitX96: 0
+        });
+
+        IERC20(C.usdc_bridged()).approve(C.uniswapV3Router(), amount);
+
+        amountOut = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
+        sourceToken = C.usdc();
     }
 }

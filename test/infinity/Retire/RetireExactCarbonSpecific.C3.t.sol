@@ -31,7 +31,8 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
-    address USDC;
+    address USDC_NATIVE;
+    address USDC_BRIDGED;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -49,7 +50,8 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -67,8 +69,12 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         retireExactC3(UBO, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_UBO_USDC(uint256 retireAmount) public {
-        retireExactC3(USDC, UBO, retireAmount, SUSHI_UBO_LP);
+    function test_infinity_retireExactCarbonSpecific_UBO_USDC_NATIVE(uint256 retireAmount) public {
+        retireExactC3(USDC_NATIVE, UBO, retireAmount, SUSHI_UBO_LP);
+    }
+
+    function test_infinity_retireExactCarbonSpecific_UBO_USDC_BRIDGED(uint256 retireAmount) public {
+        retireExactC3(USDC_BRIDGED, UBO, retireAmount, SUSHI_UBO_LP);
     }
 
     function test_infinity_retireExactCarbonSpecific_UBO_KLIMA(uint256 retireAmount) public {
@@ -87,8 +93,12 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
         retireExactC3(NBO, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
-    function test_infinity_retireExactCarbonSpecific_NBO_USDC(uint256 retireAmount) public {
-        retireExactC3(USDC, NBO, retireAmount, SUSHI_NBO_LP);
+    function test_infinity_retireExactCarbonSpecific_NBO_USDC_NATIVE(uint256 retireAmount) public {
+        retireExactC3(USDC_NATIVE, NBO, retireAmount, SUSHI_NBO_LP);
+    }
+
+    function test_infinity_retireExactCarbonSpecific_NBO_USDC_BRIDGED(uint256 retireAmount) public {
+        retireExactC3(USDC_BRIDGED, NBO, retireAmount, SUSHI_NBO_LP);
     }
 
     function test_infinity_retireExactCarbonSpecific_NBO_KLIMA(uint256 retireAmount) public {
@@ -163,6 +173,10 @@ contract RetireExactCarbonSpecificC3 is TestHelper, AssertionHelper {
 
             // No tokens left in contract
             assertZeroTokenBalance(sourceToken, diamond);
+            // if source token was native, we need to also confirm bridged dust has been returned
+            if (sourceToken == USDC_NATIVE) {
+                assertZeroTokenBalance(USDC_BRIDGED, diamond);
+            }
             assertZeroTokenBalance(poolToken, diamond);
             assertZeroTokenBalance(projectToken, diamond);
 

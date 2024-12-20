@@ -24,7 +24,8 @@ contract RedeemToucanPoolSpecificNCT is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
-    address USDC;
+    address USDC_BRIDGED;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -41,7 +42,8 @@ contract RedeemToucanPoolSpecificNCT is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -58,8 +60,12 @@ contract RedeemToucanPoolSpecificNCT is TestHelper, AssertionHelper {
         redeemNCT(NCT, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolSpecific_redeemNCT_usingUSDC_fuzz(uint256 redeemAmount) public {
-        redeemNCT(USDC, redeemAmount);
+    function test_infinity_toucanRedeemPoolSpecific_redeemNCT_usingUSDC_NATIVE_fuzz(uint256 redeemAmount) public {
+        redeemNCT(USDC_NATIVE, redeemAmount);
+    }
+
+    function test_infinity_toucanRedeemPoolSpecific_redeemNCT_usingUSDC_BRIDGED_fuzz(uint256 redeemAmount) public {
+        redeemNCT(USDC_BRIDGED, redeemAmount);
     }
 
     function test_infinity_toucanRedeemPoolSpecific_redeemNCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
