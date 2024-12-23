@@ -54,9 +54,9 @@ contract UpgradeInfinityForTradeDustRevisions is Script, HelperContract {
 
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(retireCarbonF),
+                facetAddress: address(c3RedeemF),
                 action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RetireCarbonFacet")
+                functionSelectors: generateSelectors("RedeemC3PoolFacet")
             })
         );
 
@@ -74,9 +74,9 @@ contract UpgradeInfinityForTradeDustRevisions is Script, HelperContract {
 
         cut[2] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(c3RedeemF),
+                facetAddress: address(retireCarbonF),
                 action: IDiamondCut.FacetCutAction.Replace,
-                functionSelectors: generateSelectors("RedeemC3PoolFacet")
+                functionSelectors: generateSelectors("RetireCarbonFacet")
             })
         );
 
