@@ -39,31 +39,32 @@ library LibCMARKCarbon {
         address poolToken,
         address projectToken,
         uint amount,
-        address retiringAddress,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage,
-        string memory consumptionCountryCode
+        LibRetire.RetireDetails memory details
     ) internal {
-        ICMARKCreditToken(projectToken).retire(amount, beneficiaryAddress, beneficiaryString, retirementMessage);
+        ICMARKCreditToken(projectToken).retire(
+            amount,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage,
+            details.consumptionCountryCode
+        );
 
         LibRetire.saveRetirementDetails(
             poolToken,
             projectToken,
             amount,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage
         );
 
         emit CarbonRetired(
             LibRetire.CarbonBridge.C3,
-            retiringAddress,
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage,
+            details.retiringAddress,
+            details.retiringEntityString,
+            details.beneficiaryAddress,
+            details.beneficiaryString,
+            details.retirementMessage,
             projectToken,
             amount
         );

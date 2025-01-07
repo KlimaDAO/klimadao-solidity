@@ -37,26 +37,25 @@ contract RetireCMARKFacet is ReentrancyGuard {
     function cmarkRetireExactCarbon(
         address carbonToken,
         uint amount,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage,
-        LibTransfer.From fromMode
+        LibRetire.RetireDetails memory details,
+        LibTransfer.From fromMode,
     ) external nonReentrant returns (uint retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific CMARK tokens
         // No fee is charged
 
         LibTransfer.receiveToken(IERC20(carbonToken), amount, msg.sender, fromMode);
 
+        if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
+        if (details.retiringEntityString == null)  {
+            details.retiringEntityString = "KlimaDAO Retirement Aggregator";
+        }
+
         // Retire the carbon
         LibCMARKCarbon.retireCMARK(
             address(0), // Direct retirement, no pool token
             carbonToken,
             amount,
-            msg.sender,
-            "KlimaDAO Retirement Aggregator",
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
+            details
         );
 
         return LibRetire.getTotalRetirements(beneficiaryAddress);
@@ -66,37 +65,29 @@ contract RetireCMARKFacet is ReentrancyGuard {
      * @notice                     Retires CMARK credits directly
      * @param carbonToken          Pool token to redeem
      * @param amount               Amounts of underlying tokens to redeem
-     * @param retiringEntityString String description of the retiring entity
-     * @param beneficiaryAddress   0x address for the beneficiary
-     * @param beneficiaryString    String description of the beneficiary
-     * @param retirementMessage    String message for this specific retirement
+     * @param details              Mapping of retirement details
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
     function cmarkRetireExactCarbonWithEntity(
         address carbonToken,
         uint amount,
-        string memory retiringEntityString,
-        address beneficiaryAddress,
-        string memory beneficiaryString,
-        string memory retirementMessage,
-        LibTransfer.From fromMode
+        LibRetire.RetireDetails memory details,
+        LibTransfer.From fromMode,
     ) external nonReentrant returns (uint retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific CMARK tokens
         // No fee is charged
 
         LibTransfer.receiveToken(IERC20(carbonToken), amount, msg.sender, fromMode);
 
+        if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
+
         // Retire the carbon
         LibCMARKCarbon.retireCMARK(
             address(0), // Direct retirement, no pool token
             carbonToken,
             amount,
-            msg.sender,
-            retiringEntityString,
-            beneficiaryAddress,
-            beneficiaryString,
-            retirementMessage
+            details
         );
 
         return LibRetire.getTotalRetirements(beneficiaryAddress);
