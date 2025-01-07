@@ -236,24 +236,6 @@ library LibRetire {
                 amount,
                 details
             );
-        } else if (LibCMARKCarbon.isValid(creditToken)) {
-            RetireDetails memory details;
-
-            details.retiringAddress = retiringAddress;
-            details.retiringEntityString = retiringEntityString;
-            details.beneficiaryAddress = beneficiaryAddress;
-            details.beneficiaryString = beneficiaryString;
-            details.retirementMessage = retirementMessage;
-
-            // Retire the carbon
-            LibCMARKCarbon.retireCMARK(
-                address(0), // Direct retirement, no pool token
-                creditToken,
-                tokenId,
-                amount,
-                details
-            );
-        }
     }
 
     /**
