@@ -29,11 +29,7 @@ library LibCMARKCarbon {
      * @notice                     Retire a CMARK project token
      * @param projectToken         Project token being retired
      * @param amount               Amount of tokens to retire
-     * @param retiringAddress      Address initiating this retirement
-     * @param retiringEntityString String description of the retiring entity
-     * @param beneficiaryAddress   0x address for the beneficiary
-     * @param beneficiaryString    String description of the beneficiary
-     * @param retirementMessage    String message for this specific retirement
+     * @param details              Encoded struct of retirement details needed for the retirement
      */
     function retireCMARK(
         address poolToken,
@@ -59,7 +55,7 @@ library LibCMARKCarbon {
         );
 
         emit CarbonRetired(
-            LibRetire.CarbonBridge.C3,
+            LibRetire.CarbonBridge.CMARK,
             details.retiringAddress,
             details.retiringEntityString,
             details.beneficiaryAddress,
@@ -71,6 +67,7 @@ library LibCMARKCarbon {
     }
 
     function isValid(address token) internal returns (bool) {
-        return ICMARKCreditTokenFactory(C.cMARKCreditFactory()).creditAddressToId(token) != '';
+        bytes memory tempEmptyStringTest = bytes(ICMARKCreditTokenFactory(C.cmarkCreditFactory()).creditAddressToId(token));
+        return tempEmptyStringTest.length > 0;
     }
 }

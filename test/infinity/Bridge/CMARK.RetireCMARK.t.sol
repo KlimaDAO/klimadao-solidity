@@ -34,6 +34,7 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
     string beneficiary = "Test Beneficiary";
     string message = "Test Message";
     string entity = "Test Entity";
+    string consumptionCountryCode = "US";
 
     address diamond = vm.envAddress("INFINITY_ADDRESS");
     address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
@@ -53,7 +54,7 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
         uint256 tokenId = 1; // TODO: decide how to set this
         uint256 retireAmount = 100e18;
         swipeERC20Tokens(CMARK, defaultCarbonRetireAmount, CMARK, address(this));
-        IERC20(CMARK).setApprovalForAll(diamond, true);
+        IERC20(CMARK).approve(diamond, defaultCarbonRetireAmount);
 
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
@@ -78,14 +79,22 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
             defaultCarbonRetireAmount
         );
 
+        LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
+            retiringAddress: address(this),
+            retiringEntityString: entity,
+            beneficiaryAddress: beneficiaryAddress,
+            beneficiaryString: beneficiary,
+            retirementMessage: message,
+            beneficiaryLocation: "",
+            consumptionCountryCode: "DE",
+            consumptionPeriodStart: 0,
+            consumptionPeriodEnd: 0
+        });
+
         uint256 retirementIndex = retireCMARKFacet.cmarkRetireExactCarbon(
             CMARK,
-            tokenId,
             defaultCarbonRetireAmount,
-            entity,
-            beneficiaryAddress,
-            beneficiary,
-            message,
+            details,
             LibTransfer.From.EXTERNAL
         );
 

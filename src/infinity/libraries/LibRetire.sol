@@ -236,6 +236,7 @@ library LibRetire {
                 amount,
                 details
             );
+        }
     }
 
     /**
@@ -291,7 +292,6 @@ library LibRetire {
             LibCMARKCarbon.retireCMARK(
                 address(0), // Direct retirement, no pool token
                 creditToken,
-                tokenId,
                 amount,
                 details
             );
