@@ -28,9 +28,7 @@ contract RetireCMARKFacet is ReentrancyGuard {
      * @notice                     Retires CMARK credits directly
      * @param carbonToken          Pool token to redeem
      * @param amount               Amounts of underlying tokens to redeem
-     * @param beneficiaryAddress   0x address for the beneficiary
-     * @param beneficiaryString    String description of the beneficiary
-     * @param retirementMessage    String message for this specific retirement
+     * @param details              Encoded struct of retirement details needed for the retirement
      * @param fromMode             From Mode for transfering tokens
      * @return retirementIndex     The latest retirement index for the beneficiary address
      */
@@ -38,7 +36,7 @@ contract RetireCMARKFacet is ReentrancyGuard {
         address carbonToken,
         uint amount,
         LibRetire.RetireDetails memory details,
-        LibTransfer.From fromMode,
+        LibTransfer.From fromMode
     ) external nonReentrant returns (uint retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific CMARK tokens
         // No fee is charged
@@ -46,7 +44,9 @@ contract RetireCMARKFacet is ReentrancyGuard {
         LibTransfer.receiveToken(IERC20(carbonToken), amount, msg.sender, fromMode);
 
         if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
-        if (details.retiringEntityString == null)  {
+
+        bytes memory tempEmptyStringTest = bytes(details.retiringEntityString);
+        if (tempEmptyStringTest.length == 0)  {
             details.retiringEntityString = "KlimaDAO Retirement Aggregator";
         }
 
@@ -58,7 +58,7 @@ contract RetireCMARKFacet is ReentrancyGuard {
             details
         );
 
-        return LibRetire.getTotalRetirements(beneficiaryAddress);
+        return LibRetire.getTotalRetirements(details.beneficiaryAddress);
     }
 
     /**
@@ -73,7 +73,7 @@ contract RetireCMARKFacet is ReentrancyGuard {
         address carbonToken,
         uint amount,
         LibRetire.RetireDetails memory details,
-        LibTransfer.From fromMode,
+        LibTransfer.From fromMode
     ) external nonReentrant returns (uint retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific CMARK tokens
         // No fee is charged
@@ -90,6 +90,6 @@ contract RetireCMARKFacet is ReentrancyGuard {
             details
         );
 
-        return LibRetire.getTotalRetirements(beneficiaryAddress);
+        return LibRetire.getTotalRetirements(details.beneficiaryAddress);
     }
 }
