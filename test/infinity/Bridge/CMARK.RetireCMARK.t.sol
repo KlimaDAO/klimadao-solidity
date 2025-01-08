@@ -22,7 +22,6 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint256 tokenId,
         uint256 retiredAmount
     );
 
@@ -51,7 +50,6 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
     }
 
     function test_infinity_cmarkRetireExactCarbon() public {
-        uint256 tokenId = 0;
         uint256 retireAmount = 100e18;
         swipeERC20Tokens(CMARK, defaultCarbonRetireAmount, CMARK, address(this));
         IERC20(CMARK).approve(diamond, defaultCarbonRetireAmount);
@@ -73,6 +71,7 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
             beneficiaryAddress,
             beneficiary,
             message,
+            address(0),
             CMARK,
             defaultCarbonRetireAmount
         );
