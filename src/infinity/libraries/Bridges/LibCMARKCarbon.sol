@@ -32,7 +32,6 @@ library LibCMARKCarbon {
      * @param details              Encoded struct of retirement details needed for the retirement
      */
     function retireCMARK(
-        address poolToken,
         address projectToken,
         uint amount,
         LibRetire.RetireDetails memory details
@@ -46,7 +45,7 @@ library LibCMARKCarbon {
         );
 
         LibRetire.saveRetirementDetails(
-            poolToken,
+            address(0),
             projectToken,
             amount,
             details.beneficiaryAddress,
