@@ -52,7 +52,6 @@ contract RetireCMARKFacet is ReentrancyGuard {
 
         // Retire the carbon
         LibCMARKCarbon.retireCMARK(
-            address(0), // Direct retirement, no pool token
             carbonToken,
             amount,
             details

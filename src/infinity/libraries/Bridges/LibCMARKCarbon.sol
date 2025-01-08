@@ -21,6 +21,7 @@ library LibCMARKCarbon {
         address indexed beneficiaryAddress,
         string beneficiaryString,
         string retirementMessage,
+        address indexed carbonPool,
         address carbonToken,
         uint retiredAmount
     );
@@ -60,6 +61,7 @@ library LibCMARKCarbon {
             details.beneficiaryAddress,
             details.beneficiaryString,
             details.retirementMessage,
+            address(0),
             projectToken,
             amount
         );
