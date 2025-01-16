@@ -3,6 +3,7 @@ pragma solidity ^0.8.16;
 
 import "../../../libraries/Bridges/LibC3Carbon.sol";
 import "../../../ReentrancyGuard.sol";
+import "../../../libraries/TokenSwap/LibSwap.sol";
 
 contract RedeemC3PoolFacet is ReentrancyGuard {
     /**
@@ -71,6 +72,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(projectTokens.length == amounts.length, "Array lengths not equal");
 
         uint256 totalCarbon;
+        address originalSourceToken = sourceToken;
 
         for (uint256 i; i < amounts.length; i++) {
             totalCarbon += amounts[i] + LibC3Carbon.getExactCarbonSpecificRedeemFee(poolToken, amounts[i]);
@@ -79,6 +81,12 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(totalCarbon > 0, "Cannot redeem zero tokens");
 
         uint256 receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            // set the original source token to return trade dust in the correct token
+            originalSourceToken = C.usdc();
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
@@ -89,7 +97,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
             receivedAmount = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
         }
 
         require(receivedAmount >= totalCarbon, "Not enough pool tokens");

@@ -21,11 +21,18 @@ library C {
     address private constant USDC_BRIDGED = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
     address private constant USDC = 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359;
 
+    // Uniswap V3 Quoter
+    address private constant UNISWAP_V3_QUOTER = 0x5e55C9e631FAE526cd4B0526C4818D6e0a9eF0e3;
+
     // DEX Router Addresses
+    address private constant UNISWAP_V3_POLYGON = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
     address private constant SUSHI_POLYGON = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
     address private constant QUICKSWAP_POLYGON = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff;
     address private constant SUSHI_BENTO = 0x0319000133d3AdA02600f0875d2cf03D442C3367;
     address private constant SUSHI_TRIDENT_POLYGON = 0xc5017BE80b4446988e8686168396289a9A62668E;
+
+    // Uniswap V3 USDC/USDC.e pool fee
+    uint24 private constant UNISWAPV3_NATIVE_USDC_BRIDGED_USDC_POOL_FEE = 100;
 
     // Marketplace contracts
     address private constant CARBONMARK = 0x7B51dBc2A8fD98Fe0924416E628D5755f57eB821;
@@ -129,6 +136,18 @@ library C {
 
     function sushiBento() internal pure returns (address) {
         return SUSHI_BENTO;
+    }
+
+    function uniswapV3Router() internal pure returns (address) {
+        return UNISWAP_V3_POLYGON;
+    }
+
+    function uniswapV3Quoter() internal pure returns (address) {
+        return UNISWAP_V3_QUOTER;
+    }
+
+    function uniswapV3UsdcNativeBridgedPoolFee() internal pure returns (uint24) {
+        return UNISWAPV3_NATIVE_USDC_BRIDGED_USDC_POOL_FEE;
     }
 
     function klimaCarbonRetirements() internal pure returns (address) {

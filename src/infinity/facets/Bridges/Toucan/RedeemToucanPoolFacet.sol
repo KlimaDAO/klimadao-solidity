@@ -7,6 +7,7 @@ import "../../../libraries/LibRetire.sol";
 import "../../../libraries/TokenSwap/LibSwap.sol";
 import "../../../libraries/Bridges/LibToucanCarbon.sol";
 import "../../../ReentrancyGuard.sol";
+import "../../../libraries/TokenSwap/LibSwap.sol";
 
 contract RedeemToucanPoolFacet is ReentrancyGuard {
     /**
@@ -75,6 +76,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
         require(projectTokens.length == amounts.length, "Array lengths not equal");
 
         uint256 totalCarbon;
+        address originalSourceToken = sourceToken;
 
         for (uint256 i; i < amounts.length; i++) {
             amounts[i] += LibToucanCarbon.getSpecificRedeemFee(poolToken, amounts[i]);
@@ -85,6 +87,13 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
 
         uint256 receivedAmount = LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
+        // after this point the contract has bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            // set the original source token to return trade dust in the correct token
+            originalSourceToken = C.usdc();
+        }
+
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
                 maxAmountIn = LibKlima.unwrapKlima(maxAmountIn);
@@ -94,7 +103,7 @@ contract RedeemToucanPoolFacet is ReentrancyGuard {
             receivedAmount = LibSwap.swapToExactCarbonDefault(sourceToken, poolToken, maxAmountIn, totalCarbon);
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
         }
 
         require(receivedAmount >= totalCarbon, "Not enough pool tokens");

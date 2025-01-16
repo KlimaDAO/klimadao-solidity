@@ -5,6 +5,9 @@ import "../../libraries/LibRetire.sol";
 import "../../libraries/TokenSwap/LibSwap.sol";
 import "../../ReentrancyGuard.sol";
 
+// Import the Uniswap V3 interfaces
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+
 contract RetireCarbonFacet is ReentrancyGuard {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
@@ -48,11 +51,19 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         uint256 totalCarbon = LibRetire.getTotalCarbon(retireAmount);
 
+        address originalSourceToken = sourceToken;
+
         if (sourceToken == poolToken) {
             require(totalCarbon == maxAmountIn, "Incorrect pool amount");
         }
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+        // after this point the contract has bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            originalSourceToken = C.usdc();
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
@@ -71,7 +82,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
             totalCarbon = carbonReceived;
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
         }
 
         LibRetire.retireReceivedCarbon(
@@ -124,11 +135,19 @@ contract RetireCarbonFacet is ReentrancyGuard {
 
         uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(poolToken, retireAmount);
 
+        address originalSourceToken = sourceToken;
+
         if (sourceToken == poolToken) {
             require(totalCarbon == maxAmountIn, "Incorrect pool amount");
         }
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+        // after this point the contract has bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            originalSourceToken = C.usdc();
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
@@ -144,7 +163,7 @@ contract RetireCarbonFacet is ReentrancyGuard {
             }
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
 
             require(carbonReceived >= totalCarbon, "Swap not enough");
             totalCarbon = carbonReceived;

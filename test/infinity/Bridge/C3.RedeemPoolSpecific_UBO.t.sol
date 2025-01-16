@@ -24,7 +24,8 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
     // Addresses pulled from current diamond constants
     address KLIMA_TREASURY;
     address STAKING;
-    address USDC;
+    address USDC_BRIDGED;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -43,7 +44,8 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         KLIMA_TREASURY = constantsFacet.treasury();
         STAKING = constantsFacet.staking();
 
-        USDC = constantsFacet.usdc_bridged();
+        USDC_BRIDGED = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -60,8 +62,12 @@ contract RedeemUBOSpecificTest is TestHelper, AssertionHelper {
         redeemUBO(UBO, redeemAmount);
     }
 
-    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUSDC_fuzz(uint256 redeemAmount) public {
-        redeemUBO(USDC, redeemAmount);
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUSDC_NATIVE_fuzz(uint256 redeemAmount) public {
+        redeemUBO(USDC_NATIVE, redeemAmount);
+    }
+
+    function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingUSDC_BRIDGED_fuzz(uint256 redeemAmount) public {
+        redeemUBO(USDC_BRIDGED, redeemAmount);
     }
 
     function test_infinity_c3RedeemPoolSpecific_redeemUBO_usingKLIMA_fuzz(uint256 redeemAmount) public {
