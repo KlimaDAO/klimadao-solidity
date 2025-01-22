@@ -5,4 +5,6 @@ interface ICMARKCreditToken {
 
 interface ICMARKCreditTokenFactory {
     function creditAddressToId(address) external view returns (string memory);
+    function creditIdToAddress(id) external view returns (address memory);
+    function issueCredits(string, uint256, address) external;
 }
