@@ -19,6 +19,7 @@ contract UpgradeInfinityForCMARK is Script, HelperContract {
         //read env variables and choose EOA for transaction signing
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address diamond = vm.envAddress("INFINITY_ADDRESS");
+        bytes updateFacetsCalldata;
 
         OwnershipFacet ownerF = OwnershipFacet(diamond);
 
