@@ -9,8 +9,8 @@ import {Diamond} from "../src/infinity/Diamond.sol";
 import "../src/infinity/facets/DiamondCutFacet.sol";
 import "../src/infinity/facets/DiamondLoupeFacet.sol";
 import "../src/infinity/facets/OwnershipFacet.sol";
-import {RetireCarbonmarkFacet} from "../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
-import {RetireCMARKFacet} from "../src/infinity/facets/Bridges/CMARK/RetireCMARKFacet.sol";
+import { RetireCarbonmarkFacet } from "../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
+import { RetireCMARKFacet } from "../src/infinity/facets/Bridges/CMARK/RetireCMARKFacet.sol";
 
 import "../test/infinity/HelperContract.sol";
 
