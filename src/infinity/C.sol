@@ -57,6 +57,7 @@ library C {
     address constant TOUCAN_REGISTRY = 0x263fA1c180889b3a3f46330F32a4a23287E99FC9;
     address constant C3_PROJECT_FACTORY = 0xa4c951B30952f5E2feFC8a92F4d3c7551925A63B;
     address constant ICR_PROJECT_REGISTRY = 0x9f87988FF45E9b58ae30fA1685088460125a7d8A;
+    address constant CMARK_CREDIT_FACTORY = 0xEeE3abDD638E219261e061c06C0798Fd5C05B5D3;
 
     address constant COOREST_POOL = 0x363ae9B7Dbf55c0956A74C3be4ed0996d277A8BE;
     address constant COOREST_POCC_TOKEN = 0x51cF819352FC536aD8A84214922615C160BB497D;
@@ -164,6 +165,10 @@ library C {
 
     function c3ProjectFactory() internal pure returns (address) {
         return C3_PROJECT_FACTORY;
+    }
+
+    function cmarkCreditFactory() internal pure returns (address) {
+        return CMARK_CREDIT_FACTORY;
     }
 
     function carbonmark() internal pure returns (address) {
