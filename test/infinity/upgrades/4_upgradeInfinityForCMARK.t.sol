@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import { UpgradeInfinityForCMARK } from "../../../script/4_upgradeInfinityForCMARK.s.sol";
 import { ConstantsGetter, TestHelper } from "../../infinity/TestHelper.sol";
 import { AssertionHelper } from "../../helpers/AssertionHelper.sol";
+import { ListingsHelper } from "../../helpers/Listings.sol";
 import { Test } from "forge-std/Test.sol";
 import { IERC20 } from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { ICarbonmark } from "../../../src/infinity/interfaces/ICarbonmark.sol";
@@ -12,12 +13,16 @@ import { LibRetire } from "../../../src/infinity/libraries/LibRetire.sol";
 import { LibTransfer } from "../../../src/infinity/libraries/Token/LibTransfer.sol";
 import { RetireCarbonmarkFacet } from "../../../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
 
-contract DeployRA is TestHelper, AssertionHelper {
+contract DeployRA is TestHelper, AssertionHelper, ListingsHelper {
+    UpgradeInfinityForCMARK upgradeScript;
     ConstantsGetter constantsFacet;
-    address constant USDC_ADDRESS;
+    address USDC_ADDRESS;
 
     uint256 constant AMOUNT = 1 ether;
-    address constant RETIRER = vm.addr(1);
+    uint256 constant SOURCE_AMOUNT = 1 ether;
+    uint256 constant unitPrice = 1e12;
+    uint256 constant minFillAmount = 1e18;
+    address RETIRER = vm.addr(1);
 
     address constant DIAMOND_OWNER = 0x843dE2e99449834cd6C6456Bd35894d0B157B947; // mainnet multisig
     address constant DIAMOND_ADDRESS = 0x8cE54d9625371fb2a068986d32C85De8E6e995f8; // mainnet RA diamond
@@ -32,6 +37,7 @@ contract DeployRA is TestHelper, AssertionHelper {
     ICMARKCreditTokenFactory cmarkFactory;
 
     address CMARK_ADDRESS;
+    address carbonmark;
 
     bytes data;
 
@@ -46,7 +52,10 @@ contract DeployRA is TestHelper, AssertionHelper {
         beneficiaryAddress: RETIRER,
         beneficiaryString: beneficiary,
         retirementMessage: message,
-        consumptionCountryCode: "DE"
+        beneficiaryLocation: "Germany",
+        consumptionCountryCode: "DE",
+        consumptionPeriodStart: block.timestamp,
+        consumptionPeriodEnd: block.timestamp + 1 days
     });
 
     function setUp() public {
@@ -57,10 +66,13 @@ contract DeployRA is TestHelper, AssertionHelper {
         constantsFacet = ConstantsGetter(DIAMOND_ADDRESS);
         USDC_ADDRESS = constantsFacet.usdc();
 
+        carbonmark = constantsFacet.carbonmark();
+
         // TODO: give the RETIRER some USDC to pay for the listing
 
         // Deploy the new facet on the fork and set the calldata
-        data = UpgradeInfinityForCMARK.run();
+        upgradeScript = new UpgradeInfinityForCMARK();
+        data = upgradeScript.run();
     }
 
     function doUpgrade() public {
@@ -90,26 +102,25 @@ contract DeployRA is TestHelper, AssertionHelper {
         // create a listing before upgrade
         transferCMARK(AMOUNT, RETIRER);
         vm.startPrank(RETIRER);
-        IERC20(CMARK_ADDRESS).approve(DIAMOND_ADDRESS, amount);
+        IERC20(CMARK_ADDRESS).approve(DIAMOND_ADDRESS, AMOUNT);
 
         // TODO: figure out how to import the Marketplace functionality via ABI instead of source code
         ICarbonmark marketplace = ICarbonmark(DIAMOND_ADDRESS);
         bytes32 cmarkListingId =
-            marketplace.createListing(CMARK_ADDRESS, amount, 1_000_000_000, 1 ether, block.timestamp + 600);
+            marketplace.createListing(CMARK_ADDRESS, AMOUNT, 1_000_000_000, 1 ether, block.timestamp + 600);
 
         vm.warp(PREUPGRADE_BLOCK);
         // expect the retire call to revert since we have warped to a block before the upgrade
-        vm.expectRevert();
 
-        // TODO: figure out how to instantiate the proper facet for retiring
         RetireCarbonmarkFacet diamond = RetireCarbonmarkFacet(DIAMOND_ADDRESS);
-        bytes32 cmarkRetireId = diamond.retireCarbonmarkListing(
-            cmarkListingId, sourceAmount, retireAmount, details, LibTransfer.From.EXTERNAL
+        ICarbonmark.CreditListing memory listingStruct =
+            getCarbonmarkListingStruct(carbonmark, cmarkListingId, AMOUNT, unitPrice);
+        vm.expectRevert();
+        uint256 cmarkRetireId = diamond.retireCarbonmarkListing(
+            listingStruct, SOURCE_AMOUNT, AMOUNT, details, LibTransfer.From.EXTERNAL
         );
-        // TODO: rewrite this assert to check the retirement (fails if not upgraded, succeeds if so)
-        // MAKE SURE IT STILL PASSES AFTER UPGRADE!
 
-        assertEq(marketplace.getRemainingAmount(cmarkListingId), amount);
+        assertEq(marketplace.getRemainingAmount(cmarkListingId), AMOUNT);
         vm.stopPrank();
 
         // upgrade the diamond
@@ -117,10 +128,10 @@ contract DeployRA is TestHelper, AssertionHelper {
 
         vm.startPrank(RETIRER);
         // confirm retirement functions after upgrade as well (without revert)
-        bytes32 cmarkRetireId2 = diamond.retireCarbonmarkListing(
-            cmarkListingId, sourceAmount, retireAmount, details, LibTransfer.From.EXTERNAL
+        uint256 cmarkRetireId2 = diamond.retireCarbonmarkListing(
+            listingStruct, SOURCE_AMOUNT, AMOUNT, details, LibTransfer.From.EXTERNAL
         );
-        assertEq(marketplace.getRemainingAmount(cmarkListingId), amount);
+        assertEq(marketplace.getRemainingAmount(cmarkListingId), 0);
         vm.stopPrank();
 
     }
