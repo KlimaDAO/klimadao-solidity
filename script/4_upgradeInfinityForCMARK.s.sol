@@ -15,11 +15,11 @@ import { RetireCMARKFacet } from "../src/infinity/facets/Bridges/CMARK/RetireCMA
 import "../test/infinity/HelperContract.sol";
 
 contract UpgradeInfinityForCMARK is Script, HelperContract {
-    function run() external {
+    function run() external returns (bytes memory) {
         //read env variables and choose EOA for transaction signing
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address diamond = vm.envAddress("INFINITY_ADDRESS");
-        bytes updateFacetsCalldata;
+        bytes memory updateFacetsCalldata;
 
         OwnershipFacet ownerF = OwnershipFacet(diamond);
 
