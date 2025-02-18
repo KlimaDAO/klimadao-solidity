@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { UpgradeInfinityForCMARK } from "../../../script/4_upgradeInfinityForCMARK.s.sol";
+import { UpgradeInfinityForCMARK } from "../../../script/6_upgradeInfinityForCMARK.s.sol";
 import { TestHelper } from "../../infinity/TestHelper.sol";
 import { C } from "../../../src/infinity/C.sol";
 import { AssertionHelper } from "../../helpers/AssertionHelper.sol";
