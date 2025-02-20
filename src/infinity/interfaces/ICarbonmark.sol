@@ -2,6 +2,24 @@
 pragma solidity ^0.8.16;
 
 interface ICarbonmark {
+
+    error CarbonmarkMarketplace_ListingDoesNotExist();
+    error CarbonmarkMarketplace_ListingAlreadyExists();
+    error CarbonmarkMarketplace_ListingNotOwner();
+    error CarbonmarkMarketplace_ListingExpired();
+    error CarbonmarkMarketplace_ListingTokenNotSupported(address token);
+    error CarbonmarkMarketplace_ListingTokenBalanceTooLow(address token, uint256 currentBalance, uint256 listingAmount);
+    error CarbonmarkMarketplace_ListingTokenAllowanceTooLow(
+        address token, uint256 currentAllowance, uint256 listingAmount
+    );
+    error CarbonmarkMarketplace_ListingTokenNotApprovedForAll(address token, bool approval);
+    error CarbonmarkMarketplace_ListingPurchaseInExcessOfAvailable();
+    error CarbonmarkMarketplace_ListingFillTotalCostGreaterThanMax();
+    error CarbonmarkMarketplace_ListingPurchaseBelowMinimumFill();
+    error CarbonmarkMarketplace_ListingFillDetailsMismatch();
+    error CarbonmarkMarketplace_ListingAmountLessThanMinFillAmount(uint256 amount, uint256 minFillAmount);
+    error CarbonmarkMarketplace_ListingAmountZero();
+
     /**
      * @notice Struct containing all of the detail information needed to fill a listing
      * @param account Ethereum address of the account who owns the listing
