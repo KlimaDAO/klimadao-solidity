@@ -128,6 +128,9 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
 
     function facets() external view returns (Facet[] memory facets_) {}
 
+    /**
+     * Sends transferAmount token from sender to receiver
+     */
     function swipeERC20Tokens(address token, uint256 transferAmount, address sender, address receiver)
         public
         returns (uint256 newReceiverBalance)
@@ -140,8 +143,8 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         // Impersonate sender
         vm.prank(sender);
 
-        // Approve the test contract to spend tokens on behalf of sender
-        IERC20(token).approve(address(this), transferAmount);
+        // Approve the test contract to spend tokens on behalf of sender => should not it be on behalf of the receiver?
+        IERC20(token).approve(address(this), transferAmount); 
 
         // Transfer ERC20 tokens from sender to receiver
         IERC20(token).transferFrom(sender, receiver, transferAmount);

@@ -411,7 +411,11 @@ abstract contract TestHelper is Test, HelperContract {
 
         maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
-
+    /**
+     * Sources token for the current test contract.
+     * Automagically computes source address and amount
+     * Approves the diamond contract to use those tokens
+     */
     function getSourceTokens(
         TransactionType txType,
         address diamond,
