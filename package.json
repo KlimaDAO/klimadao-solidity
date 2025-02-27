@@ -4,7 +4,7 @@
   "description": "KlimaDAO Solidity contracts for the protocol",
   "main": "index.js",
   "scripts": {
-    "test": "forge t -vvv --ffi --fork-url http://localhost:8545 --summary",
+    "test": "eval $(grep '^POLYGON_URL' .env) && forge t -vvv --ffi --fork-url http://localhost:8545 --summary",
     "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test test_infinity --summary",
     "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test  test_protocol --summary",
     "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
@@ -19,7 +19,6 @@
     "propose:03_update_native_usdc_revisions": "bun multisig-proposals/03-update-native-usdc-revisions.ts",
     "propose:04_update_returnTradeDust_revisions": "bun multisig-proposals/04-update-returnTradeDust-revisions.ts",
     "propose:05_update_retirecmark_facet": "bun multisig-proposals/05-update-retirecmark-facet.ts"
-
   },
   "repository": {
     "type": "git",
