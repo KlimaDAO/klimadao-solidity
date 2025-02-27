@@ -7,7 +7,7 @@ import "../libraries/TokenSwap/LibSwap.sol";
 import "../C.sol";
 import "../AppStorage.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/IQuoterView.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/IQuoterV2.sol";
 
 /**
  * @author Cujo
@@ -18,7 +18,6 @@ contract RetirementQuoter {
 
     function getSourceAmountSwapOnly(address sourceToken, address carbonToken, uint256 amountOut)
         public
-        view
         returns (uint256 amountIn)
     {
         (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
@@ -32,7 +31,6 @@ contract RetirementQuoter {
 
     function getSourceAmountDefaultRetirement(address sourceToken, address carbonToken, uint256 retireAmount)
         public
-        view
         returns (uint256 amountIn)
     {
         uint256 totalCarbon = LibRetire.getTotalCarbon(retireAmount);
@@ -56,7 +54,6 @@ contract RetirementQuoter {
 
     function getSourceAmountSpecificRetirement(address sourceToken, address carbonToken, uint256 retireAmount)
         public
-        view
         returns (uint256 amountIn)
     {
         uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(carbonToken, retireAmount);
@@ -80,7 +77,6 @@ contract RetirementQuoter {
 
     function getSourceAmountDefaultRedeem(address sourceToken, address carbonToken, uint256 redeemAmount)
         public
-        view
         returns (uint256 amountIn)
     {
         if (sourceToken == carbonToken) return redeemAmount;
@@ -96,7 +92,6 @@ contract RetirementQuoter {
 
     function getSourceAmountSpecificRedeem(address sourceToken, address carbonToken, uint256[] memory redeemAmounts)
         public
-        view
         returns (uint256 amountIn)
     {
         // Toucan Calculations
@@ -167,7 +162,6 @@ contract RetirementQuoter {
 
     function calculateAdditionalSwapFee(address originalSourceToken, uint256 sourceAmount)
         internal
-        view
         returns (uint256 additionalSwapAmount)
     {
         additionalSwapAmount = 0;
@@ -178,17 +172,16 @@ contract RetirementQuoter {
 
     function getUniswapV3Quote(address tokenIn, address tokenOut, uint256 amount)
         internal
-        view
         returns (uint256 additionalSwapAmount)
     {
-        IQuoterView.QuoteExactOutputSingleParams memory params = IQuoterView.QuoteExactOutputSingleParams({
+        IQuoterV2.QuoteExactOutputSingleParams memory params = IQuoterV2.QuoteExactOutputSingleParams({
             tokenIn: tokenIn,
             tokenOut: tokenOut,
             amount: amount,
             fee: 100,
             sqrtPriceLimitX96: 0
         });
-        (uint256 amountIn,,,) = IQuoterView(C.uniswapV3Quoter()).quoteExactOutputSingle(params);
+        (uint256 amountIn,,,) = IQuoterV2(C.uniswapV3Quoter()).quoteExactOutputSingle(params);
         return amountIn > amount ? amountIn - amount : 0;
     }
 }
