@@ -22,6 +22,7 @@ import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemTo
 import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
 import {RetireCarbonmarkFacet} from "src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
+import {BatchRetireFacet} from "src/infinity/facets/Retire/BatchRetireFacet.sol";
 import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
@@ -66,6 +67,7 @@ abstract contract TestHelper is Test, HelperContract {
     RedeemToucanPoolFacet toucanRedeemF;
     RetireToucanTCO2Facet toucanRetireF;
     RetireCarbonFacet retireCarbonF;
+    BatchRetireFacet batchRetireF;
     RetireInfoFacet retireInfoF;
     RetireSourceFacet retireSourceF;
     RetirementQuoter retirementQuoterF;
@@ -213,6 +215,7 @@ abstract contract TestHelper is Test, HelperContract {
         toucanRedeemF = new RedeemToucanPoolFacet();
         retirementQuoterF = new RetirementQuoter();
         retireCarbonF = new RetireCarbonFacet();
+        batchRetireF = new BatchRetireFacet();
         // retireSourceF = new RetireSourceFacet();
         // retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
@@ -245,7 +248,7 @@ abstract contract TestHelper is Test, HelperContract {
 
         // Local Uniswap setup
 
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](4);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](5);
 
         cut[0] = (
             IDiamondCut.FacetCut({
@@ -276,6 +279,14 @@ abstract contract TestHelper is Test, HelperContract {
                 facetAddress: address(c3RedeemF),
                 action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("RedeemC3PoolFacet")
+            })
+        );
+
+        cut[4] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(batchRetireF),
+                action: IDiamondCut.FacetCutAction.Add, // Replace by IDiamondCut.FacetCutAction.Replace after deployment
+                functionSelectors: generateSelectors("BatchRetireFacet")
             })
         );
 
