@@ -13,6 +13,7 @@ import { ICMARKCreditTokenFactory } from "../../../src/infinity/interfaces/ICMAR
 import { LibRetire } from "../../../src/infinity/libraries/LibRetire.sol";
 import { LibTransfer } from "../../../src/infinity/libraries/Token/LibTransfer.sol";
 import { RetireCarbonmarkFacet } from "../../../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
+import { BatchRetireFacet } from "../../../src/infinity/facets/Retire/BatchRetireFacet.sol";
 import {IToucanPool} from "../../../src/infinity/interfaces/IToucan.sol";
 
 import "../TestHelper.sol";
@@ -21,6 +22,7 @@ import "../../helpers/AssertionHelper.sol";
 contract UpgradeInfinityForBatchRetireTest is TestHelper, AssertionHelper, ListingsHelper {
     UpgradeInfinityForBatchRetire upgradeScript;
     RetireCarbonmarkFacet retireCarbonmarkFacet;
+    BatchRetireFacet batchRetireFacet;
     ConstantsGetter constantsFacet;
 
 
@@ -46,20 +48,23 @@ contract UpgradeInfinityForBatchRetireTest is TestHelper, AssertionHelper, Listi
     string entity = "Test Entity";
     
     function setUp() public {
+        // Start fork
+        string memory RPC_URL = vm.envString("POLYGON_URL");
+        uint256 forkId = vm.createFork(RPC_URL);
+        vm.selectFork(forkId);
+
         // Set constants variables
+        // This must be done after forking the blockchain because it actually adds a new facet to the diamond
         addConstantsGetter(DIAMOND_ADDRESS);
         constantsFacet = ConstantsGetter(DIAMOND_ADDRESS);
         retireCarbonmarkFacet = RetireCarbonmarkFacet(DIAMOND_ADDRESS);
-        
+        batchRetireFacet = BatchRetireFacet(DIAMOND_ADDRESS);
+
         CARBONMARK = constantsFacet.carbonmark();
         BCT = constantsFacet.bct();
         USDC_BRIDGED = constantsFacet.usdc_bridged();
         USDC_NATIVE = constantsFacet.usdc();
 
-        // Start fork
-        string memory RPC_URL = vm.envString("POLYGON_URL");
-        uint256 forkId = vm.createFork(RPC_URL);
-        vm.selectFork(forkId);
     }
 
     function doUpgrade() public {
@@ -79,10 +84,44 @@ contract UpgradeInfinityForBatchRetireTest is TestHelper, AssertionHelper, Listi
     }
 
     function test_retirement() public {
+        doUpgrade();
+
+        // Build callData
+        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](1);
+
+        calls[0] = BatchRetireFacet.Call({
+            callData: retireCarbonmarkListingCall()
+        });
+
+        // Save state before doing the retirements
+        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
+        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+
+
+        // Perform the batch retirement
+        uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+
+        for (uint256 i = 0; i < retirementIndexes.length; ++i) {
+            console.logUint(retirementIndexes[i]);
+        } 
+
+        // Return value matches
+        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), retirementIndexes[retirementIndexes.length-1]);
+
+        // Account state values updated
+        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + 1);
+        
+        // Retire listing
+        assertZeroTokenBalance(USDC_BRIDGED, DIAMOND_ADDRESS);
+    }
+
+    function retireCarbonmarkListingCall() public returns (bytes memory)
+    {
         address TCO2 = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
         uint256 listingAmount = 1_250_000_000_000_000_000;
         uint256 retireAmount = 5e17;
-        // create listing
+
+         // create listing
         deal(TCO2, address(this), listingAmount); 
 
         IERC20(TCO2).approve(CARBONMARK, listingAmount);
@@ -95,18 +134,7 @@ contract UpgradeInfinityForBatchRetireTest is TestHelper, AssertionHelper, Listi
 
         // Get USDC
         uint256 sourceAmount = ICarbonmark(CARBONMARK).getUnitPrice(listing.id) * retireAmount / 1e18;
-        //getSourceTokens(TransactionType.EXACT_SOURCE, DIAMOND_ADDRESS, USDC_BRIDGED, USDC_BRIDGED, sourceAmount);
-
-        // Retire listing
-        //retireExactBCT(listing, retireAmount, sourceAmount);
-        //assertZeroTokenBalance(USDC_BRIDGED, DIAMOND_ADDRESS);
-    }
-
-    function retireExactBCT(ICarbonmark.CreditListing memory listing, uint256 retireAmount, uint256 sourceAmount)
-        public
-    {
-        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        getSourceTokens(TransactionType.EXACT_SOURCE, DIAMOND_ADDRESS, USDC_NATIVE, USDC_NATIVE, sourceAmount);
 
         LibRetire.RetireDetails memory details = LibRetire.RetireDetails({
             retiringAddress: address(this),
@@ -120,16 +148,6 @@ contract UpgradeInfinityForBatchRetireTest is TestHelper, AssertionHelper, Listi
             consumptionPeriodEnd: 0
         });
 
-        uint256 retirementIndex = retireCarbonmarkFacet.retireCarbonmarkListing(
-            listing, sourceAmount, retireAmount, details, LibTransfer.From.EXTERNAL
-        );
-
-        // Return value matches
-        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), retirementIndex);
-
-        // Account state values updated
-        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + 1);
-        assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + retireAmount);
+        return abi.encodeWithSignature("retireCarbonmarkListing((bytes32,address,address,uint256,uint256,uint256),uint256,uint256,(address,string,address,string,string,string,string,uint256,uint256),uint8)",listing,sourceAmount,retireAmount,details,LibTransfer.From.EXTERNAL);
     }
-
 }

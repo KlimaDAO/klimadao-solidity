@@ -38,7 +38,7 @@ contract UpgradeInfinityForBatchRetire is Script, HelperContract {
                 functionSelectors: generateSelectors("BatchRetireFacet")
             })
         );
-
+        
         vm.stopBroadcast();
 
         // get calldata for the upgrade without init for internal library function view
