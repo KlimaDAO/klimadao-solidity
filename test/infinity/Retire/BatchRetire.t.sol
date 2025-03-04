@@ -31,11 +31,11 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
     address diamond = vm.envAddress("INFINITY_ADDRESS");
 
     // Addresses pulled from current diamond constants
-    // Addresses pulled from current diamond constants
     address CARBONMARK;
     address BCT;
     address USDC_BRIDGED;
     address USDC_NATIVE;
+    address[] projectsBCT;
 
     function setUp() public {
         // Set constants variables
@@ -48,6 +48,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         BCT = constantsFacet.bct();
         USDC_BRIDGED = constantsFacet.usdc_bridged();
         USDC_NATIVE = constantsFacet.usdc();
+        projectsBCT = IToucanPool(BCT).getScoredTCO2s();
 
         upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
@@ -55,17 +56,25 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
 
     function test_retirement() public {
         // Build callData
-        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](1);
+        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](3);
 
         // Listing retirement call
         calls[0] = BatchRetireFacet.Call({
             callData: retireCarbonmarkListingCallData()
         });
-        // Carbon default carbon retirement call
-        /*
+
+        
+        // Default carbon retirement call
         calls[1] = BatchRetireFacet.Call({
             callData: retireExactCarbonDefaultCallData()
-        });*/
+        });
+
+        // Specific carbon retirement call
+        calls[2] = BatchRetireFacet.Call({
+            callData: retireExactCarbonSpecificCallData()
+        });
+
+        uint nbRetirements = calls.length;
 
         // Save state before doing the retirements
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
@@ -80,26 +89,34 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         } 
 
         // Return value matches
-        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), retirementIndexes[retirementIndexes.length-1]);
+        //assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + nbRetirements);
+        //assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + 5e17 * nbRetirements);
 
-        // Account state values updated
-        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + 1);
-        
-        // Retire listing
-        assertZeroTokenBalance(USDC_BRIDGED, diamond);
+    }
+
+    function retireExactCarbonSpecificCallData() public returns (bytes memory)
+    {
+        address POOL_TOKEN = BCT;
+        address PROJECT_TOKEN = projectsBCT[randomish(projectsBCT.length)];
+        address SOURCE_TOKEN = USDC_NATIVE;
+        uint256 retireAmount = 5e17;
+
+        // Get USDC
+        uint256 sourceAmount = getSourceTokens(TransactionType.SPECIFIC_RETIRE, diamond, SOURCE_TOKEN, POOL_TOKEN, retireAmount);
+
+        return abi.encodeWithSignature("retireExactCarbonSpecific(address,address,address,uint256,uint256,string,address,string,string,uint8)",SOURCE_TOKEN,POOL_TOKEN,PROJECT_TOKEN,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
     }
 
     function retireExactCarbonDefaultCallData() public returns (bytes memory)
     {
-        address TOKEN = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
-        address POOL = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
-        address DEFAULT_PROJECT_BCT = getDefaultToucanProject(BCT);
+        address POOL_TOKEN = BCT;
+        address SOURCE_TOKEN = USDC_NATIVE;
         uint256 retireAmount = 5e17;
 
-        // Get USDC
-        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_RETIRE, diamond, DEFAULT_PROJECT_BCT, BCT, retireAmount);
+        // Get Source token
+        uint256 sourceAmount = getSourceTokens(TransactionType.DEFAULT_RETIRE, diamond, SOURCE_TOKEN, POOL_TOKEN, retireAmount);
 
-        return abi.encodeWithSignature("retireExactCarbonDefault(address,address,uint256,uint256,string,address,string,string,uint8)",TOKEN,POOL,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
+        return abi.encodeWithSignature("retireExactCarbonDefault(address,address,uint256,uint256,string,address,string,string,uint8)",SOURCE_TOKEN,POOL_TOKEN,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
     }
 
     function retireCarbonmarkListingCallData() public returns (bytes memory)

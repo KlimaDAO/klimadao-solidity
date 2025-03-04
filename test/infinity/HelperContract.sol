@@ -143,7 +143,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         // Impersonate sender
         vm.prank(sender);
 
-        // Approve the test contract to spend tokens on behalf of sender => should not it be on behalf of the receiver?
+        // Approve the test contract to spend tokens on behalf of sender
         IERC20(token).approve(address(this), transferAmount); 
 
         // Transfer ERC20 tokens from sender to receiver

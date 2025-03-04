@@ -474,7 +474,7 @@ abstract contract TestHelper is Test, HelperContract {
         vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
 
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
+        IERC20(sourceToken).approve(diamond, type(uint256).max);
     }
 
     //////////// EVM Helpers ////////////
