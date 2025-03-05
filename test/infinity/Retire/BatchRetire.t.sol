@@ -37,6 +37,11 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
     address USDC_NATIVE;
     address[] projectsBCT;
 
+    struct BatchedRetirementEvent { 
+        bool success;
+        uint256 retirementIndex;
+    }
+
     function setUp() public {
         // Set constants variables
         // This must be done after forking the blockchain because it actually adds a new facet to the diamond
@@ -54,9 +59,26 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         sendDustToTreasury(diamond);
     }
 
+    function test_empty_calldata() public {
+        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](0);
+
+        vm.expectRevert("callData cannot be empty");
+        uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+    }
+
+    function test_no_retirements_performed() public {
+        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](1);
+
+        vm.expectRevert("No successful retirements performed");
+        uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+    }
+
+    /**
+     * Performs 4 retirements. One of them fails
+     */
     function test_retirement() public {
         // Build callData
-        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](3);
+        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](4);
 
         // Listing retirement call
         calls[0] = BatchRetireFacet.Call({
@@ -69,32 +91,73 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
             callData: retireExactCarbonDefaultCallData(4e17)
         });
 
-        // Specific carbon retirement call
+        // Failing retirement
         calls[2] = BatchRetireFacet.Call({
+            callData: "0x"
+        });
+
+        // Specific carbon retirement call
+        calls[3] = BatchRetireFacet.Call({
             callData: retireExactCarbonSpecificCallData(3e17)
         });
 
-        uint nbSuccessfulRetirements = calls.length;
+        uint nbSuccessfulRetirements = calls.length - 1;
 
         // Save state before doing the retirements
         uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
         uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
 
-
         // Perform the batch retirement
+        vm.recordLogs();
         uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+        Vm.Log[] memory logs = vm.getRecordedLogs();
 
-        for (uint256 i = 0; i < retirementIndexes.length; ++i) {
-            console.logUint(retirementIndexes[i]);
-        } 
-
-        // Return value matches
+        // Check that ccoherence
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + nbSuccessfulRetirements);
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + 12e17);
 
+        // Check emitted logs
+        BatchedRetirementEvent[] memory events = extractBatchedRetirementDoneLogs(logs);
+        assertEq(events[0].success, true);
+        assertEq(events[0].retirementIndex, currentRetirements + 1);
+
+        assertEq(events[1].success, true);
+        assertEq(events[1].retirementIndex, currentRetirements + 2);
+        
+        assertEq(events[2].success, false);
+        assertEq(events[2].retirementIndex, type(uint256).max);
+        
+        assertEq(events[3].success, true);
+        assertEq(events[3].retirementIndex, currentRetirements + 3);
+        
+
     }
 
-    function retireExactCarbonSpecificCallData(uint256 retireAmount) public returns (bytes memory)
+    function extractBatchedRetirementDoneLogs(Vm.Log[] memory logs) private returns (BatchedRetirementEvent[] memory events) {
+        // Compute number of events
+        bytes32 wantedKeccak = keccak256("BatchedRetirementDone(bool,uint256)");
+        uint32 count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            if (logs[i].topics[0] == wantedKeccak) count++;
+        }
+
+        // Allocate array
+        BatchedRetirementEvent[] memory events = new BatchedRetirementEvent[](count);
+
+        // Compute events
+        count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            bytes memory data = logs[i].data;
+            if (logs[i].topics[0] == wantedKeccak) {
+                (bool success, uint256 retirementIndex) = abi.decode(data, (bool, uint256));
+                events[count] = BatchedRetirementEvent({success: success, retirementIndex: retirementIndex});
+                count++;
+            }
+        }
+        return events;
+    }
+
+    function retireExactCarbonSpecificCallData(uint256 retireAmount) private returns (bytes memory)
     {
         address POOL_TOKEN = BCT;
         address PROJECT_TOKEN = projectsBCT[randomish(projectsBCT.length)];
@@ -106,7 +169,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         return abi.encodeWithSignature("retireExactCarbonSpecific(address,address,address,uint256,uint256,string,address,string,string,uint8)",SOURCE_TOKEN,POOL_TOKEN,PROJECT_TOKEN,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
     }
 
-    function retireExactCarbonDefaultCallData(uint256 retireAmount) public returns (bytes memory)
+    function retireExactCarbonDefaultCallData(uint256 retireAmount) private returns (bytes memory)
     {
         address POOL_TOKEN = BCT;
         address SOURCE_TOKEN = USDC_NATIVE;
@@ -117,7 +180,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         return abi.encodeWithSignature("retireExactCarbonDefault(address,address,uint256,uint256,string,address,string,string,uint8)",SOURCE_TOKEN,POOL_TOKEN,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
     }
 
-    function retireCarbonmarkListingCallData(uint256 retireAmount) public returns (bytes memory)
+    function retireCarbonmarkListingCallData(uint256 retireAmount) private returns (bytes memory)
     {
         address TCO2 = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
         uint256 listingAmount = 1_250_000_000_000_000_000;

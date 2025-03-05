@@ -45,6 +45,8 @@ library LibRetire {
         uint256 consumptionPeriodEnd;
     }
 
+    event BatchedRetirementDone(bool success, uint256 retirementIndex);
+
     /* ========== Default Redemption Retirements ========== */
 
     /**
