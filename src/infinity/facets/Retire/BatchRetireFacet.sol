@@ -30,7 +30,7 @@ contract BatchRetireFacet is ReentrancyGuard {
 
             // Extract the retirement index
             if (success && data.length == 32) {
-                retirementIndexes[i] = abi.decode(data, (uint256));
+                retirementIndexes[i] = abi.decode(data, (uint256)) - 1;
                 hasSuccess = true;
             }
             else {

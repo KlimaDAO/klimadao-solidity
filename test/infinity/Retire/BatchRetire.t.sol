@@ -27,7 +27,8 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
     string entity = "Test Entity";
 
     // Addresses defined in .env
-    address beneficiaryAddress = vm.envAddress("BENEFICIARY_ADDRESS");
+    address beneficiaryAddress1 = vm.envAddress("BENEFICIARY_ADDRESS");
+    address beneficiaryAddress2 = vm.envAddress("BENEFICIARY_ADDRESS2");
     address diamond = vm.envAddress("INFINITY_ADDRESS");
 
     // Addresses pulled from current diamond constants
@@ -74,7 +75,11 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
     }
 
     /**
-     * Performs 4 retirements. One of them fails
+     * Performs 4 retirements by 2 different users. One of them fails
+     * 1: listing retirement for  user 1
+     * 2: default carbon retirement by user 2
+     * 3: reverted retirement
+     * 4: specific carbon retirement by user 1
      */
     function test_retirement() public {
         // Build callData
@@ -82,13 +87,13 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
 
         // Listing retirement call
         calls[0] = BatchRetireFacet.Call({
-            callData: retireCarbonmarkListingCallData(5e17)
+            callData: retireCarbonmarkListingCallData(beneficiaryAddress1, 5e17)
         });
 
         
         // Default carbon retirement call
         calls[1] = BatchRetireFacet.Call({
-            callData: retireExactCarbonDefaultCallData(4e17)
+            callData: retireExactCarbonDefaultCallData(beneficiaryAddress2, 4e17)
         });
 
         // Failing retirement
@@ -98,37 +103,50 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
 
         // Specific carbon retirement call
         calls[3] = BatchRetireFacet.Call({
-            callData: retireExactCarbonSpecificCallData(3e17)
+            callData: retireExactCarbonSpecificCallData(beneficiaryAddress1, 3e17)
         });
 
         uint nbSuccessfulRetirements = calls.length - 1;
 
         // Save state before doing the retirements
-        uint256 currentRetirements = LibRetire.getTotalRetirements(beneficiaryAddress);
-        uint256 currentTotalCarbon = LibRetire.getTotalCarbonRetired(beneficiaryAddress);
+        uint256 currentRetirements1 = LibRetire.getTotalRetirements(beneficiaryAddress1);
+        uint256 currentTotalCarbon1 = LibRetire.getTotalCarbonRetired(beneficiaryAddress1);
+
+        uint256 currentRetirements2 = LibRetire.getTotalRetirements(beneficiaryAddress2);
+        uint256 currentTotalCarbon2 = LibRetire.getTotalCarbonRetired(beneficiaryAddress2);
 
         // Perform the batch retirement
         vm.recordLogs();
         uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
         Vm.Log[] memory logs = vm.getRecordedLogs();
 
-        // Check that ccoherence
-        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress), currentRetirements + nbSuccessfulRetirements);
-        assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress), currentTotalCarbon + 12e17);
+        // Check return value
+        assertEq(retirementIndexes.length, calls.length);
+        assertEq(retirementIndexes[0], currentRetirements1);
+        assertEq(retirementIndexes[1], currentRetirements2);
+        assertEq(retirementIndexes[2], type(uint256).max);
+        assertEq(retirementIndexes[3], currentRetirements1 + 1);
+
+        // Check storage changes
+        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress1), currentRetirements1 + 2);
+        assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress1), currentTotalCarbon1 + 8e17);
+
+        assertEq(LibRetire.getTotalRetirements(beneficiaryAddress2), currentRetirements2 + 1);
+        assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress2), currentTotalCarbon2 + 4e17);
 
         // Check emitted logs
         BatchedRetirementEvent[] memory events = extractBatchedRetirementDoneLogs(logs);
         assertEq(events[0].success, true);
-        assertEq(events[0].retirementIndex, currentRetirements + 1);
+        assertEq(events[0].retirementIndex, currentRetirements1);
 
         assertEq(events[1].success, true);
-        assertEq(events[1].retirementIndex, currentRetirements + 2);
-        
+        assertEq(events[1].retirementIndex, currentRetirements2);        
+
         assertEq(events[2].success, false);
         assertEq(events[2].retirementIndex, type(uint256).max);
         
         assertEq(events[3].success, true);
-        assertEq(events[3].retirementIndex, currentRetirements + 3);
+        assertEq(events[3].retirementIndex, currentRetirements1 + 1);
         
 
     }
@@ -157,7 +175,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         return events;
     }
 
-    function retireExactCarbonSpecificCallData(uint256 retireAmount) private returns (bytes memory)
+    function retireExactCarbonSpecificCallData(address beneficiaryAddress, uint256 retireAmount) private returns (bytes memory)
     {
         address POOL_TOKEN = BCT;
         address PROJECT_TOKEN = projectsBCT[randomish(projectsBCT.length)];
@@ -169,7 +187,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         return abi.encodeWithSignature("retireExactCarbonSpecific(address,address,address,uint256,uint256,string,address,string,string,uint8)",SOURCE_TOKEN,POOL_TOKEN,PROJECT_TOKEN,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
     }
 
-    function retireExactCarbonDefaultCallData(uint256 retireAmount) private returns (bytes memory)
+    function retireExactCarbonDefaultCallData(address beneficiaryAddress, uint256 retireAmount) private returns (bytes memory)
     {
         address POOL_TOKEN = BCT;
         address SOURCE_TOKEN = USDC_NATIVE;
@@ -180,7 +198,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         return abi.encodeWithSignature("retireExactCarbonDefault(address,address,uint256,uint256,string,address,string,string,uint8)",SOURCE_TOKEN,POOL_TOKEN,sourceAmount,retireAmount,entity,beneficiaryAddress,beneficiary,message,LibTransfer.From.EXTERNAL);
     }
 
-    function retireCarbonmarkListingCallData(uint256 retireAmount) private returns (bytes memory)
+    function retireCarbonmarkListingCallData(address beneficiaryAddress, uint256 retireAmount) private returns (bytes memory)
     {
         address TCO2 = 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991;
         uint256 listingAmount = 1_250_000_000_000_000_000;
