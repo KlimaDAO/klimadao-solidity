@@ -463,7 +463,7 @@ abstract contract TestHelper is Test, HelperContract {
         } else if (sourceToken == constantsFacet.klima() || sourceToken == constantsFacet.sKlima()) {
             sourceTarget = constantsFacet.staking();
 
-            // Ensure that any sKLIMA pulled can succesfully be unstaked
+            // Ensure that any sKLIMA pulled can successfully be unstaked
             uint256 stakingBalance = IERC20(constantsFacet.klima()).balanceOf(constantsFacet.sKlima());
             vm.assume(sourceAmount < stakingBalance / 2);
         } else if (sourceToken == constantsFacet.wsKlima()) {
