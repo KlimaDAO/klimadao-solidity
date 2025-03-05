@@ -557,10 +557,10 @@ library LibSwap {
         });
 
         IERC20(C.usdc()).approve(C.uniswapV3Router(), maxAmountIn);
-        ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
+        adjustedAmountOut = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
 
         sourceToken = C.usdc_bridged();
-        return (sourceToken, maxAmountIn);
+        return (sourceToken, adjustedAmountOut);
     }
 
     /**

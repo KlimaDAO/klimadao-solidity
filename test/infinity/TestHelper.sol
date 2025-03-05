@@ -422,18 +422,19 @@ abstract contract TestHelper is Test, HelperContract {
 
         maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
+
     /**
-     * Sources token for the current test contract.
-     * Automagically computes source address and amount
-     * Approves the diamond contract to use those tokens
+     * Detects the source address and amount to acquire a token
      */
-    function getSourceTokens(
+    function getSourceTokensHelper(
         TransactionType txType,
         address diamond,
         address sourceToken,
         address pool,
-        uint256 amountOut
-    ) internal returns (uint256 sourceAmount) {
+        uint256 amountOut,
+        uint256 slippage
+
+    ) internal returns (address sourceTarget, uint256 sourceAmount) {
         ConstantsGetter constantsFacet = ConstantsGetter(diamond);
         address USDC_BRIDGED_HOLDER = vm.envAddress("USDC_BRIDGED_HOLDER");
         address USDC_NATIVE_HOLDER = vm.envAddress("USDC_NATIVE_HOLDER");
@@ -471,11 +472,43 @@ abstract contract TestHelper is Test, HelperContract {
         } else {
             sourceTarget = constantsFacet.treasury();
         }
+        sourceAmount = sourceAmount + (sourceAmount * slippage) / 100;
         vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
-
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, type(uint256).max);
+        return (sourceTarget, sourceAmount);
     }
+
+    /**
+     * Get source tokens 
+     * Applies slippage to allow for multiple retirements
+     */
+    function getSourceTokensWithSlippage(
+        TransactionType txType,
+        address diamond,
+        address sourceToken,
+        address pool,
+        uint256 amountOut,
+        uint256 slippage
+    ) internal returns (uint256 sourceAmount) {
+        address sourceTarget;
+        (sourceTarget, sourceAmount) = getSourceTokensHelper(txType, diamond, sourceToken,pool, amountOut, slippage);
+        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
+        IERC20(sourceToken).approve(diamond, type(uint256).max); 
+        return sourceAmount;
+   }
+
+    /**
+     * Sources token for the current test contract with no slippage.
+     */
+    function getSourceTokens(
+        TransactionType txType,
+        address diamond,
+        address sourceToken,
+        address pool,
+        uint256 amountOut
+    ) internal returns (uint256 sourceAmount) {
+        return getSourceTokensWithSlippage(txType, diamond, sourceToken,pool, amountOut, 0);
+    }
+
 
     //////////// EVM Helpers ////////////
 
