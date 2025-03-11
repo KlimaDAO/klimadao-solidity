@@ -524,11 +524,11 @@ library LibSwap {
      * @notice swap native usdc to bridged usdc in uniswapV3
      * @param maxAmountIn the amount of native usdc to swap
      * @return sourceToken This will always be C.usdc_bridged()
-     * @return adjustedAmountOut The amount of bridged usdc received
+     * @return amountOut The amount of bridged usdc received
      */
     function swapNativeUsdcToBridgedUsdc(uint256 maxAmountIn)
         internal
-        returns (address sourceToken, uint256 adjustedAmountOut)
+        returns (address sourceToken, uint256 amountOut)
     {
         // In order to not restrict maxAmountIn, we need a swapFeeThreshold to roughly set amountOutMinimum
         // Miniscule swaps have higher % fees i.e. a swap of 2 has a fee of 1 (50%)
@@ -557,10 +557,10 @@ library LibSwap {
         });
 
         IERC20(C.usdc()).approve(C.uniswapV3Router(), maxAmountIn);
-        adjustedAmountOut = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
+        amountOut = ISwapRouter(C.uniswapV3Router()).exactInputSingle(params);
 
         sourceToken = C.usdc_bridged();
-        return (sourceToken, adjustedAmountOut);
+        return (sourceToken, amountOut);
     }
 
     /**
