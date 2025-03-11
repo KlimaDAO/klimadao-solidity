@@ -1,13 +1,13 @@
 pragma solidity ^0.8.16;
 
-import {RetireSourceFacet} from "../../../src/infinity/facets/Retire/RetireSourceFacet.sol";
-import {RetirementQuoter} from "../../../src/infinity/facets/RetirementQuoter.sol";
-import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
-import {LibKlima} from "../../../src/infinity/libraries/LibKlima.sol";
-import {LibToucanCarbon} from "../../../src/infinity/libraries/Bridges/LibToucanCarbon.sol";
-import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
-import {IToucanPool} from "../../../src/infinity/interfaces/IToucan.sol";
-import { BatchRetireFacet } from "../../../src/infinity/facets/Retire/BatchRetireFacet.sol";
+import { RetireSourceFacet } from "../../../src/infinity/facets/Retire/RetireSourceFacet.sol";
+import { RetirementQuoter } from "../../../src/infinity/facets/RetirementQuoter.sol";
+import { LibRetire } from "../../../src/infinity/libraries/LibRetire.sol";
+import { LibKlima } from "../../../src/infinity/libraries/LibKlima.sol";
+import { LibToucanCarbon } from "../../../src/infinity/libraries/Bridges/LibToucanCarbon.sol";
+import { LibTransfer } from "../../../src/infinity/libraries/Token/LibTransfer.sol";
+import { IToucanPool } from "../../../src/infinity/interfaces/IToucan.sol";
+import { BatchCallFacet } from "../../../src/infinity/facets/Retire/BatchCallFacet.sol";
 import { ICarbonmark } from "../../../src/infinity/interfaces/ICarbonmark.sol";
 
 import "../TestHelper.sol";
@@ -15,9 +15,9 @@ import "../../helpers/AssertionHelper.sol";
 
 import {console2} from "../../../lib/forge-std/src/console2.sol";
 
-contract BatchRetireTest is TestHelper, AssertionHelper {
+contract BatchCallTest is TestHelper, AssertionHelper {
     RetireSourceFacet retireSourceFacet;
-    BatchRetireFacet batchRetireFacet;
+    BatchCallFacet batchCallFacet;
     RetirementQuoter quoterFacet;
     ConstantsGetter constantsFacet;
 
@@ -47,7 +47,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         // This must be done after forking the blockchain because it actually adds a new facet to the diamond
         addConstantsGetter(diamond);
         constantsFacet = ConstantsGetter(diamond);
-        batchRetireFacet = BatchRetireFacet(diamond);
+        batchCallFacet = BatchCallFacet(diamond);
 
         CARBONMARK = constantsFacet.carbonmark();
         BCT = constantsFacet.bct();
@@ -60,48 +60,48 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
     }
 
     function test_empty_calldata() public {
-        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](0);
+        BatchCallFacet.Call[] memory calls = new BatchCallFacet.Call[](0); // No calls
 
         vm.expectRevert("callData cannot be empty");
-        uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+        batchCallFacet.batchCall(calls);
     }
 
-    function test_no_retirements_performed() public {
-        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](1);
+    function test_no_calls_performed() public {
+        BatchCallFacet.Call[] memory calls = new BatchCallFacet.Call[](1); // One call with empty data
 
-        vm.expectRevert("No successful retirements performed");
-        uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+        vm.expectRevert("No successful calls performed");
+        batchCallFacet.batchCall(calls);
     }
 
     /**
-     * Performs 4 retirements by 2 different users. One of them fails
+     * Performs 4 calls by 2 different users. One of them fails
      * 1: listing retirement for  user 1
      * 2: default carbon retirement by user 2
      * 3: reverted retirement
      * 4: specific carbon retirement by user 1
      */
-    function test_retirement() public {
+    function test_batch_retirement() public {
         // Build callData
-        BatchRetireFacet.Call[] memory calls = new BatchRetireFacet.Call[](4);
+        BatchCallFacet.Call[] memory calls = new BatchCallFacet.Call[](4);
 
         // Listing retirement call
-        calls[0] = BatchRetireFacet.Call({
+        calls[0] = BatchCallFacet.Call({
             callData: retireCarbonmarkListingCallData(beneficiaryAddress1, 5e17)
         });
 
         
         // Default carbon retirement call
-        calls[1] = BatchRetireFacet.Call({
+        calls[1] = BatchCallFacet.Call({
             callData: retireExactCarbonDefaultCallData(beneficiaryAddress2, 4e17)
         });
 
         // Failing retirement
-        calls[2] = BatchRetireFacet.Call({
+        calls[2] = BatchCallFacet.Call({
             callData: "0x"
         });
 
         // Specific carbon retirement call
-        calls[3] = BatchRetireFacet.Call({
+        calls[3] = BatchCallFacet.Call({
             callData: retireExactCarbonSpecificCallData(beneficiaryAddress1, 3e17)
         });
 
@@ -116,7 +116,7 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
 
         // Perform the batch retirement
         vm.recordLogs();
-        uint256[] memory retirementIndexes = batchRetireFacet.batchRetire(calls);
+        uint256[] memory retirementIndexes = batchCallFacet.batchCall(calls);
         Vm.Log[] memory logs = vm.getRecordedLogs();
 
         // Check return value

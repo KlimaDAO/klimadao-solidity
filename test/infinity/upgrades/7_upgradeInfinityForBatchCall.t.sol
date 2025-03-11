@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { UpgradeInfinityForBatchRetire } from "../../../script/7_upgradeInfinityForBatchRetire.s.sol";
+import { UpgradeInfinityForBatchCall } from "../../../script/7_upgradeInfinityForBatchCall.s.sol";
 import { TestHelper } from "../../infinity/TestHelper.sol";
 
 import "../TestHelper.sol";
 
-contract UpgradeInfinityForBatchRetireTest is TestHelper {
+contract UpgradeInfinityForBatchCallTest is TestHelper {
    
     function setUp() public {
         // Start fork
@@ -20,7 +20,7 @@ contract UpgradeInfinityForBatchRetireTest is TestHelper {
         address DIAMOND_ADDRESS = vm.envAddress("INFINITY_ADDRESS");
 
         // Set the calldata
-        UpgradeInfinityForBatchRetire upgradeScript = new UpgradeInfinityForBatchRetire();
+        UpgradeInfinityForBatchCall upgradeScript = new UpgradeInfinityForBatchCall();
         bytes memory data = upgradeScript.run();
 
         // Prank the owner of the Diamond

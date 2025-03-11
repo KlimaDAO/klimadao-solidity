@@ -22,7 +22,7 @@ import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemTo
 import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
 import {RetireCarbonmarkFacet} from "src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
-import {BatchRetireFacet} from "src/infinity/facets/Retire/BatchRetireFacet.sol";
+import {BatchCallFacet} from "src/infinity/facets/Retire/BatchCallFacet.sol";
 import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
@@ -67,7 +67,7 @@ abstract contract TestHelper is Test, HelperContract {
     RedeemToucanPoolFacet toucanRedeemF;
     RetireToucanTCO2Facet toucanRetireF;
     RetireCarbonFacet retireCarbonF;
-    BatchRetireFacet batchRetireF;
+    BatchCallFacet batchCallF;
     RetireInfoFacet retireInfoF;
     RetireSourceFacet retireSourceF;
     RetirementQuoter retirementQuoterF;
@@ -215,7 +215,7 @@ abstract contract TestHelper is Test, HelperContract {
         toucanRedeemF = new RedeemToucanPoolFacet();
         retirementQuoterF = new RetirementQuoter();
         retireCarbonF = new RetireCarbonFacet();
-        batchRetireF = new BatchRetireFacet();
+        batchCallF = new BatchCallFacet();
         // retireSourceF = new RetireSourceFacet();
         // retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
@@ -284,9 +284,9 @@ abstract contract TestHelper is Test, HelperContract {
 
         cut[4] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(batchRetireF),
+                facetAddress: address(batchCallF),
                 action: IDiamondCut.FacetCutAction.Add, // Replace by IDiamondCut.FacetCutAction.Replace after deployment
-                functionSelectors: generateSelectors("BatchRetireFacet")
+                functionSelectors: generateSelectors("BatchCallFacet")
             })
         );
 

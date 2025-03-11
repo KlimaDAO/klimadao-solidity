@@ -9,11 +9,11 @@ import {Diamond} from "../src/infinity/Diamond.sol";
 import "../src/infinity/facets/DiamondCutFacet.sol";
 import "../src/infinity/facets/DiamondLoupeFacet.sol";
 import "../src/infinity/facets/OwnershipFacet.sol";
-import { BatchRetireFacet } from "../src/infinity/facets/Retire/BatchRetireFacet.sol";
+import { BatchCallFacet } from "../src/infinity/facets/Retire/BatchCallFacet.sol";
 
 import "../test/infinity/HelperContract.sol";
 
-contract UpgradeInfinityForBatchRetire is Script, HelperContract {
+contract UpgradeInfinityForBatchCall is Script, HelperContract {
     function run() external returns (bytes memory) {
         //read env variables and choose EOA for transaction signing
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -25,7 +25,7 @@ contract UpgradeInfinityForBatchRetire is Script, HelperContract {
         vm.startBroadcast(deployerPrivateKey);
 
         //deploy updated facets and init contract
-        BatchRetireFacet batchRetireF = new BatchRetireFacet();
+        BatchCallFacet batchCallF = new BatchCallFacet();
 
         // FacetCut array which contains the facet to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
@@ -33,9 +33,9 @@ contract UpgradeInfinityForBatchRetire is Script, HelperContract {
         // Klima Infinity specific facets
         cut[0] = (
             IDiamondCut.FacetCut({
-                facetAddress: address(batchRetireF),
+                facetAddress: address(batchCallF),
                 action: IDiamondCut.FacetCutAction.Add,
-                functionSelectors: generateSelectors("BatchRetireFacet")
+                functionSelectors: generateSelectors("BatchCallFacet")
             })
         );
         
@@ -49,8 +49,8 @@ contract UpgradeInfinityForBatchRetire is Script, HelperContract {
             ""
         );
 
-        console2.log("New batchRetireF address");
-        console2.logAddress(address(batchRetireF));
+        console2.log("New batchCallF address");
+        console2.logAddress(address(batchCallF));
 
         console2.log("diamondCut calldata");
         console2.logBytes(updateFacetsCalldata);
