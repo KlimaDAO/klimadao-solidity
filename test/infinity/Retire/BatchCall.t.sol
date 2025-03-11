@@ -38,10 +38,6 @@ contract BatchCallTest is TestHelper, AssertionHelper {
     address USDC_NATIVE;
     address[] projectsBCT;
 
-    struct BatchedCallsEvent { 
-        uint256[] results;
-    }
-
     function setUp() public {
         // Set constants variables
         // This must be done after forking the blockchain because it actually adds a new facet to the diamond
@@ -71,6 +67,28 @@ contract BatchCallTest is TestHelper, AssertionHelper {
 
         vm.expectRevert("No successful calls performed");
         batchCallFacet.batchCall(calls);
+    }
+
+    function test_underlying_retirement_actors() public {
+        BatchCallFacet.Call[] memory calls = new BatchCallFacet.Call[](1);
+        calls[0] = BatchCallFacet.Call({
+            callData: retireCarbonmarkListingCallData(beneficiaryAddress1, 5e17)
+        });
+
+        vm.recordLogs();
+        batchCallFacet.batchCall(calls);
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+
+        CarbonRetiredEvent[] memory events = extractCarbonRetiredLogs(logs);
+
+        assertEq(events[0].retiringAddress, address(this));
+        assertEq(events[0].retiringEntityString, entity);
+        assertEq(events[0].beneficiaryAddress, beneficiaryAddress1);
+        assertEq(events[0].beneficiaryString, beneficiary);
+        assertEq(events[0].retirementMessage, message);
+        assertEq(events[0].projectToken, 0xb139C4cC9D20A3618E9a2268D73Eff18C496B991);
+        assertEq(events[0].poolToken, 0x0000000000000000000000000000000000000000);
+        assertEq(events[0].amount, 5e17);
     }
 
     /**
@@ -143,30 +161,6 @@ contract BatchCallTest is TestHelper, AssertionHelper {
         assertEq(events[0].results[3], currentRetirements1 + 1);
         
 
-    }
-
-    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) private returns (BatchedCallsEvent[] memory events) {
-        // Compute number of events
-        bytes32 wantedKeccak = keccak256("BatchedCallsDone(uint256[])");
-        uint32 count = 0;
-        for (uint32 i; i < logs.length; i++) {
-            if (logs[i].topics[0] == wantedKeccak) count++;
-        }
-
-        // Allocate array
-        BatchedCallsEvent[] memory events = new BatchedCallsEvent[](count);
-
-        // Compute events
-        count = 0;
-        for (uint32 i; i < logs.length; i++) {
-            bytes memory data = logs[i].data;
-            if (logs[i].topics[0] == wantedKeccak) {
-                uint256[] memory results = abi.decode(data, (uint256[]));
-                events[count] = BatchedCallsEvent({results: results});
-                count++;
-            }
-        }
-        return events;
     }
 
     function retireExactCarbonSpecificCallData(address beneficiaryAddress, uint256 retireAmount) private returns (bytes memory)

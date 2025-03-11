@@ -546,4 +546,88 @@ abstract contract TestHelper is Test, HelperContract {
             if (balance > 0) return projects[i];
         }
     }
+
+    struct BatchedCallsEvent { 
+        uint256[] results;
+    }
+
+    struct CarbonRetiredEvent { 
+        address retiringAddress;
+        string retiringEntityString;
+        address beneficiaryAddress;
+        string beneficiaryString;
+        string retirementMessage;
+        address poolToken;
+        address projectToken;
+        uint256 amount;
+    }
+    
+    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) public returns (BatchedCallsEvent[] memory events) {
+        // Compute number of events
+        bytes32 wantedKeccak = keccak256("BatchedCallsDone(uint256[])");
+        uint32 count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            if (logs[i].topics[0] == wantedKeccak) count++;
+        }
+
+        // Allocate array
+        BatchedCallsEvent[] memory events = new BatchedCallsEvent[](count);
+
+        // Compute events
+        count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            bytes memory data = logs[i].data;
+            if (logs[i].topics[0] == wantedKeccak) {
+                uint256[] memory results = abi.decode(data, (uint256[]));
+                events[count] = BatchedCallsEvent({results: results});
+                count++;
+            }
+        }
+        return events;
+    }
+
+    function extractCarbonRetiredLogs(Vm.Log[] memory logs) public returns (CarbonRetiredEvent[] memory events) {
+        // Compute number of events
+        bytes32 wantedKeccak = keccak256("CarbonRetired(uint8,address,string,address,string,string,address,address,uint256)");
+        uint32 count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            if (logs[i].topics[0] == wantedKeccak) count++;
+        }
+        // Allocate array
+        CarbonRetiredEvent[] memory events = new CarbonRetiredEvent[](count);
+
+        // Compute events
+        count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            bytes memory data = logs[i].data;
+            
+            if (logs[i].topics[0] == wantedKeccak) {
+                address retiringAddress = address(uint160(uint256(logs[i].topics[1])));
+                address beneficiaryAddress = address(uint160(uint256(logs[i].topics[2])));
+
+                (
+                    string memory retirementMessage,
+                string memory retiringEntityString,
+                string memory beneficiaryString,
+                address poolToken,
+                address projectToken,
+                uint256 amount
+                ) = abi.decode(data, (string, string, string, address, address, uint256));
+
+                events[count] = CarbonRetiredEvent({
+                    retiringAddress:retiringAddress, 
+                    retiringEntityString: retiringEntityString,
+                    beneficiaryAddress:beneficiaryAddress, 
+                    beneficiaryString:beneficiaryString, 
+                    retirementMessage:retirementMessage,
+                    poolToken:poolToken, 
+                    projectToken:projectToken, 
+                    amount:amount
+                });
+                count++;
+            }
+        }
+        return events;
+    }
+
 }
