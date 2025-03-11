@@ -38,9 +38,8 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
     address USDC_NATIVE;
     address[] projectsBCT;
 
-    struct BatchedRetirementEvent { 
-        bool success;
-        uint256 retirementIndex;
+    struct BatchedCallsEvent { 
+        uint256[] results;
     }
 
     function setUp() public {
@@ -135,40 +134,35 @@ contract BatchRetireTest is TestHelper, AssertionHelper {
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress2), currentTotalCarbon2 + 4e17);
 
         // Check emitted logs
-        BatchedRetirementEvent[] memory events = extractBatchedRetirementDoneLogs(logs);
-        assertEq(events[0].success, true);
-        assertEq(events[0].retirementIndex, currentRetirements1);
-
-        assertEq(events[1].success, true);
-        assertEq(events[1].retirementIndex, currentRetirements2);        
-
-        assertEq(events[2].success, false);
-        assertEq(events[2].retirementIndex, type(uint256).max);
-        
-        assertEq(events[3].success, true);
-        assertEq(events[3].retirementIndex, currentRetirements1 + 1);
+        BatchedCallsEvent[] memory events = extractBatchedCallsDoneLogs(logs);
+        assertEq(events.length, 1);
+        assertEq(events[0].results.length, 4);
+        assertEq(events[0].results[0], currentRetirements1);
+        assertEq(events[0].results[1], currentRetirements2);        
+        assertEq(events[0].results[2], type(uint256).max);
+        assertEq(events[0].results[3], currentRetirements1 + 1);
         
 
     }
 
-    function extractBatchedRetirementDoneLogs(Vm.Log[] memory logs) private returns (BatchedRetirementEvent[] memory events) {
+    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) private returns (BatchedCallsEvent[] memory events) {
         // Compute number of events
-        bytes32 wantedKeccak = keccak256("BatchedRetirementDone(bool,uint256)");
+        bytes32 wantedKeccak = keccak256("BatchedCallsDone(uint256[])");
         uint32 count = 0;
         for (uint32 i; i < logs.length; i++) {
             if (logs[i].topics[0] == wantedKeccak) count++;
         }
 
         // Allocate array
-        BatchedRetirementEvent[] memory events = new BatchedRetirementEvent[](count);
+        BatchedCallsEvent[] memory events = new BatchedCallsEvent[](count);
 
         // Compute events
         count = 0;
         for (uint32 i; i < logs.length; i++) {
             bytes memory data = logs[i].data;
             if (logs[i].topics[0] == wantedKeccak) {
-                (bool success, uint256 retirementIndex) = abi.decode(data, (bool, uint256));
-                events[count] = BatchedRetirementEvent({success: success, retirementIndex: retirementIndex});
+                uint256[] memory results = abi.decode(data, (uint256[]));
+                events[count] = BatchedCallsEvent({results: results});
                 count++;
             }
         }

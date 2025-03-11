@@ -15,14 +15,14 @@ contract BatchRetireFacet is ReentrancyGuard {
      */
     function batchRetire(
         Call[] calldata calls
-    ) external payable nonBatchReentrant returns (uint256[] memory retirementIndexes)  {
+    ) external payable nonBatchReentrant returns (uint256[] memory results)  {
         require (calls.length > 0, "callData cannot be empty");
         
         address diamondAddress = address(this); // Gets the diamond contract address
 
         bool hasSuccess = false; // Tracks a successfully permormed retirement
 
-        uint256[] memory retirementIndexes = new uint256[](calls.length);
+        uint256[] memory results = new uint256[](calls.length);
 
         for (uint i = 0; i < calls.length; i++) {
             // Execute call
@@ -30,19 +30,19 @@ contract BatchRetireFacet is ReentrancyGuard {
 
             // Extract the retirement index
             if (success && data.length == 32) {
-                retirementIndexes[i] = abi.decode(data, (uint256)) - 1;
+                results[i] = abi.decode(data, (uint256)) - 1;
                 hasSuccess = true;
             }
             else {
                 // type(uint256).max represents an error
-                retirementIndexes[i] = type(uint256).max;
+                results[i] = type(uint256).max;
             }
 
             // Emit an event with the result of the call
-            emit LibRetire.BatchedRetirementDone(success, retirementIndexes[i]);
         }
+        emit LibRetire.BatchedCallsDone(results);
         require (hasSuccess, "No successful retirements performed"); // Reverts if no successful retirements occurs
 
-        return retirementIndexes;
+        return results;
     }
 }
