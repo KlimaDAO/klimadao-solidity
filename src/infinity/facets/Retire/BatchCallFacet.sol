@@ -10,40 +10,42 @@ contract BatchCallFacet is ReentrancyGuard {
     }
     /**
      * Performs multiple calls to the diamond contract
-     * Returns an array containing the calls results
-     * The biggest uint256 represents an error
+     * Returns an array containing the calls return data
+     * 0x represents an error
      */
     function batchCall(
         Call[] calldata calls
-    ) external payable nonBatchReentrant returns (uint256[] memory results)  {
+    ) external payable nonBatchReentrant returns (LibRetire.BatchedCallsData[] memory result)  {
         require (calls.length > 0, "callData cannot be empty");
         
         address diamondAddress = address(this); // Gets the diamond contract address
 
-        bool hasSuccess = false; // Tracks a successfully permormed call
+        bool hasSuccess = false; // Tracks that at least one call was performed successfully
 
-        uint256[] memory results = new uint256[](calls.length);
+        LibRetire.BatchedCallsData[] memory result = new LibRetire.BatchedCallsData[](calls.length);
 
+        
         for (uint i = 0; i < calls.length; i++) {
             // Execute call
-            (bool success, bytes memory data) = diamondAddress.delegatecall(calls[i].callData);
+            (bool success, bytes memory callData) = diamondAddress.delegatecall(calls[i].callData);
 
-            // Extract the call result
-            if (success && data.length == 32) {
-                results[i] = abi.decode(data, (uint256)) - 1;
+            //  Set the success and data for the call
+            result[i].success = success;
+            if (success) {
+                result[i].data = callData;
                 hasSuccess = true;
-            }
-            else {
-                // type(uint256).max represents an error
-                results[i] = type(uint256).max;
+            } else {
+                result[i].data = "0x";
             }
 
         }
-        // Emit an event with the call results
-        emit LibRetire.BatchedCallsDone(results);
+        // Reverts if no successful calls occured
+        require (hasSuccess, "No successful calls performed"); 
 
-        require (hasSuccess, "No successful calls performed"); // Reverts if no successful calls occured
+        // Emit an event with the call results and data
+        emit LibRetire.BatchedCallsDone(result);
 
-        return results;
+
+        return result;
     }
 }
