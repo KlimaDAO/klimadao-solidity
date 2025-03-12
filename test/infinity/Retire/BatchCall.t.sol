@@ -166,11 +166,20 @@ contract BatchCallTest is TestHelper, AssertionHelper {
         assertEq(batchEvents.length, 1);
 
         LibRetire.BatchedCallsData[] memory batchData = batchEvents[0];
+
         assertEq(batchData.length, 4);
+        
         assertEq(abi.decode(batchData[0].data, (uint256)), currentRetirements1 + 1);
+        assertEq(batchData[0].success, true);
+
         assertEq(abi.decode(batchData[1].data, (uint256)), currentRetirements2 + 1);        
+        assertEq(batchData[1].success, true);
+
         assertEq(batchData[2].data, "0x");
+        assertEq(batchData[2].success, false);
+
         assertEq(abi.decode(batchData[3].data, (uint256)), currentRetirements1 + 2);
+        assertEq(batchData[3].success, true);
         
 
     }
