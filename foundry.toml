@@ -31,7 +31,3 @@ book = "book.toml"
 
 [etherscan]
 polygon = { key = "${POLYGONSCAN_API_KEY}" }
-
-[dependencies]
-v3-core = "https://github.com/Uniswap/v3-core"
-v3-periphery = "https://github.com/Uniswap/v3-periphery"
