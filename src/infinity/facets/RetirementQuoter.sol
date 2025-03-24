@@ -7,7 +7,7 @@ import "../libraries/TokenSwap/LibSwap.sol";
 import "../C.sol";
 import "../AppStorage.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/IQuoterView.sol";
+import "extra-lib/v3-periphery/contracts/interfaces/IQuoterView.sol";
 
 /**
  * @author Cujo
