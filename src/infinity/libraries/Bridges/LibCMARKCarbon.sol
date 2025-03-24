@@ -67,7 +67,7 @@ library LibCMARKCarbon {
         );
     }
 
-    function isValid(address token) view returns (bool) {
+    function isValid(address token) internal returns (bool) {
         return bytes(ICMARKCreditTokenFactory(C.cmarkCreditFactory()).creditAddressToId(token)).length > 0 ||
            bytes(ICMARKCreditTokenFactory(C.tverCreditFactory()).creditAddressToId(token)).length > 0;
     }

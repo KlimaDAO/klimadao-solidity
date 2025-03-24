@@ -172,6 +172,10 @@ library C {
         return CMARK_CREDIT_FACTORY;
     }
 
+    function tverCreditFactory() internal pure returns (address) {
+        return TVER_CREDIT_FACTORY;
+    }
+
     function carbonmark() internal pure returns (address) {
         return CARBONMARK;
     }
