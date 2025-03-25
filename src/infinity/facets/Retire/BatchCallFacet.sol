@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import "../../ReentrancyGuard.sol";
+import "../../libraries/LibRetire.sol";
 
-contract BatchCallFacet is ReentrancyGuard {
+contract BatchCallFacet {
 
     struct Call {
         bytes callData; // Encoded call of a diamond retirement function
@@ -15,7 +15,7 @@ contract BatchCallFacet is ReentrancyGuard {
      */
     function batchCall(
         Call[] calldata calls
-    ) external payable nonBatchReentrant returns (uint256[] memory results)  {
+    ) external payable returns (uint256[] memory results)  {
         require (calls.length > 0, "callData cannot be empty");
         
         address diamondAddress = address(this); // Gets the diamond contract address
