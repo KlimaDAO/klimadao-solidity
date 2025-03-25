@@ -36,7 +36,9 @@ import {ICRProject} from "./interfaces/ICR.sol";
 import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
 import {IToucanPool} from "src/infinity/interfaces/IToucan.sol";
 import {IwsKLIMA} from "src/infinity/interfaces/IKlima.sol";
+import { LibRetire } from "src/infinity/libraries/LibRetire.sol";
 import "./HelperContract.sol";
+import "forge-std/console2.sol";
 
 import {C} from "src/infinity/C.sol";
 
@@ -547,10 +549,6 @@ abstract contract TestHelper is Test, HelperContract {
         }
     }
 
-    struct BatchedCallsEvent { 
-        uint256[] results;
-    }
-
     struct CarbonRetiredEvent { 
         uint8 bridge;
         address retiringAddress;
@@ -563,24 +561,23 @@ abstract contract TestHelper is Test, HelperContract {
         uint256 amount;
     }
     
-    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) public returns (BatchedCallsEvent[] memory events) {
+    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) public returns (LibRetire.BatchedCallsData[][] memory events) {
         // Compute number of events
-        bytes32 wantedKeccak = keccak256("BatchedCallsDone(uint256[])");
+        bytes32 wantedKeccak = keccak256("BatchedCallsDone((bool,bytes)[])");
         uint32 count = 0;
         for (uint32 i; i < logs.length; i++) {
             if (logs[i].topics[0] == wantedKeccak) count++;
         }
 
         // Allocate array
-        BatchedCallsEvent[] memory events = new BatchedCallsEvent[](count);
+        LibRetire.BatchedCallsData[][] memory events = new LibRetire.BatchedCallsData[][](count);
 
         // Compute events
         count = 0;
         for (uint32 i; i < logs.length; i++) {
             bytes memory data = logs[i].data;
             if (logs[i].topics[0] == wantedKeccak) {
-                uint256[] memory results = abi.decode(data, (uint256[]));
-                events[count] = BatchedCallsEvent({results: results});
+                events[count] = abi.decode(data, (LibRetire.BatchedCallsData[]));
                 count++;
             }
         }
@@ -603,6 +600,8 @@ abstract contract TestHelper is Test, HelperContract {
             bytes memory data = logs[i].data;
             
             if (logs[i].topics[0] == wantedKeccak) {
+
+                // Don't know why this is encoded like this
                 address retiringAddress = address(uint160(uint256(logs[i].topics[1])));
                 address beneficiaryAddress = address(uint160(uint256(logs[i].topics[2])));
                 address poolToken = address(uint160(uint256(logs[i].topics[3])));

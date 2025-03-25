@@ -63,7 +63,10 @@ contract BatchCallTest is TestHelper, AssertionHelper {
     }
 
     function test_no_calls_performed() public {
-        BatchCallFacet.Call[] memory calls = new BatchCallFacet.Call[](1); // One call with empty data
+        BatchCallFacet.Call[] memory calls = new BatchCallFacet.Call[](1); // One call with invalid data
+                calls[0] = BatchCallFacet.Call({
+            callData: "0x28"
+        });
 
         vm.expectRevert("No successful calls performed");
         batchCallFacet.batchCall(calls);
@@ -115,7 +118,7 @@ contract BatchCallTest is TestHelper, AssertionHelper {
 
         // Failing retirement
         calls[2] = BatchCallFacet.Call({
-            callData: "0x"
+            callData: "0x3888"
         });
 
         // Specific carbon retirement call
@@ -134,15 +137,22 @@ contract BatchCallTest is TestHelper, AssertionHelper {
 
         // Perform the batch retirement
         vm.recordLogs();
-        uint256[] memory retirementIndexes = batchCallFacet.batchCall(calls);
+        LibRetire.BatchedCallsData[] memory result = batchCallFacet.batchCall(calls);
         Vm.Log[] memory logs = vm.getRecordedLogs();
 
         // Check return value
-        assertEq(retirementIndexes.length, calls.length);
-        assertEq(retirementIndexes[0], currentRetirements1);
-        assertEq(retirementIndexes[1], currentRetirements2);
-        assertEq(retirementIndexes[2], type(uint256).max);
-        assertEq(retirementIndexes[3], currentRetirements1 + 1);
+        assertEq(result.length, calls.length);
+        assertEq(result[0].success, true);
+        assertEq(abi.decode(result[0].data, (uint256)), currentRetirements1 + 1);
+
+        assertEq(result[1].success, true);
+        assertEq(abi.decode(result[1].data, (uint256)), currentRetirements2 + 1);
+
+        assertEq(result[2].success, false);
+        assertEq(result[2].data, "0x");
+
+        assertEq(result[3].success, true);
+        assertEq(abi.decode(result[3].data, (uint256)), currentRetirements1 + 2);
 
         // Check storage changes
         assertEq(LibRetire.getTotalRetirements(beneficiaryAddress1), currentRetirements1 + 2);
@@ -152,13 +162,24 @@ contract BatchCallTest is TestHelper, AssertionHelper {
         assertEq(LibRetire.getTotalCarbonRetired(beneficiaryAddress2), currentTotalCarbon2 + 4e17);
 
         // Check emitted logs
-        BatchedCallsEvent[] memory events = extractBatchedCallsDoneLogs(logs);
-        assertEq(events.length, 1);
-        assertEq(events[0].results.length, 4);
-        assertEq(events[0].results[0], currentRetirements1);
-        assertEq(events[0].results[1], currentRetirements2);        
-        assertEq(events[0].results[2], type(uint256).max);
-        assertEq(events[0].results[3], currentRetirements1 + 1);
+        LibRetire.BatchedCallsData[][] memory batchEvents = extractBatchedCallsDoneLogs(logs);
+        assertEq(batchEvents.length, 1);
+
+        LibRetire.BatchedCallsData[] memory batchData = batchEvents[0];
+
+        assertEq(batchData.length, 4);
+        
+        assertEq(abi.decode(batchData[0].data, (uint256)), currentRetirements1 + 1);
+        assertEq(batchData[0].success, true);
+
+        assertEq(abi.decode(batchData[1].data, (uint256)), currentRetirements2 + 1);        
+        assertEq(batchData[1].success, true);
+
+        assertEq(batchData[2].data, "0x");
+        assertEq(batchData[2].success, false);
+
+        assertEq(abi.decode(batchData[3].data, (uint256)), currentRetirements1 + 2);
+        assertEq(batchData[3].success, true);
         
 
     }
