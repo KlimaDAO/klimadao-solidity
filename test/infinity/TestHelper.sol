@@ -552,6 +552,7 @@ abstract contract TestHelper is Test, HelperContract {
     }
 
     struct CarbonRetiredEvent { 
+        uint8 bridge;
         address retiringAddress;
         string retiringEntityString;
         address beneficiaryAddress;
@@ -604,25 +605,27 @@ abstract contract TestHelper is Test, HelperContract {
             if (logs[i].topics[0] == wantedKeccak) {
                 address retiringAddress = address(uint160(uint256(logs[i].topics[1])));
                 address beneficiaryAddress = address(uint160(uint256(logs[i].topics[2])));
+                address poolToken = address(uint160(uint256(logs[i].topics[3])));
 
                 (
+                    uint8 bridge,
+                    string memory retiringEntityString,
+                    string memory beneficiaryString,
                     string memory retirementMessage,
-                string memory retiringEntityString,
-                string memory beneficiaryString,
-                address poolToken,
-                address projectToken,
-                uint256 amount
-                ) = abi.decode(data, (string, string, string, address, address, uint256));
+                    address projectToken,
+                    uint256 amount
+                ) = abi.decode(data, (uint8, string, string, string, address, uint256));
 
                 events[count] = CarbonRetiredEvent({
-                    retiringAddress:retiringAddress, 
+                    bridge: bridge,
+                    retiringAddress: retiringAddress, 
                     retiringEntityString: retiringEntityString,
-                    beneficiaryAddress:beneficiaryAddress, 
-                    beneficiaryString:beneficiaryString, 
-                    retirementMessage:retirementMessage,
-                    poolToken:poolToken, 
-                    projectToken:projectToken, 
-                    amount:amount
+                    beneficiaryAddress: beneficiaryAddress,
+                    beneficiaryString: beneficiaryString,
+                    retirementMessage: retirementMessage,
+                    poolToken: poolToken,
+                    projectToken: projectToken,
+                    amount: amount
                 });
                 count++;
             }
