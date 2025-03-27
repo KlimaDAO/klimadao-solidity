@@ -68,7 +68,7 @@ library LibCMARKCarbon {
     }
 
     function isValid(address token) internal returns (bool) {
-        bytes memory tempEmptyStringTest = bytes(ICMARKCreditTokenFactory(C.cmarkCreditFactory()).creditAddressToId(token));
-        return tempEmptyStringTest.length > 0;
+        return bytes(ICMARKCreditTokenFactory(C.cmarkCreditFactory()).creditAddressToId(token)).length > 0 ||
+           bytes(ICMARKCreditTokenFactory(C.tverCreditFactory()).creditAddressToId(token)).length > 0;
     }
 }
