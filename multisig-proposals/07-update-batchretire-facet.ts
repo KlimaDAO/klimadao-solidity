@@ -51,11 +51,6 @@ const safeTransaction = await protocolKitOwner1.createTransaction({
 
 const safeTxHash = await protocolKitOwner1.getTransactionHash(safeTransaction);
 const signature = await protocolKitOwner1.signHash(safeTxHash);
-console.log("safeTxHash", safeTxHash);
-console.log("signature", signature);
-console.log("senderSignature", signature.data);
-console.log("senderAddress", OWNER_1_ADDRESS);
-console.log("nextNonce", nextNonce);
 
 // Propose transaction to the service
 await apiKit.proposeTransaction({
@@ -64,4 +59,4 @@ await apiKit.proposeTransaction({
   safeTxHash,
   senderAddress: OWNER_1_ADDRESS,
   senderSignature: signature.data,
-}).then(res => console.log("res", res)).catch(err => console.log("err", err));
+});
