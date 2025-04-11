@@ -20,8 +20,6 @@ contract UpgradeInfinityForBatchCall is Script, HelperContract {
         address diamond = vm.envAddress("INFINITY_ADDRESS");
         bytes memory updateFacetsCalldata;
 
-        OwnershipFacet ownerF = OwnershipFacet(diamond);
-
         vm.startBroadcast(deployerPrivateKey);
 
         //deploy updated facets and init contract
