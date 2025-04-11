@@ -475,7 +475,18 @@ abstract contract TestHelper is Test, HelperContract {
             sourceTarget = constantsFacet.treasury();
         }
         sourceAmount = sourceAmount + (sourceAmount * slippage) / 100;
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
+
+        uint256 sourceBalance = IERC20(sourceToken).balanceOf(sourceTarget);
+
+        if (!(sourceAmount <= sourceBalance)) {
+            console2.logString("Wallet");
+            console2.logAddress(sourceTarget);
+            console2.logString("Has insufficient balance");
+            console2.logUint(sourceBalance);
+            console2.logString("<");
+            console2.logUint(sourceAmount);
+        }
+
         return (sourceTarget, sourceAmount);
     }
 
