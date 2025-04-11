@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { UpgradeInfinityForBatchCall } from "../../../script/7_upgradeInfinityForBatchCall.s.sol";
+import { UpgradeInfinityForBatchCall } from "../../../script/8_upgradeInfinityForBatchCall.s.sol";
 import { TestHelper } from "../../infinity/TestHelper.sol";
 
 import "../TestHelper.sol";

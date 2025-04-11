@@ -22,7 +22,8 @@
     "propose:03_update_native_usdc_revisions": "bun multisig-proposals/03-update-native-usdc-revisions.ts",
     "propose:04_update_returnTradeDust_revisions": "bun multisig-proposals/04-update-returnTradeDust-revisions.ts",
     "propose:05_update_retirecmark_facet": "bun multisig-proposals/05-update-retirecmark-facet.ts",
-    "propose:06_update_retirecmark_facet_tver": "bun multisig-proposals/06-update-retirecmark-facet-tver.ts"
+    "propose:06_update_retirecmark_facet_tver": "bun multisig-proposals/06-update-retirecmark-facet-tver.ts",
+    "propose:07_update_batchretire_facet": "bun multisig-proposals/07-update-batchretire-facet.ts"
   },
   "repository": {
     "type": "git",
