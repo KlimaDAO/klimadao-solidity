@@ -45,6 +45,13 @@ library LibRetire {
         uint256 consumptionPeriodEnd;
     }
 
+    struct BatchedCallsData {
+        bool success;
+        bytes data;
+    }
+
+    event BatchedCallsDone(BatchedCallsData[] callsData);
+
     /* ========== Default Redemption Retirements ========== */
 
     /**

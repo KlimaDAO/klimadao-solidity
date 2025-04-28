@@ -15,7 +15,7 @@ curl -L https://foundry.paradigm.xyz | bash
 This will download foundryup. Then install Foundry by running:
 
 ```
-foundryup
+foundryup -i v0.3.0 
 ```
 
 ## Deploy

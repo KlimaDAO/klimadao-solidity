@@ -4,7 +4,7 @@
   "description": "KlimaDAO Solidity contracts for the protocol",
   "main": "index.js",
   "scripts": {
-    "test": "forge t -vvv --ffi --fork-url http://localhost:8545 --summary",
+    "test": "eval $(grep '^POLYGON_URL' .env) && forge t -vvv --ffi --fork-url http://localhost:8545 --summary",
     "test-infinity": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test test_infinity --summary",
     "test-protocol": "forge t -vvv --ffi --fork-url http://localhost:8545 --match-test  test_protocol --summary",
     "fork": "eval $(grep '^POLYGON_URL' .env) && anvil --fork-url ${POLYGON_URL} --block-base-fee-per-gas 30000000000",
@@ -14,13 +14,16 @@
     "test:upgrade-native-usdc-revisions": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForNativeUsdcRevisionsTest --summary",
     "test:upgrade-return-trade-dust": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForTradeDustRevisionsTest --summary",
     "test:upgrade-cmark": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForCMARKCredits --summary",
+    "test:upgrade-batch-call": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForBatchCallTest --summary",
+    "test:batch-call": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract ^BatchCallTest$ --summary",
     "test:upgrade-tver": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForTVERCredits --summary",
     "propose:01_update_swap_routes": "bun multisig-proposals/01-update-swap-routes.ts",
     "propose:02_update_retiremark_facet": "bun multisig-proposals/02-update-retirecarbonmark-facet.ts",
     "propose:03_update_native_usdc_revisions": "bun multisig-proposals/03-update-native-usdc-revisions.ts",
     "propose:04_update_returnTradeDust_revisions": "bun multisig-proposals/04-update-returnTradeDust-revisions.ts",
     "propose:05_update_retirecmark_facet": "bun multisig-proposals/05-update-retirecmark-facet.ts",
-    "propose:06_update_retirecmark_facet_tver": "bun multisig-proposals/06-update-retirecmark-facet-tver.ts"
+    "propose:06_update_retirecmark_facet_tver": "bun multisig-proposals/06-update-retirecmark-facet-tver.ts",
+    "propose:07_update_batchretire_facet": "bun multisig-proposals/07-update-batchretire-facet.ts"
   },
   "repository": {
     "type": "git",

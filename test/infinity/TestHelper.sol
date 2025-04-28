@@ -22,6 +22,7 @@ import {RedeemToucanPoolFacet} from "src/infinity/facets/Bridges/Toucan/RedeemTo
 import {RetireToucanTCO2Facet} from "src/infinity/facets/Bridges/Toucan/RetireToucanTCO2Facet.sol";
 import {RetireCarbonFacet} from "src/infinity/facets/Retire/RetireCarbonFacet.sol";
 import {RetireCarbonmarkFacet} from "src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
+import {BatchCallFacet} from "src/infinity/facets/Retire/BatchCallFacet.sol";
 import {RetireInfoFacet} from "src/infinity/facets/Retire/RetireInfoFacet.sol";
 import {RetireSourceFacet} from "src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "src/infinity/facets/RetirementQuoter.sol";
@@ -35,7 +36,9 @@ import {ICRProject} from "./interfaces/ICR.sol";
 import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
 import {IToucanPool} from "src/infinity/interfaces/IToucan.sol";
 import {IwsKLIMA} from "src/infinity/interfaces/IKlima.sol";
+import { LibRetire } from "src/infinity/libraries/LibRetire.sol";
 import "./HelperContract.sol";
+import "forge-std/console2.sol";
 
 import {C} from "src/infinity/C.sol";
 
@@ -66,6 +69,7 @@ abstract contract TestHelper is Test, HelperContract {
     RedeemToucanPoolFacet toucanRedeemF;
     RetireToucanTCO2Facet toucanRetireF;
     RetireCarbonFacet retireCarbonF;
+    BatchCallFacet batchCallF;
     RetireInfoFacet retireInfoF;
     RetireSourceFacet retireSourceF;
     RetirementQuoter retirementQuoterF;
@@ -213,6 +217,7 @@ abstract contract TestHelper is Test, HelperContract {
         toucanRedeemF = new RedeemToucanPoolFacet();
         retirementQuoterF = new RetirementQuoter();
         retireCarbonF = new RetireCarbonFacet();
+        batchCallF = new BatchCallFacet();
         // retireSourceF = new RetireSourceFacet();
         // retireCarbonmarkF = new RetireCarbonmarkFacet();
         // retireICRF = new RetireICRFacet();
@@ -245,7 +250,7 @@ abstract contract TestHelper is Test, HelperContract {
 
         // Local Uniswap setup
 
-        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](4);
+        IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](5);
 
         cut[0] = (
             IDiamondCut.FacetCut({
@@ -276,6 +281,14 @@ abstract contract TestHelper is Test, HelperContract {
                 facetAddress: address(c3RedeemF),
                 action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("RedeemC3PoolFacet")
+            })
+        );
+
+        cut[4] = (
+            IDiamondCut.FacetCut({
+                facetAddress: address(batchCallF),
+                action: IDiamondCut.FacetCutAction.Add, // Replace by IDiamondCut.FacetCutAction.Replace after deployment
+                functionSelectors: generateSelectors("BatchCallFacet")
             })
         );
 
@@ -412,13 +425,18 @@ abstract contract TestHelper is Test, HelperContract {
         maxAmount = maxExcessReserves >= maxTreasuryHoldings ? maxTreasuryHoldings : maxExcessReserves;
     }
 
-    function getSourceTokens(
+    /**
+     * Detects the source address and amount to acquire a token
+     */
+    function getSourceTokensHelper(
         TransactionType txType,
         address diamond,
         address sourceToken,
         address pool,
-        uint256 amountOut
-    ) internal returns (uint256 sourceAmount) {
+        uint256 amountOut,
+        uint256 slippage
+
+    ) internal returns (address sourceTarget, uint256 sourceAmount) {
         ConstantsGetter constantsFacet = ConstantsGetter(diamond);
         address USDC_BRIDGED_HOLDER = vm.envAddress("USDC_BRIDGED_HOLDER");
         address USDC_NATIVE_HOLDER = vm.envAddress("USDC_NATIVE_HOLDER");
@@ -448,7 +466,7 @@ abstract contract TestHelper is Test, HelperContract {
         } else if (sourceToken == constantsFacet.klima() || sourceToken == constantsFacet.sKlima()) {
             sourceTarget = constantsFacet.staking();
 
-            // Ensure that any sKLIMA pulled can succesfully be unstaked
+            // Ensure that any sKLIMA pulled can successfully be unstaked
             uint256 stakingBalance = IERC20(constantsFacet.klima()).balanceOf(constantsFacet.sKlima());
             vm.assume(sourceAmount < stakingBalance / 2);
         } else if (sourceToken == constantsFacet.wsKlima()) {
@@ -456,11 +474,54 @@ abstract contract TestHelper is Test, HelperContract {
         } else {
             sourceTarget = constantsFacet.treasury();
         }
-        vm.assume(sourceAmount <= IERC20(sourceToken).balanceOf(sourceTarget));
+        sourceAmount = sourceAmount + (sourceAmount * slippage) / 100;
 
-        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, sourceAmount);
+        uint256 sourceBalance = IERC20(sourceToken).balanceOf(sourceTarget);
+
+        if (!(sourceAmount <= sourceBalance)) {
+            console2.logString("Wallet");
+            console2.logAddress(sourceTarget);
+            console2.logString("Has insufficient balance");
+            console2.logUint(sourceBalance);
+            console2.logString("<");
+            console2.logUint(sourceAmount);
+        }
+
+        return (sourceTarget, sourceAmount);
     }
+
+    /**
+     * Get source tokens 
+     * Applies slippage to allow for multiple retirements
+     */
+    function getSourceTokensWithSlippage(
+        TransactionType txType,
+        address diamond,
+        address sourceToken,
+        address pool,
+        uint256 amountOut,
+        uint256 slippage
+    ) internal returns (uint256 sourceAmount) {
+        address sourceTarget;
+        (sourceTarget, sourceAmount) = getSourceTokensHelper(txType, diamond, sourceToken,pool, amountOut, slippage);
+        swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
+        IERC20(sourceToken).approve(diamond, type(uint256).max); 
+        return sourceAmount;
+   }
+
+    /**
+     * Sources token for the current test contract with no slippage.
+     */
+    function getSourceTokens(
+        TransactionType txType,
+        address diamond,
+        address sourceToken,
+        address pool,
+        uint256 amountOut
+    ) internal returns (uint256 sourceAmount) {
+        return getSourceTokensWithSlippage(txType, diamond, sourceToken,pool, amountOut, 0);
+    }
+
 
     //////////// EVM Helpers ////////////
 
@@ -498,4 +559,88 @@ abstract contract TestHelper is Test, HelperContract {
             if (balance > 0) return projects[i];
         }
     }
+
+    struct CarbonRetiredEvent { 
+        uint8 bridge;
+        address retiringAddress;
+        string retiringEntityString;
+        address beneficiaryAddress;
+        string beneficiaryString;
+        string retirementMessage;
+        address poolToken;
+        address projectToken;
+        uint256 amount;
+    }
+    
+    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) public returns (LibRetire.BatchedCallsData[][] memory events) {
+        // Compute number of events
+        bytes32 wantedKeccak = keccak256("BatchedCallsDone((bool,bytes)[])");
+        uint32 count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            if (logs[i].topics[0] == wantedKeccak) count++;
+        }
+
+        // Allocate array
+        LibRetire.BatchedCallsData[][] memory events = new LibRetire.BatchedCallsData[][](count);
+
+        // Compute events
+        count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            bytes memory data = logs[i].data;
+            if (logs[i].topics[0] == wantedKeccak) {
+                events[count] = abi.decode(data, (LibRetire.BatchedCallsData[]));
+                count++;
+            }
+        }
+        return events;
+    }
+
+    function extractCarbonRetiredLogs(Vm.Log[] memory logs) public returns (CarbonRetiredEvent[] memory events) {
+        // Compute number of events
+        bytes32 wantedKeccak = keccak256("CarbonRetired(uint8,address,string,address,string,string,address,address,uint256)");
+        uint32 count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            if (logs[i].topics[0] == wantedKeccak) count++;
+        }
+        // Allocate array
+        CarbonRetiredEvent[] memory events = new CarbonRetiredEvent[](count);
+
+        // Compute events
+        count = 0;
+        for (uint32 i; i < logs.length; i++) {
+            bytes memory data = logs[i].data;
+            
+            if (logs[i].topics[0] == wantedKeccak) {
+
+                // Don't know why this is encoded like this
+                address retiringAddress = address(uint160(uint256(logs[i].topics[1])));
+                address beneficiaryAddress = address(uint160(uint256(logs[i].topics[2])));
+                address poolToken = address(uint160(uint256(logs[i].topics[3])));
+
+                (
+                    uint8 bridge,
+                    string memory retiringEntityString,
+                    string memory beneficiaryString,
+                    string memory retirementMessage,
+                    address projectToken,
+                    uint256 amount
+                ) = abi.decode(data, (uint8, string, string, string, address, uint256));
+
+                events[count] = CarbonRetiredEvent({
+                    bridge: bridge,
+                    retiringAddress: retiringAddress, 
+                    retiringEntityString: retiringEntityString,
+                    beneficiaryAddress: beneficiaryAddress,
+                    beneficiaryString: beneficiaryString,
+                    retirementMessage: retirementMessage,
+                    poolToken: poolToken,
+                    projectToken: projectToken,
+                    amount: amount
+                });
+                count++;
+            }
+        }
+        return events;
+    }
+
 }
