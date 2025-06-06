@@ -25,6 +25,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
     address KLIMA_TREASURY;
     address STAKING;
     address USDC;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -42,6 +43,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         STAKING = constantsFacet.staking();
 
         USDC = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -50,7 +52,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         DEFAULT_PROJECT = getDefaultToucanProject(BCT);
         KLIMA_RETIREMENT_BOND = constantsFacet.klimaRetirementBond();
 
-        upgradeCurrentDiamond(diamond);
+        // upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 
@@ -60,6 +62,10 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
 
     function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemBCT(USDC, redeemAmount);
+    }
+
+    function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingUSDC_NATIVE_fuzz(uint256 redeemAmount) public {
+        redeemBCT(USDC_NATIVE, redeemAmount);
     }
 
     function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
