@@ -93,7 +93,6 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.bct());
         uint256 bondBalance = IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND);
 
-
         if (redeemAmount == 0) {
             vm.expectRevert();
 

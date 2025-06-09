@@ -89,10 +89,7 @@ contract RetireCMARKFacetTest is TestHelper, AssertionHelper {
         });
 
         uint256 retirementIndex = retireCMARKFacet.cmarkRetireExactCarbon(
-            CMARK,
-            defaultCarbonRetireAmount,
-            details,
-            LibTransfer.From.EXTERNAL
+            CMARK, defaultCarbonRetireAmount, details, LibTransfer.From.EXTERNAL
         );
 
         // No tokens left in contract

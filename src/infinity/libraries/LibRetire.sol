@@ -296,11 +296,7 @@ library LibRetire {
             );
         } else if (LibCMARKCarbon.isValid(creditToken)) {
             // Retire the carbon
-            LibCMARKCarbon.retireCMARK(
-                creditToken,
-                amount,
-                details
-            );
+            LibCMARKCarbon.retireCMARK(creditToken, amount, details);
         }
     }
 

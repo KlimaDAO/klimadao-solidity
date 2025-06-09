@@ -194,9 +194,6 @@ abstract contract TestHelper is Test, HelperContract {
         // FacetCut array which contains the three standard facets to be added
         IDiamondCut.FacetCut[] memory cut = new IDiamondCut.FacetCut[](1);
 
-
-
-
         cut[0] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(constantF),
@@ -289,7 +286,7 @@ abstract contract TestHelper is Test, HelperContract {
         cut[4] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(batchCallF),
-                action: IDiamondCut.FacetCutAction.Replace, 
+                action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("BatchCallFacet")
             })
         );
@@ -476,7 +473,6 @@ abstract contract TestHelper is Test, HelperContract {
             sourceTarget = constantsFacet.treasury();
         }
         sourceAmount = sourceAmount + (sourceAmount * slippage) / 100;
-
 
         uint256 sourceBalance = IERC20(sourceToken).balanceOf(sourceTarget);
 

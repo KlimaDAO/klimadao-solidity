@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { UpgradeInfinityForBatchCall } from "../../../script/8_upgradeInfinityForBatchCall.s.sol";
-import { TestHelper } from "../../infinity/TestHelper.sol";
+import {UpgradeInfinityForBatchCall} from "../../../script/8_upgradeInfinityForBatchCall.s.sol";
+import {TestHelper} from "../../infinity/TestHelper.sol";
 
 import "../TestHelper.sol";
 
 contract UpgradeInfinityForBatchCallTest is TestHelper {
-   
     function setUp() public {
         // Start fork
         string memory RPC_URL = vm.envString("POLYGON_URL");

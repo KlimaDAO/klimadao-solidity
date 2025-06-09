@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { UpgradeInfinityForCMARK } from "../../../script/6_upgradeInfinityForCMARK.s.sol";
-import { TestHelper } from "../../infinity/TestHelper.sol";
-import { C } from "../../../src/infinity/C.sol";
-import { AssertionHelper } from "../../helpers/AssertionHelper.sol";
-import { ListingsHelper } from "../../helpers/Listings.sol";
-import { Test } from "forge-std/Test.sol";
-import { IERC20 } from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import { ICarbonmark } from "../../../src/infinity/interfaces/ICarbonmark.sol";
-import { ICMARKCreditTokenFactory } from "../../../src/infinity/interfaces/ICMARKCredit.sol";
-import { LibRetire } from "../../../src/infinity/libraries/LibRetire.sol";
-import { LibTransfer } from "../../../src/infinity/libraries/Token/LibTransfer.sol";
-import { RetireCMARKFacet } from "../../../src/infinity/facets/Bridges/CMARK/RetireCMARKFacet.sol";
-import { RetireCarbonmarkFacet } from "../../../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
+import {UpgradeInfinityForCMARK} from "../../../script/6_upgradeInfinityForCMARK.s.sol";
+import {TestHelper} from "../../infinity/TestHelper.sol";
+import {C} from "../../../src/infinity/C.sol";
+import {AssertionHelper} from "../../helpers/AssertionHelper.sol";
+import {ListingsHelper} from "../../helpers/Listings.sol";
+import {Test} from "forge-std/Test.sol";
+import {IERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {ICarbonmark} from "../../../src/infinity/interfaces/ICarbonmark.sol";
+import {ICMARKCreditTokenFactory} from "../../../src/infinity/interfaces/ICMARKCredit.sol";
+import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
+import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
+import {RetireCMARKFacet} from "../../../src/infinity/facets/Bridges/CMARK/RetireCMARKFacet.sol";
+import {RetireCarbonmarkFacet} from "../../../src/infinity/facets/Retire/RetireCarbonmarkFacet.sol";
 
 contract UpgradeInfinityForCMARKCredits is TestHelper, AssertionHelper, ListingsHelper {
     UpgradeInfinityForCMARK upgradeScript;
@@ -31,9 +31,9 @@ contract UpgradeInfinityForCMARKCredits is TestHelper, AssertionHelper, Listings
 
     address constant CMARK_FACTORY_OWNER = 0xc51Cc27d3BB611DB27f26F617E1c15483A8790Cf;
     address constant CMARK_FACTORY_ADDRESS = 0xEeE3abDD638E219261e061c06C0798Fd5C05B5D3;
-    string constant CMARK_TOKEN_ID = 'CMARK-1-2025';
+    string constant CMARK_TOKEN_ID = "CMARK-1-2025";
 
-    uint256 constant PREUPGRADE_BLOCK = 67015013;
+    uint256 constant PREUPGRADE_BLOCK = 67_015_013;
 
     ICMARKCreditTokenFactory cmarkFactory;
 
@@ -114,24 +114,23 @@ contract UpgradeInfinityForCMARKCredits is TestHelper, AssertionHelper, Listings
 
         bytes32 cmarkListingId =
             marketplace.createListing(CMARK_ADDRESS, AMOUNT, unitPrice, minFillAmount, block.timestamp + 600);
-        ICarbonmark.CreditListing memory listingStruct =
-            ICarbonmark.CreditListing({
-                id: cmarkListingId,
-                account: ICarbonmark(carbonmark).getListingOwner(cmarkListingId),
-                token: CMARK_ADDRESS,
-                tokenId: 0,
-                remainingAmount: ICarbonmark(carbonmark).getRemainingAmount(cmarkListingId),
-                unitPrice: unitPrice
-            });
+        ICarbonmark.CreditListing memory listingStruct = ICarbonmark.CreditListing({
+            id: cmarkListingId,
+            account: ICarbonmark(carbonmark).getListingOwner(cmarkListingId),
+            token: CMARK_ADDRESS,
+            tokenId: 0,
+            remainingAmount: ICarbonmark(carbonmark).getRemainingAmount(cmarkListingId),
+            unitPrice: unitPrice
+        });
 
         // LibRetire doesn't revert on unknown carbon,
         // so we will check that the filled order ends up in the Diamond contract itself
         uint256 cmarkRetireId = diamond.retireCarbonmarkListing(
-            listingStruct, SOURCE_AMOUNT, AMOUNT/2, details, LibTransfer.From.EXTERNAL
+            listingStruct, SOURCE_AMOUNT, AMOUNT / 2, details, LibTransfer.From.EXTERNAL
         );
 
-        assertEq(IERC20(CMARK_ADDRESS).balanceOf(RETIRER), AMOUNT/2);
-        assertEq(IERC20(CMARK_ADDRESS).balanceOf(DIAMOND_ADDRESS), AMOUNT/2);
+        assertEq(IERC20(CMARK_ADDRESS).balanceOf(RETIRER), AMOUNT / 2);
+        assertEq(IERC20(CMARK_ADDRESS).balanceOf(DIAMOND_ADDRESS), AMOUNT / 2);
         vm.stopPrank();
 
         // upgrade the diamond
@@ -143,16 +142,14 @@ contract UpgradeInfinityForCMARKCredits is TestHelper, AssertionHelper, Listings
             listingStruct, SOURCE_AMOUNT / 2, AMOUNT / 4, details, LibTransfer.From.EXTERNAL
         );
 
-        assertEq(IERC20(CMARK_ADDRESS).balanceOf(RETIRER), AMOUNT/4);
-        assertEq(IERC20(CMARK_ADDRESS).balanceOf(DIAMOND_ADDRESS), AMOUNT/2);
-        assertEq(marketplace.getRemainingAmount(cmarkListingId), AMOUNT/4);
+        assertEq(IERC20(CMARK_ADDRESS).balanceOf(RETIRER), AMOUNT / 4);
+        assertEq(IERC20(CMARK_ADDRESS).balanceOf(DIAMOND_ADDRESS), AMOUNT / 2);
+        assertEq(marketplace.getRemainingAmount(cmarkListingId), AMOUNT / 4);
 
         RetireCMARKFacet rcmDiamond = RetireCMARKFacet(DIAMOND_ADDRESS);
-        uint256 cmarkRetireId3 = rcmDiamond.cmarkRetireExactCarbon(
-            CMARK_ADDRESS, AMOUNT/4, details, LibTransfer.From.EXTERNAL
-        );
+        uint256 cmarkRetireId3 =
+            rcmDiamond.cmarkRetireExactCarbon(CMARK_ADDRESS, AMOUNT / 4, details, LibTransfer.From.EXTERNAL);
         assertEq(IERC20(CMARK_ADDRESS).balanceOf(RETIRER), 0);
         vm.stopPrank();
-
     }
 }

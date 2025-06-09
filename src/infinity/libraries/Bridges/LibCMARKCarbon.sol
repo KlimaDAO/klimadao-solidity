@@ -12,7 +12,6 @@ import "lib/forge-std/src/console.sol";
  * @author MarcusAurelius
  * @title LibCMARKCarbon
  */
-
 library LibCMARKCarbon {
     event CarbonRetired(
         LibRetire.CarbonBridge carbonBridge,
@@ -23,7 +22,7 @@ library LibCMARKCarbon {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /**
@@ -32,11 +31,7 @@ library LibCMARKCarbon {
      * @param amount               Amount of tokens to retire
      * @param details              Encoded struct of retirement details needed for the retirement
      */
-    function retireCMARK(
-        address projectToken,
-        uint amount,
-        LibRetire.RetireDetails memory details
-    ) internal {
+    function retireCMARK(address projectToken, uint256 amount, LibRetire.RetireDetails memory details) internal {
         ICMARKCreditToken(projectToken).retire(
             amount,
             details.beneficiaryAddress,
@@ -68,7 +63,7 @@ library LibCMARKCarbon {
     }
 
     function isValid(address token) internal returns (bool) {
-        return bytes(ICMARKCreditTokenFactory(C.cmarkCreditFactory()).creditAddressToId(token)).length > 0 ||
-           bytes(ICMARKCreditTokenFactory(C.tverCreditFactory()).creditAddressToId(token)).length > 0;
+        return bytes(ICMARKCreditTokenFactory(C.cmarkCreditFactory()).creditAddressToId(token)).length > 0
+            || bytes(ICMARKCreditTokenFactory(C.tverCreditFactory()).creditAddressToId(token)).length > 0;
     }
 }

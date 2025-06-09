@@ -16,7 +16,7 @@ contract RetireCMARKFacet is ReentrancyGuard {
         string retirementMessage,
         address indexed carbonPool,
         address carbonToken,
-        uint retiredAmount
+        uint256 retiredAmount
     );
 
     /**
@@ -34,10 +34,10 @@ contract RetireCMARKFacet is ReentrancyGuard {
      */
     function cmarkRetireExactCarbon(
         address carbonToken,
-        uint amount,
+        uint256 amount,
         LibRetire.RetireDetails memory details,
         LibTransfer.From fromMode
-    ) external nonReentrant returns (uint retirementIndex) {
+    ) external nonReentrant returns (uint256 retirementIndex) {
         // Currently this is a simple wrapper for direct calls on specific CMARK tokens
         // No fee is charged
 
@@ -46,16 +46,12 @@ contract RetireCMARKFacet is ReentrancyGuard {
         if (details.retiringAddress == address(0)) details.retiringAddress = msg.sender;
 
         bytes memory tempEmptyStringTest = bytes(details.retiringEntityString);
-        if (tempEmptyStringTest.length == 0)  {
+        if (tempEmptyStringTest.length == 0) {
             details.retiringEntityString = "KlimaDAO Retirement Aggregator";
         }
 
         // Retire the carbon
-        LibCMARKCarbon.retireCMARK(
-            carbonToken,
-            amount,
-            details
-        );
+        LibCMARKCarbon.retireCMARK(carbonToken, amount, details);
 
         return LibRetire.getTotalRetirements(details.beneficiaryAddress);
     }

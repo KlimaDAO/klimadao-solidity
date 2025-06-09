@@ -28,10 +28,8 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         cmd[3] = "methods";
         cmd[4] = "--json";
 
-        
         bytes memory res = vm.ffi(cmd);
         string memory st = string(res);
-
 
         // extract function signatures and take first 4 bytes of keccak
         strings.slice memory s = st.toSlice();
@@ -149,7 +147,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         vm.prank(sender);
 
         // Approve the test contract to spend tokens on behalf of sender
-        IERC20(token).approve(address(this), transferAmount); 
+        IERC20(token).approve(address(this), transferAmount);
 
         // Transfer ERC20 tokens from sender to receiver
         IERC20(token).transferFrom(sender, receiver, transferAmount);

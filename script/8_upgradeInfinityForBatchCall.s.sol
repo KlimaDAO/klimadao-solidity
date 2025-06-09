@@ -9,7 +9,7 @@ import {Diamond} from "../src/infinity/Diamond.sol";
 import "../src/infinity/facets/DiamondCutFacet.sol";
 import "../src/infinity/facets/DiamondLoupeFacet.sol";
 import "../src/infinity/facets/OwnershipFacet.sol";
-import { BatchCallFacet } from "../src/infinity/facets/Retire/BatchCallFacet.sol";
+import {BatchCallFacet} from "../src/infinity/facets/Retire/BatchCallFacet.sol";
 
 import "../test/infinity/HelperContract.sol";
 
@@ -36,16 +36,11 @@ contract UpgradeInfinityForBatchCall is Script, HelperContract {
                 functionSelectors: generateSelectors("BatchCallFacet")
             })
         );
-        
+
         vm.stopBroadcast();
 
         // get calldata for the upgrade without init for internal library function view
-        updateFacetsCalldata = abi.encodeWithSelector(
-            IDiamondCut.diamondCut.selector,
-            cut,
-            address(0),
-            ""
-        );
+        updateFacetsCalldata = abi.encodeWithSelector(IDiamondCut.diamondCut.selector, cut, address(0), "");
 
         console2.log("New batchCallF address");
         console2.logAddress(address(batchCallF));
@@ -54,6 +49,5 @@ contract UpgradeInfinityForBatchCall is Script, HelperContract {
         console2.logBytes(updateFacetsCalldata);
 
         return updateFacetsCalldata;
-
     }
 }
