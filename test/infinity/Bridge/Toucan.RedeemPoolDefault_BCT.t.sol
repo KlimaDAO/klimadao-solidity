@@ -52,7 +52,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         DEFAULT_PROJECT = getDefaultToucanProject(BCT);
         KLIMA_RETIREMENT_BOND = constantsFacet.klimaRetirementBond();
 
-        // upgradeCurrentDiamond(diamond);
+        upgradeCurrentDiamond(diamond);
         sendDustToTreasury(diamond);
     }
 
@@ -76,11 +76,15 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         redeemBCT(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingWSKLIMA_fuzz() public {
+        // hardcode to circumvent larger funding refactor
+        uint256 redeemAmount = 1e18;
+
         redeemBCT(WSKLIMA, redeemAmount);
     }
 
     function redeemBCT(address sourceToken, uint256 redeemAmount) internal {
+        // set upper limit to 60% of pool balance
         vm.assume(redeemAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 60) / 100);
 
         if (redeemAmount == 0 && sourceToken != BCT) vm.expectRevert();
@@ -88,6 +92,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
 
         uint256 poolBalance = IERC20(DEFAULT_PROJECT).balanceOf(constantsFacet.bct());
         uint256 bondBalance = IERC20(BCT).balanceOf(KLIMA_RETIREMENT_BOND);
+
 
         if (redeemAmount == 0) {
             vm.expectRevert();

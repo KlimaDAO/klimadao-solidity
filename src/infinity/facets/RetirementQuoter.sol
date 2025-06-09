@@ -91,8 +91,9 @@ contract RetirementQuoter {
 
         uint256 additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, swapSourceAmount);
 
-        return swapSourceAmount + additionalSwapAmount;
+          return swapSourceAmount + additionalSwapAmount;
     }
+    
 
     function getSourceAmountSpecificRedeem(address sourceToken, address carbonToken, uint256[] memory redeemAmounts)
         public
