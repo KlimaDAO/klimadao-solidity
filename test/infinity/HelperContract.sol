@@ -21,16 +21,19 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
     // return array of function selectors for given facet name
     function generateSelectors(string memory _facetName) internal returns (bytes4[] memory selectors) {
         //get string of contract methods
-        string[] memory cmd = new string[](4);
+        string[] memory cmd = new string[](5);
         cmd[0] = "forge";
         cmd[1] = "inspect";
         cmd[2] = _facetName;
         cmd[3] = "methods";
+        cmd[4] = "--json";
+
         bytes memory res = vm.ffi(cmd);
         string memory st = string(res);
 
         // extract function signatures and take first 4 bytes of keccak
         strings.slice memory s = st.toSlice();
+
         strings.slice memory delim = ":".toSlice();
         strings.slice memory delim2 = ",".toSlice();
         selectors = new bytes4[]((s.count(delim)));
@@ -144,7 +147,7 @@ abstract contract HelperContract is IDiamond, IDiamondLoupe, Test {
         vm.prank(sender);
 
         // Approve the test contract to spend tokens on behalf of sender
-        IERC20(token).approve(address(this), transferAmount); 
+        IERC20(token).approve(address(this), transferAmount);
 
         // Transfer ERC20 tokens from sender to receiver
         IERC20(token).transferFrom(sender, receiver, transferAmount);

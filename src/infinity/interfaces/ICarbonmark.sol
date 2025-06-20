@@ -2,7 +2,6 @@
 pragma solidity ^0.8.16;
 
 interface ICarbonmark {
-
     error CarbonmarkMarketplace_ListingDoesNotExist();
     error CarbonmarkMarketplace_ListingAlreadyExists();
     error CarbonmarkMarketplace_ListingNotOwner();

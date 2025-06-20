@@ -36,9 +36,8 @@ import {ICRProject} from "./interfaces/ICR.sol";
 import {IC3Pool} from "src/infinity/interfaces/IC3.sol";
 import {IToucanPool} from "src/infinity/interfaces/IToucan.sol";
 import {IwsKLIMA} from "src/infinity/interfaces/IKlima.sol";
-import { LibRetire } from "src/infinity/libraries/LibRetire.sol";
+import {LibRetire} from "src/infinity/libraries/LibRetire.sol";
 import "./HelperContract.sol";
-import "forge-std/console2.sol";
 
 import {C} from "src/infinity/C.sol";
 
@@ -287,7 +286,7 @@ abstract contract TestHelper is Test, HelperContract {
         cut[4] = (
             IDiamondCut.FacetCut({
                 facetAddress: address(batchCallF),
-                action: IDiamondCut.FacetCutAction.Add, // Replace by IDiamondCut.FacetCutAction.Replace after deployment
+                action: IDiamondCut.FacetCutAction.Replace,
                 functionSelectors: generateSelectors("BatchCallFacet")
             })
         );
@@ -435,7 +434,6 @@ abstract contract TestHelper is Test, HelperContract {
         address pool,
         uint256 amountOut,
         uint256 slippage
-
     ) internal returns (address sourceTarget, uint256 sourceAmount) {
         ConstantsGetter constantsFacet = ConstantsGetter(diamond);
         address USDC_BRIDGED_HOLDER = vm.envAddress("USDC_BRIDGED_HOLDER");
@@ -491,7 +489,7 @@ abstract contract TestHelper is Test, HelperContract {
     }
 
     /**
-     * Get source tokens 
+     * Get source tokens
      * Applies slippage to allow for multiple retirements
      */
     function getSourceTokensWithSlippage(
@@ -503,11 +501,11 @@ abstract contract TestHelper is Test, HelperContract {
         uint256 slippage
     ) internal returns (uint256 sourceAmount) {
         address sourceTarget;
-        (sourceTarget, sourceAmount) = getSourceTokensHelper(txType, diamond, sourceToken,pool, amountOut, slippage);
+        (sourceTarget, sourceAmount) = getSourceTokensHelper(txType, diamond, sourceToken, pool, amountOut, slippage);
         swipeERC20Tokens(sourceToken, sourceAmount, sourceTarget, address(this));
-        IERC20(sourceToken).approve(diamond, type(uint256).max); 
+        IERC20(sourceToken).approve(diamond, type(uint256).max);
         return sourceAmount;
-   }
+    }
 
     /**
      * Sources token for the current test contract with no slippage.
@@ -519,9 +517,8 @@ abstract contract TestHelper is Test, HelperContract {
         address pool,
         uint256 amountOut
     ) internal returns (uint256 sourceAmount) {
-        return getSourceTokensWithSlippage(txType, diamond, sourceToken,pool, amountOut, 0);
+        return getSourceTokensWithSlippage(txType, diamond, sourceToken, pool, amountOut, 0);
     }
-
 
     //////////// EVM Helpers ////////////
 
@@ -560,7 +557,7 @@ abstract contract TestHelper is Test, HelperContract {
         }
     }
 
-    struct CarbonRetiredEvent { 
+    struct CarbonRetiredEvent {
         uint8 bridge;
         address retiringAddress;
         string retiringEntityString;
@@ -571,8 +568,11 @@ abstract contract TestHelper is Test, HelperContract {
         address projectToken;
         uint256 amount;
     }
-    
-    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs) public returns (LibRetire.BatchedCallsData[][] memory events) {
+
+    function extractBatchedCallsDoneLogs(Vm.Log[] memory logs)
+        public
+        returns (LibRetire.BatchedCallsData[][] memory events)
+    {
         // Compute number of events
         bytes32 wantedKeccak = keccak256("BatchedCallsDone((bool,bytes)[])");
         uint32 count = 0;
@@ -597,7 +597,8 @@ abstract contract TestHelper is Test, HelperContract {
 
     function extractCarbonRetiredLogs(Vm.Log[] memory logs) public returns (CarbonRetiredEvent[] memory events) {
         // Compute number of events
-        bytes32 wantedKeccak = keccak256("CarbonRetired(uint8,address,string,address,string,string,address,address,uint256)");
+        bytes32 wantedKeccak =
+            keccak256("CarbonRetired(uint8,address,string,address,string,string,address,address,uint256)");
         uint32 count = 0;
         for (uint32 i; i < logs.length; i++) {
             if (logs[i].topics[0] == wantedKeccak) count++;
@@ -609,9 +610,8 @@ abstract contract TestHelper is Test, HelperContract {
         count = 0;
         for (uint32 i; i < logs.length; i++) {
             bytes memory data = logs[i].data;
-            
-            if (logs[i].topics[0] == wantedKeccak) {
 
+            if (logs[i].topics[0] == wantedKeccak) {
                 // Don't know why this is encoded like this
                 address retiringAddress = address(uint160(uint256(logs[i].topics[1])));
                 address beneficiaryAddress = address(uint160(uint256(logs[i].topics[2])));
@@ -628,7 +628,7 @@ abstract contract TestHelper is Test, HelperContract {
 
                 events[count] = CarbonRetiredEvent({
                     bridge: bridge,
-                    retiringAddress: retiringAddress, 
+                    retiringAddress: retiringAddress,
                     retiringEntityString: retiringEntityString,
                     beneficiaryAddress: beneficiaryAddress,
                     beneficiaryString: beneficiaryString,
@@ -642,5 +642,4 @@ abstract contract TestHelper is Test, HelperContract {
         }
         return events;
     }
-
 }

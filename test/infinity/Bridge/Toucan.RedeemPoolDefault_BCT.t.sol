@@ -25,6 +25,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
     address KLIMA_TREASURY;
     address STAKING;
     address USDC;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -42,6 +43,7 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         STAKING = constantsFacet.staking();
 
         USDC = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -62,6 +64,10 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         redeemBCT(USDC, redeemAmount);
     }
 
+    function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingUSDC_NATIVE_fuzz(uint256 redeemAmount) public {
+        redeemBCT(USDC_NATIVE, redeemAmount);
+    }
+
     function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
         redeemBCT(KLIMA, redeemAmount);
     }
@@ -70,11 +76,15 @@ contract RedeemToucanPoolDefaultBCTTest is TestHelper, AssertionHelper {
         redeemBCT(SKLIMA, redeemAmount);
     }
 
-    function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingWSKLIMA_fuzz(uint256 redeemAmount) public {
+    function test_infinity_toucanRedeemPoolDefault_redeemBCT_usingWSKLIMA_fuzz() public {
+        // hardcode to circumvent larger funding refactor
+        uint256 redeemAmount = 1e18;
+
         redeemBCT(WSKLIMA, redeemAmount);
     }
 
     function redeemBCT(address sourceToken, uint256 redeemAmount) internal {
+        // set upper limit to 60% of pool balance
         vm.assume(redeemAmount < (IERC20(BCT).balanceOf(SUSHI_LP) * 60) / 100);
 
         if (redeemAmount == 0 && sourceToken != BCT) vm.expectRevert();

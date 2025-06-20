@@ -25,6 +25,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
     address KLIMA_TREASURY;
     address STAKING;
     address USDC;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -42,6 +43,7 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
         STAKING = constantsFacet.staking();
 
         USDC = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -60,6 +62,10 @@ contract RedeemToucanPoolDefaultNCTTest is TestHelper, AssertionHelper {
 
     function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemNCT(USDC, redeemAmount);
+    }
+
+    function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingUSDC_NATIVE_fuzz(uint256 redeemAmount) public {
+        redeemNCT(USDC_NATIVE, redeemAmount);
     }
 
     function test_infinity_toucanRedeemPoolDefault_redeemNCT_usingKLIMA_fuzz(uint256 redeemAmount) public {
