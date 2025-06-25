@@ -28,6 +28,8 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(amount > 0, "Cannot redeem zero tokens");
 
+        address originalSourceToken = sourceToken;
+
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
 
         // after this point the contract has bridged usdc

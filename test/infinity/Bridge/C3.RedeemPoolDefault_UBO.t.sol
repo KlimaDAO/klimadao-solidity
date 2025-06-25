@@ -25,6 +25,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
     address KLIMA_TREASURY;
     address STAKING;
     address USDC;
+    address USDC_NATIVE;
     address KLIMA;
     address SKLIMA;
     address WSKLIMA;
@@ -44,6 +45,7 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
         STAKING = constantsFacet.staking();
 
         USDC = constantsFacet.usdc_bridged();
+        USDC_NATIVE = constantsFacet.usdc();
         KLIMA = constantsFacet.klima();
         SKLIMA = constantsFacet.sKlima();
         WSKLIMA = constantsFacet.wsKlima();
@@ -62,6 +64,10 @@ contract RedeemUBODefaultTest is TestHelper, AssertionHelper {
 
     function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUSDC_fuzz(uint256 redeemAmount) public {
         redeemUBO(USDC, redeemAmount);
+    }
+
+    function test_infinity_c3RedeemPoolDefault_redeemUBO_usingUSDC_NATIVE_fuzz(uint256 redeemAmount) public {
+        redeemUBO(USDC_NATIVE, redeemAmount);
     }
 
     function test_infinity_c3RedeemPoolDefault_redeemUBO_usingKLIMA_fuzz(uint256 redeemAmount) public {
