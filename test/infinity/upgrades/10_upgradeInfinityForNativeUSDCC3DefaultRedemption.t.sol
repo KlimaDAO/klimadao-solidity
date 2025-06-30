@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {UpgradeInfinityForNativeUSDCToucanDefaultRedemption} from
-    "../../../script/9_upgradeInfinityForNativeUSDCToucanDefaultRedemption.sol";
+import {UpgradeInfinityForNativeUSDCC3DefaultRedemption} from
+    "../../../script/10_upgradeInfinityForNativeUSDCC3DefaultRedemption.s.sol";
 import {TestHelper} from "../../infinity/TestHelper.sol";
 
 import "../TestHelper.sol";
 
-contract UpgradeInfinityForNativeUSDCToucanDefaultRedemptionTest is TestHelper {
+contract UpgradeInfinityForNativeUSDCC3DefaultRedemptionTest is TestHelper {
     function setUp() public {
         // Start fork
         string memory RPC_URL = vm.envString("POLYGON_URL");
@@ -20,8 +20,8 @@ contract UpgradeInfinityForNativeUSDCToucanDefaultRedemptionTest is TestHelper {
         address DIAMOND_ADDRESS = vm.envAddress("INFINITY_ADDRESS");
 
         // Set the calldata
-        UpgradeInfinityForNativeUSDCToucanDefaultRedemption upgradeScript =
-            new UpgradeInfinityForNativeUSDCToucanDefaultRedemption();
+        UpgradeInfinityForNativeUSDCC3DefaultRedemption upgradeScript =
+            new UpgradeInfinityForNativeUSDCC3DefaultRedemption();
         console2.log("Upgrade script address");
         console2.logAddress(address(upgradeScript));
         bytes memory data = upgradeScript.run();

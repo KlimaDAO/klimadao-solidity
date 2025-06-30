@@ -28,7 +28,16 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
         require(toMode == LibTransfer.To.EXTERNAL, "Internal balances not live");
         require(amount > 0, "Cannot redeem zero tokens");
 
+        address originalSourceToken = sourceToken;
+
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
+
+        // after this point the contract has bridged usdc
+        if (sourceToken == C.usdc()) {
+            (sourceToken, maxAmountIn) = LibSwap.swapNativeUsdcToBridgedUsdc(maxAmountIn);
+            // set the original source token to return trade dust in the correct token
+            originalSourceToken = C.usdc();
+        }
 
         if (sourceToken != poolToken) {
             if (sourceToken == C.wsKlima()) {
@@ -42,7 +51,7 @@ contract RedeemC3PoolFacet is ReentrancyGuard {
             amount = carbonReceived;
 
             // Check for any trade dust and send back
-            LibSwap.returnTradeDust(sourceToken, poolToken);
+            LibSwap.returnTradeDust(originalSourceToken, poolToken);
         }
 
         (projectTokens, amounts) = LibC3Carbon.redeemPoolAuto(poolToken, amount, toMode);

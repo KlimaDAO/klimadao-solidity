@@ -16,6 +16,9 @@
     "test:upgrade-cmark": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForCMARKCredits --summary",
     "test:upgrade-batch-call": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForBatchCallTest --summary",
     "test:upgrade-native-usdc-toucan-default-redemption": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForNativeUSDCToucanDefaultRedemptionTest --summary",
+    "test:upgrade-native-usdc-c3-default-redemption": "forge test --fork-url http://localhost:8545 -vv --ffi --match-contract UpgradeInfinityForNativeUSDCC3DefaultRedemptionTest --summary",
+    "test:nbo-default-redemption": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract RedeemNBODefaultTest --summary",
+    "test:ubo-default-redemption": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract RedeemUBODefaultTest --summary",
     "test:batch-call": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract ^BatchCallTest$ --summary",
     "test:upgrade-tver": "forge test --fork-url http://localhost:8545 -vvvv --ffi --match-contract UpgradeInfinityForTVERCredits --summary",
     "propose:01_update_swap_routes": "bun multisig-proposals/01-update-swap-routes.ts",
@@ -25,7 +28,8 @@
     "propose:05_update_retirecmark_facet": "bun multisig-proposals/05-update-retirecmark-facet.ts",
     "propose:06_update_retirecmark_facet_tver": "bun multisig-proposals/06-update-retirecmark-facet-tver.ts",
     "propose:07_update_batchretire_facet": "bun multisig-proposals/07-update-batchretire-facet.ts",
-    "propose:09_update_native_usdc_toucan_default_redemption": "bun multisig-proposals/09-update-redeem-toucan-pool-facet.ts"
+    "propose:09_update_native_usdc_toucan_default_redemption": "bun multisig-proposals/09-update-redeem-toucan-pool-facet.ts",
+    "propose:10_update_native_usdc_c3_default_redemption": "bun multisig-proposals/10-update-redeem-c3-pool-facet.ts"
   },
   "repository": {
     "type": "git",
