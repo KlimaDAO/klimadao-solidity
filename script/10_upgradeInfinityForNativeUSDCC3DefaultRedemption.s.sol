@@ -15,12 +15,11 @@ import "../test/infinity/HelperContract.sol";
 
 contract UpgradeInfinityForNativeUSDCC3DefaultRedemption is Script, HelperContract {
     function run() external returns (bytes memory) {
-        //read env variables and choose EOA for transaction signing
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        // use keystore to select deployment account
         address diamond = vm.envAddress("INFINITY_ADDRESS");
         bytes memory updateFacetCalldata;
 
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
 
         //deploy updated facets and init contract
         RedeemC3PoolFacet redeemC3PoolF = new RedeemC3PoolFacet();
