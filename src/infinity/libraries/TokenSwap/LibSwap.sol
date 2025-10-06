@@ -196,37 +196,6 @@ library LibSwap {
 
     /* ========== Smaller Specific Swap Functions ========== */
 
-    /**
-     * @notice                  Swaps a given amount of USDC for KLIMA using Sushiswap
-     * @param sourceAmount      Amount of USDC to swap
-     * @param klimaAmount       Amount of KLIMA to swap for
-     * @return klimaReceived    Amount of KLIMA received
-     */
-    function swapToKlimaFromUsdc(uint256 sourceAmount, uint256 klimaAmount) internal returns (uint256 klimaReceived) {
-        address[] memory path = new address[](2);
-        path[0] = C.usdc_bridged();
-        path[1] = C.klima();
-
-        return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
-    }
-
-    /**
-     * @notice                  Swaps from arbitrary token routed through USDC for KLIMA
-     * @param sourceToken       Source token provided to swap
-     * @param sourceAmount      Amount of source token to swap
-     * @param klimaAmount       Amount of KLIMA to swap for
-     * @return klimaReceived    Amount of KLIMA received
-     */
-    function swapToKlimaFromOther(address sourceToken, uint256 sourceAmount, uint256 klimaAmount)
-        internal
-        returns (uint256 klimaReceived)
-    {
-        address[] memory path = new address[](3);
-        path[0] = sourceToken;
-        path[1] = C.usdc_bridged();
-        path[2] = C.klima();
-        return _performToExactSwap(0, C.sushiRouter(), path, sourceAmount, klimaAmount);
-    }
 
     /**
      * @notice                  Performs a swap with Retirement Bonds for carbon to retire.
@@ -242,23 +211,7 @@ library LibSwap {
         uint256 sourceAmount,
         uint256 carbonAmount
     ) internal returns (uint256 carbonRecieved) {
-        // Any form of KLIMA should be unwrapped/unstaked before this is called.
-        if (sourceToken == C.klima() || sourceToken == C.sKlima() || sourceToken == C.wsKlima()) {
-            LibTreasurySwap.swapToExact(carbonToken, sourceAmount, carbonAmount);
-            return carbonAmount;
-        }
-
-        // The only other source tokens at this point should be USDC or non-KLIMA and non-Pool tokens
-
-        if (sourceToken == C.usdc_bridged()) {
-            sourceAmount = swapToKlimaFromUsdc(sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
-        } else {
-            sourceAmount =
-                swapToKlimaFromOther(sourceToken, sourceAmount, LibTreasurySwap.getAmountIn(carbonToken, carbonAmount));
-        }
-
-        LibTreasurySwap.swapToExact(carbonToken, sourceAmount, carbonAmount);
-        return carbonAmount;
+        revert("Retirement bonds deprecated");
     }
 
     /* ========== Source Amount View Functions ========== */
@@ -360,35 +313,7 @@ library LibSwap {
         view
         returns (uint256 sourceNeeded)
     {
-        // Return the direct quote in KLIMA first
-        if (sourceToken == C.klima() || sourceToken == C.sKlima()) {
-            return LibTreasurySwap.getAmountIn(carbonToken, amount);
-        }
-
-        // Wrap the amount if using wsKLIMA
-        if (sourceToken == C.wsKlima()) {
-            return LibKlima.toWrappedAmount(LibTreasurySwap.getAmountIn(carbonToken, amount));
-        }
-
-        // Direct swap from USDC.e to KLIMA on Sushi
-        if (sourceToken == C.usdc_bridged()) {
-            uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken, amount);
-
-            address[] memory path = new address[](2);
-            path[0] = C.usdc_bridged();
-            path[1] = C.klima();
-
-            return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
-        }
-        // At this point we only have non USDC and not KLIMA tokens. Route through a source <> USDC pool on Sushi
-        uint256 klimaAmount = LibTreasurySwap.getAmountIn(carbonToken, amount);
-
-        address[] memory path = new address[](3);
-        path[0] = sourceToken;
-        path[1] = C.usdc_bridged();
-        path[2] = C.klima();
-
-        return LibUniswapV2Swap.getAmountIn(C.sushiRouter(), path, klimaAmount);
+        revert("Retirement bonds deprecated");
     }
 
     /* ========== Output Amount View Functions ========== */
