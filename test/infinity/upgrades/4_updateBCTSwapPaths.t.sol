@@ -119,16 +119,6 @@ contract UpdateBCTSwapPathsTest is TestHelper {
         assertTrue(sourceNeeded > 0, "Source amount should be greater than 0");
         assertTrue(sourceNeeded <= 100e6, "Source amount should be within available balance");
 
-        LibRetire.RetireDetails memory retireDetails = LibRetire.RetireDetails({
-            beneficiaryAddress: testUser,
-            beneficiary: "Test Beneficiary",
-            retirementMessage: "Test Retirement",
-            beneficiaryLocation: "Test Location",
-            consumptionCountryCode: "US",
-            consumptionPeriodStart: 0,
-            consumptionPeriodEnd: 0
-        });
-
         vm.startPrank(testUser);
         IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeeded);
 
@@ -138,7 +128,10 @@ contract UpdateBCTSwapPathsTest is TestHelper {
             C.bct(),
             sourceNeeded,
             retireAmount,
-            retireDetails,
+            "Test Entity",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement",
             LibTransfer.From.EXTERNAL
         );
         vm.stopPrank();
@@ -171,16 +164,6 @@ contract UpdateBCTSwapPathsTest is TestHelper {
         assertTrue(sourceNeeded > 0, "Source amount should be greater than 0");
         assertTrue(sourceNeeded <= 100e6, "Source amount should be within available balance");
 
-        LibRetire.RetireDetails memory retireDetails = LibRetire.RetireDetails({
-            beneficiaryAddress: testUser,
-            beneficiary: "Test Beneficiary",
-            retirementMessage: "Test Retirement",
-            beneficiaryLocation: "Test Location",
-            consumptionCountryCode: "US",
-            consumptionPeriodStart: 0,
-            consumptionPeriodEnd: 0
-        });
-
         vm.startPrank(testUser);
         IERC20(C.usdc()).approve(address(INFINITY_ADDRESS), sourceNeeded);
 
@@ -190,7 +173,10 @@ contract UpdateBCTSwapPathsTest is TestHelper {
             C.bct(),
             sourceNeeded,
             retireAmount,
-            retireDetails,
+            "Test Entity",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement",
             LibTransfer.From.EXTERNAL
         );
         vm.stopPrank();
@@ -223,16 +209,6 @@ contract UpdateBCTSwapPathsTest is TestHelper {
         assertTrue(sourceNeeded > 0, "Source amount should be greater than 0");
         assertTrue(sourceNeeded <= 100e9, "Source amount should be within available balance");
 
-        LibRetire.RetireDetails memory retireDetails = LibRetire.RetireDetails({
-            beneficiaryAddress: testUser,
-            beneficiary: "Test Beneficiary",
-            retirementMessage: "Test Retirement",
-            beneficiaryLocation: "Test Location",
-            consumptionCountryCode: "US",
-            consumptionPeriodStart: 0,
-            consumptionPeriodEnd: 0
-        });
-
         vm.startPrank(testUser);
         IERC20(C.klima()).approve(address(INFINITY_ADDRESS), sourceNeeded);
 
@@ -242,7 +218,10 @@ contract UpdateBCTSwapPathsTest is TestHelper {
             C.bct(),
             sourceNeeded,
             retireAmount,
-            retireDetails,
+            "Test Entity",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement",
             LibTransfer.From.EXTERNAL
         );
         vm.stopPrank();
@@ -377,16 +356,6 @@ contract UpdateBCTSwapPathsTest is TestHelper {
             retireAmount
         );
 
-        LibRetire.RetireDetails memory retireDetails = LibRetire.RetireDetails({
-            beneficiaryAddress: testUser,
-            beneficiary: "Test Beneficiary",
-            retirementMessage: "Test Retirement",
-            beneficiaryLocation: "Test Location",
-            consumptionCountryCode: "US",
-            consumptionPeriodStart: 0,
-            consumptionPeriodEnd: 0
-        });
-
         vm.startPrank(testUser);
         IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeeded);
 
@@ -396,7 +365,10 @@ contract UpdateBCTSwapPathsTest is TestHelper {
             C.bct(),
             sourceNeeded,
             retireAmount,
-            retireDetails,
+            "Test Entity",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement",
             LibTransfer.From.EXTERNAL
         );
         uint256 gasUsedBefore = gasBefore - gasleft();
@@ -424,7 +396,10 @@ contract UpdateBCTSwapPathsTest is TestHelper {
             C.bct(),
             sourceNeeded,
             retireAmount,
-            retireDetails,
+            "Test Entity",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement",
             LibTransfer.From.EXTERNAL
         );
         uint256 gasUsedAfter = gasAfter - gasleft();
