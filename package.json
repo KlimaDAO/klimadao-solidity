@@ -30,7 +30,8 @@
     "propose:06_update_retirecmark_facet_tver": "bun multisig-proposals/06-update-retirecmark-facet-tver.ts",
     "propose:07_update_batchretire_facet": "bun multisig-proposals/07-update-batchretire-facet.ts",
     "propose:09_update_native_usdc_toucan_default_redemption": "bun multisig-proposals/09-update-redeem-toucan-pool-facet.ts",
-    "propose:10_update_native_usdc_c3_default_redemption": "bun multisig-proposals/10-update-redeem-c3-pool-facet.ts"
+    "propose:10_update_native_usdc_c3_default_redemption": "bun multisig-proposals/10-update-redeem-c3-pool-facet.ts",
+    "propose:11_update_bct_swap_paths": "bun multisig-proposals/11-update-bct-swap-paths.ts"
   },
   "repository": {
     "type": "git",

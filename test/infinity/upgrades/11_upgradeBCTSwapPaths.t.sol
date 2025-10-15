@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../../../script/11_UpgradeBCTSwapPaths.s.sol";
+import "../../../script/11_upgradeBCTSwapPaths.s.sol";
 import "../../../src/infinity/facets/DiamondLoupeFacet.sol";
 import {C} from "../../../src/infinity/C.sol";
 import {ConstantsGetter} from "../../../src/infinity/mocks/ConstantsGetter.sol";
@@ -31,7 +31,7 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         vm.selectFork(polygonFork);
 
         INFINITY_ADDRESS = payable(vm.envAddress("INFINITY_ADDRESS"));
-        multisig = vm.envAddress("INFINITY_OWNER");
+        multisig = vm.envAddress("CONTRACT_MULTISIG");
 
         addConstantsGetter(INFINITY_ADDRESS);
         constantsFacet = ConstantsGetter(INFINITY_ADDRESS);
