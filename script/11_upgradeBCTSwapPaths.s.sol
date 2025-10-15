@@ -3,14 +3,13 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
 import "../src/infinity/interfaces/IDiamondCut.sol";
-import {Diamond} from "../src/infinity/Diamond.sol";
-import {UpdateBCTSwapPaths} from "../src/infinity/init/UpdateBCTSwapPaths.sol";
+import {UpgradeBCTSwapPaths} from "../src/infinity/init/UpgradeBCTSwapPaths.sol";
 import {RetireCarbonFacet} from "../src/infinity/facets/Retire/RetireCarbonFacet.sol";
 import {console2} from "forge-std/console2.sol";
 import "../test/infinity/HelperContract.sol";
 
-contract UpdateBCTSwapPathsScript is Script, HelperContract {
-    UpdateBCTSwapPaths public updateBCTSwapPathsInit;
+contract UpgradeBCTSwapPathsScript is Script, HelperContract {
+    UpgradeBCTSwapPaths public UpgradeBCTSwapPathsInit;
     RetireCarbonFacet public retireCarbonF;
     IDiamondCut.FacetCut[] public cuts;
 
@@ -21,25 +20,26 @@ contract UpdateBCTSwapPathsScript is Script, HelperContract {
         return cuts;
     }
 
-    function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        address diamond = vm.envAddress("INFINITY_ADDRESS");
+    function run() external returns (bytes memory swapPathsCalldata, bytes memory retireCarbonFacetCalldata) {
+        uint256 proposerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast(proposerPrivateKey);
 
         // Deploy init contract
-        updateBCTSwapPathsInit = new UpdateBCTSwapPaths();
+        UpgradeBCTSwapPathsInit = new UpgradeBCTSwapPaths();
 
         // Deploy updated RetireCarbonFacet
         retireCarbonF = new RetireCarbonFacet();
 
         vm.stopBroadcast();
 
+        delete cuts;
+
         // Generate calldata for multisig - swap paths update
         updateSwapPathsCalldata = abi.encodeWithSelector(
             IDiamondCut.diamondCut.selector,
             new IDiamondCut.FacetCut[](0), // No facet changes
-            address(updateBCTSwapPathsInit),
+            address(UpgradeBCTSwapPathsInit),
             abi.encodeWithSignature("init()")
         );
 
@@ -62,8 +62,8 @@ contract UpdateBCTSwapPathsScript is Script, HelperContract {
             ""
         );
 
-        console2.log("UpdateBCTSwapPaths Init Address:");
-        console2.logAddress(address(updateBCTSwapPathsInit));
+        console2.log("UpgradeBCTSwapPaths Init Address:");
+        console2.logAddress(address(UpgradeBCTSwapPathsInit));
         console2.log("\nSwap Paths Update Calldata:");
         console2.logBytes(updateSwapPathsCalldata);
 
@@ -71,5 +71,7 @@ contract UpdateBCTSwapPathsScript is Script, HelperContract {
         console2.logAddress(address(retireCarbonF));
         console2.log("\nRetireCarbonFacet Update Calldata:");
         console2.logBytes(updateRetireCarbonFacetCalldata);
+
+        return (updateSwapPathsCalldata, updateRetireCarbonFacetCalldata);
     }
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "../AppStorage.sol";
 import "../C.sol";
 
-contract UpdateBCTSwapPaths {
+contract UpgradeBCTSwapPaths {
     AppStorage internal s;
 
     function init() external {

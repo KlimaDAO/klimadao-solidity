@@ -2,27 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../../../script/4_updateBCTSwapPaths.s.sol";
-import "../../../src/infinity/interfaces/IDiamondCut.sol";
-import "../../../src/infinity/facets/DiamondCutFacet.sol";
+import "../../../script/11_UpgradeBCTSwapPaths.s.sol";
 import "../../../src/infinity/facets/DiamondLoupeFacet.sol";
-import "../../../src/infinity/libraries/LibAppStorage.sol";
-import {UpdateBCTSwapPaths} from "../../../src/infinity/init/UpdateBCTSwapPaths.sol";
 import {C} from "../../../src/infinity/C.sol";
-import {LibDiamond} from "../../../src/infinity/libraries/LibDiamond.sol";
-import {OwnershipFacet} from "../../../src/infinity/facets/OwnershipFacet.sol";
 import {ConstantsGetter} from "../../../src/infinity/mocks/ConstantsGetter.sol";
 import {RetireCarbonFacet} from "../../../src/infinity/facets/Retire/RetireCarbonFacet.sol";
 import {RetirementQuoter} from "../../../src/infinity/facets/RetirementQuoter.sol";
-import {LibRetire} from "../../../src/infinity/libraries/LibRetire.sol";
 import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
 import {TestHelper} from "../TestHelper.sol";
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
 
-contract UpdateBCTSwapPathsTest is TestHelper {
-    UpdateBCTSwapPathsScript upgradeScript;
-    address diamond;
-    uint256 deployerPrivateKey;
+contract UpgradeBCTSwapPathsTest is TestHelper {
+    UpgradeBCTSwapPathsScript upgradeScript;
     uint256 polygonFork;
 
     // set by env
@@ -33,16 +24,14 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     RetirementQuoter retirementQuoter;
     RetireCarbonFacet retireCarbonFacet;
 
-    AppStorage s;
-
     function setUp() public {
-        upgradeScript = new UpdateBCTSwapPathsScript();
-        diamond = address(0x1234567890123456789012345678901234567890);
-        deployerPrivateKey = 0xabc123;
+        upgradeScript = new UpgradeBCTSwapPathsScript();
+        string memory polygonRpc = vm.envString("POLYGON_URL");
+        polygonFork = vm.createFork(polygonRpc);
+        vm.selectFork(polygonFork);
 
-        // Set up environment variables
         INFINITY_ADDRESS = payable(vm.envAddress("INFINITY_ADDRESS"));
-        multisig = vm.envAddress("CONTRACT_MULTISIG");
+        multisig = vm.envAddress("INFINITY_OWNER");
 
         addConstantsGetter(INFINITY_ADDRESS);
         constantsFacet = ConstantsGetter(INFINITY_ADDRESS);
@@ -50,31 +39,44 @@ contract UpdateBCTSwapPathsTest is TestHelper {
         retireCarbonFacet = RetireCarbonFacet(INFINITY_ADDRESS);
     }
 
-    function testDeploymentOfUpdateBCTSwapPaths() public {
+    function _performUpgrade() internal {
+        bytes memory swapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
+        bytes memory retireFacetCalldata = upgradeScript.updateRetireCarbonFacetCalldata();
+
+        vm.startPrank(multisig);
+        (bool swapSuccess,) = INFINITY_ADDRESS.call(swapPathsCalldata);
+        require(swapSuccess, "Swap paths update failed");
+        (bool facetSuccess,) = INFINITY_ADDRESS.call(retireFacetCalldata);
+        require(facetSuccess, "RetireCarbonFacet update failed");
+        vm.stopPrank();
+    }
+
+    function testDeploymentOfUpgradeBCTSwapPaths() public {
         upgradeScript.run();
 
-        // Check if UpdateBCTSwapPaths was deployed
-        assertTrue(address(upgradeScript.updateBCTSwapPathsInit()) != address(0), "UpdateBCTSwapPaths not deployed");
+        // Check if UpgradeBCTSwapPaths was deployed
+        assertTrue(address(upgradeScript.UpgradeBCTSwapPathsInit()) != address(0), "UpgradeBCTSwapPaths not deployed");
     }
 
     function testCallDataGeneration() public {
         upgradeScript.run();
 
         bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
+        bytes memory updateRetireCarbonFacetCalldata = upgradeScript.updateRetireCarbonFacetCalldata();
 
         assertTrue(updateSwapPathsCalldata.length > 0, "Update swap paths calldata is empty");
+        assertTrue(updateRetireCarbonFacetCalldata.length > 0, "RetireCarbonFacet update calldata is empty");
     }
 
     function testVerifyUpdatedBCTSwapPaths() public {
         upgradeScript.run();
 
-        IDiamondCut.FacetCut[] memory emptyCut = new IDiamondCut.FacetCut[](0);
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
+        _performUpgrade();
 
-        vm.startPrank(multisig);
-        (bool success, bytes memory returnData) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        vm.stopPrank();
-        assertTrue(success, "Swap paths update failed");
+        DiamondLoupeFacet loupe = DiamondLoupeFacet(INFINITY_ADDRESS);
+        address retireFacetAddress =
+            loupe.facetAddress(RetireCarbonFacet.retireExactCarbonDefault.selector);
+        assertEq(retireFacetAddress, address(upgradeScript.retireCarbonF()), "RetireCarbonFacet not replaced");
 
         // Verify BCT from USDC.e path is [USDC.e, BCT] (2 tokens)
         (uint8[] memory swapDexes, address[] memory ammRouters, address[] memory swapPath) =
@@ -99,10 +101,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     function testRetireBCTWithUSDCe() public {
         upgradeScript.run();
 
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // Setup test with USDC.e
         address testUser = address(0x1234);
@@ -145,10 +144,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     function testRetireBCTWithNativeUSDC() public {
         upgradeScript.run();
 
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // Setup test with native USDC
         address testUser = address(0x1235);
@@ -191,10 +187,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     function testRetireBCTWithKLIMA() public {
         upgradeScript.run();
 
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // Setup test with KLIMA
         address testUser = address(0x1236);
@@ -253,10 +246,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
         );
 
         // Execute upgrade
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // Get quotes after upgrade
         uint256 usdceQuoteAfter = retirementQuoter.getSourceAmountDefaultRetirement(
@@ -282,10 +272,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     function testRetirementBondsReverted() public {
         upgradeScript.run();
 
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // Note: swapWithRetirementBonds is an internal function
         // We can't test it directly, but the retirement bond code path
@@ -296,10 +283,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     function testAllCarbonTokenRetirements() public {
         upgradeScript.run();
 
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         address testUser = address(0x1237);
         uint256 retireAmount = 1e18;
@@ -382,10 +366,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
         vm.stopPrank();
 
         // Execute upgrade
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // Get gas cost after upgrade
         deal(C.usdc_bridged(), testUser, 100e6);
@@ -425,10 +406,7 @@ contract UpdateBCTSwapPathsTest is TestHelper {
     function testRetireSpecificTCO2WithUSDCe() public {
         upgradeScript.run();
 
-        bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        vm.prank(multisig);
-        (bool success,) = INFINITY_ADDRESS.call(updateSwapPathsCalldata);
-        assertTrue(success, "Swap paths update failed");
+        _performUpgrade();
 
         // This test verifies that specific TCO2 retirement path works
         // after swap path update by ensuring BCT redemption works correctly
