@@ -25,10 +25,11 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
     RetireCarbonFacet retireCarbonFacet;
 
     function setUp() public {
-        upgradeScript = new UpgradeBCTSwapPathsScript();
         string memory polygonRpc = vm.envString("POLYGON_URL");
         polygonFork = vm.createFork(polygonRpc);
         vm.selectFork(polygonFork);
+
+        upgradeScript = new UpgradeBCTSwapPathsScript();
 
         INFINITY_ADDRESS = payable(vm.envAddress("INFINITY_ADDRESS"));
         multisig = vm.envAddress("CONTRACT_MULTISIG");
@@ -71,14 +72,27 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
     function testVerifyUpdatedBCTSwapPaths() public {
         upgradeScript.run();
 
+        // BEFORE UPGRADE: Verify current BCT swap paths
+        (uint8[] memory swapDexesBefore, address[] memory ammRoutersBefore, address[] memory swapPathBefore) =
+            constantsFacet.getSwapInfo(C.bct(), C.usdc_bridged());
+
+        // BEFORE: Should be 3-hop path [USDC.e, KLIMA, BCT] or similar
+        assertTrue(swapPathBefore.length >= 3, "BCT swap path before upgrade should be 3+ hops");
+
+        // BEFORE: Verify KLIMA -> BCT direct path exists
+        (uint8[] memory klimaSwapDexesBefore, address[] memory klimaAmmRoutersBefore, address[] memory klimaSwapPathBefore) =
+            constantsFacet.getSwapInfo(C.bct(), C.klima());
+        assertTrue(klimaSwapDexesBefore.length > 0, "KLIMA -> BCT should have direct path before upgrade");
+
         _performUpgrade();
 
+        // AFTER UPGRADE: Verify RetireCarbonFacet replacement
         DiamondLoupeFacet loupe = DiamondLoupeFacet(INFINITY_ADDRESS);
         address retireFacetAddress =
             loupe.facetAddress(RetireCarbonFacet.retireExactCarbonDefault.selector);
         assertEq(retireFacetAddress, address(upgradeScript.retireCarbonF()), "RetireCarbonFacet not replaced");
 
-        // Verify BCT from USDC.e path is [USDC.e, BCT] (2 tokens)
+        // AFTER: Verify BCT from USDC.e path is [USDC.e, BCT] (2 tokens)
         (uint8[] memory swapDexes, address[] memory ammRouters, address[] memory swapPath) =
             constantsFacet.getSwapInfo(C.bct(), C.usdc_bridged());
 
@@ -90,12 +104,87 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         assertEq(swapPath[0], C.usdc_bridged(), "Incorrect first address in swap path for BCT");
         assertEq(swapPath[1], C.bct(), "Incorrect second address in swap path for BCT");
 
-        // Verify KLIMA -> BCT path is deleted (length == 0)
+        // AFTER: Verify KLIMA -> BCT path is deleted (length == 0)
         (uint8[] memory klimaSwapDexes, address[] memory klimaAmmRouters, address[] memory klimaSwapPath) =
             constantsFacet.getSwapInfo(C.bct(), C.klima());
 
         assertEq(klimaSwapDexes.length, 0, "KLIMA -> BCT swap dexes should be empty");
         assertEq(klimaAmmRouters.length, 0, "KLIMA -> BCT AMM routers should be empty");
+        assertEq(klimaSwapPath.length, 0, "KLIMA -> BCT swap path should be empty");
+    }
+
+    function testRetireBCTBeforeAndAfterUpgrade() public {
+        upgradeScript.run();
+
+        address testUser = address(0x1234);
+        uint256 retireAmount = 1e18; // 1 BCT
+
+        // BEFORE UPGRADE: Test retirement with USDC.e works
+        deal(C.usdc_bridged(), testUser, 200e6); // Double amount for both tests
+
+        uint256 sourceNeededBefore = retirementQuoter.getSourceAmountDefaultRetirement(
+            C.usdc_bridged(),
+            C.bct(),
+            retireAmount
+        );
+
+        assertTrue(sourceNeededBefore > 0, "Source amount before upgrade should be greater than 0");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeededBefore);
+
+        // Execute retirement before upgrade
+        retireCarbonFacet.retireExactCarbonDefault(
+            C.usdc_bridged(),
+            C.bct(),
+            sourceNeededBefore,
+            retireAmount,
+            "Test Entity Before",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement Before",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        uint256 balanceAfterFirstRetirement = IERC20(C.usdc_bridged()).balanceOf(testUser);
+        assertTrue(balanceAfterFirstRetirement < 200e6, "USDC.e should have been spent before upgrade");
+
+        // Perform upgrade
+        _performUpgrade();
+
+        // AFTER UPGRADE: Test retirement still works (should be more efficient)
+        uint256 sourceNeededAfter = retirementQuoter.getSourceAmountDefaultRetirement(
+            C.usdc_bridged(),
+            C.bct(),
+            retireAmount
+        );
+
+        assertTrue(sourceNeededAfter > 0, "Source amount after upgrade should be greater than 0");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeededAfter);
+
+        // Execute retirement after upgrade
+        retireCarbonFacet.retireExactCarbonDefault(
+            C.usdc_bridged(),
+            C.bct(),
+            sourceNeededAfter,
+            retireAmount,
+            "Test Entity After",
+            testUser,
+            "Test Beneficiary",
+            "Test Retirement After",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        // Verify second retirement succeeded
+        uint256 finalBalance = IERC20(C.usdc_bridged()).balanceOf(testUser);
+        assertTrue(finalBalance < balanceAfterFirstRetirement, "USDC.e should have been spent after upgrade");
+
+        // After upgrade, the direct route should be more efficient (use less or equal USDC.e)
+        assertTrue(sourceNeededAfter <= sourceNeededBefore, "After upgrade should be more efficient or equal");
     }
 
     function testRetireBCTWithUSDCe() public {
@@ -104,7 +193,7 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         _performUpgrade();
 
         // Setup test with USDC.e
-        address testUser = address(0x1234);
+        address testUser = address(0x1235);
         uint256 retireAmount = 1e18; // 1 BCT
 
         // Deal USDC.e to test user
@@ -147,7 +236,7 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         _performUpgrade();
 
         // Setup test with native USDC
-        address testUser = address(0x1235);
+        address testUser = address(0x1236);
         uint256 retireAmount = 1e18; // 1 BCT
 
         // Deal native USDC to test user
@@ -190,7 +279,7 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         _performUpgrade();
 
         // Setup test with KLIMA
-        address testUser = address(0x1236);
+        address testUser = address(0x1237);
         uint256 retireAmount = 1e18; // 1 BCT
 
         // Deal KLIMA to test user
@@ -335,11 +424,12 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
 
     function testCompareBCTRetirementGasCosts() public {
         upgradeScript.run();
+        _performUpgrade();
 
         address testUser = address(0x1238);
         uint256 retireAmount = 1e18;
 
-        // Get gas cost before upgrade
+        // Test that retirement works after upgrade (gas measurement is informational only)
         deal(C.usdc_bridged(), testUser, 100e6);
         uint256 sourceNeeded = retirementQuoter.getSourceAmountDefaultRetirement(
             C.usdc_bridged(),
@@ -362,45 +452,14 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
             "Test Retirement",
             LibTransfer.From.EXTERNAL
         );
-        uint256 gasUsedBefore = gasBefore - gasleft();
-        vm.stopPrank();
-
-        // Execute upgrade
-        _performUpgrade();
-
-        // Get gas cost after upgrade
-        deal(C.usdc_bridged(), testUser, 100e6);
-        sourceNeeded = retirementQuoter.getSourceAmountDefaultRetirement(
-            C.usdc_bridged(),
-            C.bct(),
-            retireAmount
-        );
-
-        vm.startPrank(testUser);
-        IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeeded);
-
-        uint256 gasAfter = gasleft();
-        retireCarbonFacet.retireExactCarbonDefault(
-            C.usdc_bridged(),
-            C.bct(),
-            sourceNeeded,
-            retireAmount,
-            "Test Entity",
-            testUser,
-            "Test Beneficiary",
-            "Test Retirement",
-            LibTransfer.From.EXTERNAL
-        );
-        uint256 gasUsedAfter = gasAfter - gasleft();
+        uint256 gasUsed = gasBefore - gasleft();
         vm.stopPrank();
 
         // Log gas costs for documentation
-        console.log("Gas used before upgrade:", gasUsedBefore);
-        console.log("Gas used after upgrade:", gasUsedAfter);
+        console.log("Gas used for USDC.e -> BCT retirement:", gasUsed);
 
-        // Note: Gas comparison is for documentation purposes only
-        // Actual gas usage may vary based on pool states and amounts
-        // The upgrade changes the routing from 3-hop to 2-hop for USDC.e -> BCT
+        // Verify retirement succeeded
+        assertTrue(IERC20(C.usdc_bridged()).balanceOf(testUser) < 100e6, "USDC.e should have been spent");
     }
 
     function testRetireSpecificTCO2WithUSDCe() public {
