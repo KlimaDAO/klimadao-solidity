@@ -462,26 +462,122 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         assertTrue(IERC20(C.usdc_bridged()).balanceOf(testUser) < 100e6, "USDC.e should have been spent");
     }
 
-    function testRetireSpecificTCO2WithUSDCe() public {
+    function testRetireSpecificBCTBeforeAndAfterUpgrade() public {
         upgradeScript.run();
 
-        _performUpgrade();
-
-        // This test verifies that specific TCO2 retirement path works
-        // after swap path update by ensuring BCT redemption works correctly
-
         address testUser = address(0x1239);
-        uint256 retireAmount = 1e18;
+        uint256 retireAmount = 1e18; // 1 BCT worth of specific TCO2
 
-        deal(C.usdc_bridged(), testUser, 100e6);
+        // Setup user with double USDC.e for both tests
+        deal(C.usdc_bridged(), testUser, 200e6);
 
-        // Get quote for specific retirement
-        uint256 sourceNeeded = retirementQuoter.getSourceAmountSpecificRetirement(
+        // BEFORE UPGRADE: Test specific retirement with USDC.e
+        uint256 sourceNeededBefore = retirementQuoter.getSourceAmountSpecificRetirement(
             C.usdc_bridged(),
             C.bct(),
             retireAmount
         );
 
+        assertTrue(sourceNeededBefore > 0, "Source amount before upgrade should be greater than 0");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeededBefore);
+
+        // Execute specific retirement before upgrade
+        // Note: Using address(0) for project token means it will use oldest available TCO2s
+        retireCarbonFacet.retireExactCarbonSpecific(
+            C.usdc_bridged(),
+            C.bct(),
+            0xd1960efC6c907D01EF618E29fe9a31910Cfbec66, // Specific project token
+            sourceNeededBefore,
+            retireAmount,
+            "Test Entity Before Specific",
+            testUser,
+            "Test Beneficiary",
+            "Test Specific Retirement Before",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        uint256 balanceAfterFirstRetirement = IERC20(C.usdc_bridged()).balanceOf(testUser);
+        assertTrue(balanceAfterFirstRetirement < 200e6, "USDC.e should have been spent before upgrade");
+
+        // Perform upgrade
+        _performUpgrade();
+
+        // AFTER UPGRADE: Test specific retirement still works
+        uint256 sourceNeededAfter = retirementQuoter.getSourceAmountSpecificRetirement(
+            C.usdc_bridged(),
+            C.bct(),
+            retireAmount
+        );
+
+        assertTrue(sourceNeededAfter > 0, "Source amount after upgrade should be greater than 0");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc_bridged()).approve(address(INFINITY_ADDRESS), sourceNeededAfter);
+
+        // Execute specific retirement after upgrade
+        retireCarbonFacet.retireExactCarbonSpecific(
+            C.usdc_bridged(),
+            C.bct(),
+            0xd1960efC6c907D01EF618E29fe9a31910Cfbec66, // Specific project token
+            sourceNeededAfter,
+            retireAmount,
+            "Test Entity After Specific",
+            testUser,
+            "Test Beneficiary",
+            "Test Specific Retirement After",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        // Verify second retirement succeeded
+        uint256 finalBalance = IERC20(C.usdc_bridged()).balanceOf(testUser);
+        assertTrue(finalBalance < balanceAfterFirstRetirement, "USDC.e should have been spent after upgrade");
+
+        // After upgrade, the direct route should be more efficient (use less or equal USDC.e)
+        assertTrue(sourceNeededAfter <= sourceNeededBefore, "Specific retirement after upgrade should be more efficient or equal");
+    }
+
+    function testRetireSpecificWithNativeUSDC() public {
+        upgradeScript.run();
+        _performUpgrade();
+
+        address testUser = address(0x1241);
+        uint256 retireAmount = 1e18;
+
+        // Test specific retirement with native USDC -> BCT
+        deal(C.usdc(), testUser, 100e6);
+
+        uint256 sourceNeeded = retirementQuoter.getSourceAmountSpecificRetirement(
+            C.usdc(),
+            C.bct(),
+            retireAmount
+        );
+
         assertTrue(sourceNeeded > 0, "Source amount should be greater than 0");
+        assertTrue(sourceNeeded <= 100e6, "Source amount should be within available balance");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc()).approve(address(INFINITY_ADDRESS), sourceNeeded);
+
+        // Execute specific retirement - should convert native USDC to USDC.e then route to BCT
+        retireCarbonFacet.retireExactCarbonSpecific(
+            C.usdc(),
+            C.bct(),
+            0xd1960efC6c907D01EF618E29fe9a31910Cfbec66, // Specific project token
+            sourceNeeded,
+            retireAmount,
+            "Test Entity Native USDC",
+            testUser,
+            "Test Beneficiary",
+            "Test Specific Retirement Native USDC",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        // Verify retirement succeeded
+        assertTrue(IERC20(C.usdc()).balanceOf(testUser) < 100e6, "Native USDC should have been spent");
     }
 }
