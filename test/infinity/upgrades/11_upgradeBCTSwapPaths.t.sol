@@ -580,4 +580,110 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         // Verify retirement succeeded
         assertTrue(IERC20(C.usdc()).balanceOf(testUser) < 100e6, "Native USDC should have been spent");
     }
+
+    function testVerifyKlimaNCTPathDeprecated() public {
+        upgradeScript.run();
+
+        // BEFORE UPGRADE: Verify KLIMA -> NCT direct path exists
+        (uint8[] memory klimaSwapDexesBefore, address[] memory klimaAmmRoutersBefore, address[] memory klimaSwapPathBefore) =
+            constantsFacet.getSwapInfo(C.nct(), C.klima());
+        assertTrue(klimaSwapDexesBefore.length > 0, "KLIMA -> NCT should have direct path before upgrade");
+
+        _performUpgrade();
+
+        // AFTER UPGRADE: Verify KLIMA -> NCT path is deleted (length == 0)
+        (uint8[] memory klimaSwapDexes, address[] memory klimaAmmRouters, address[] memory klimaSwapPath) =
+            constantsFacet.getSwapInfo(C.nct(), C.klima());
+
+        assertEq(klimaSwapDexes.length, 0, "KLIMA -> NCT swap dexes should be empty");
+        assertEq(klimaAmmRouters.length, 0, "KLIMA -> NCT AMM routers should be empty");
+        assertEq(klimaSwapPath.length, 0, "KLIMA -> NCT swap path should be empty");
+    }
+
+    function testRetireNCTWithNativeUSDC() public {
+        upgradeScript.run();
+
+        _performUpgrade();
+
+        // Setup test with native USDC
+        address testUser = address(0x1242);
+        uint256 retireAmount = 1e18; // 1 NCT
+
+        // Deal native USDC to test user
+        deal(C.usdc(), testUser, 100e6);
+
+        // Get quote for retirement
+        uint256 sourceNeeded = retirementQuoter.getSourceAmountDefaultRetirement(
+            C.usdc(),
+            C.nct(),
+            retireAmount
+        );
+
+        assertTrue(sourceNeeded > 0, "Source amount should be greater than 0");
+        assertTrue(sourceNeeded <= 100e6, "Source amount should be within available balance");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc()).approve(address(INFINITY_ADDRESS), sourceNeeded);
+
+        // Execute retirement - should convert to USDC.e then route to NCT
+        retireCarbonFacet.retireExactCarbonDefault(
+            C.usdc(),
+            C.nct(),
+            sourceNeeded,
+            retireAmount,
+            "Test Entity NCT",
+            testUser,
+            "Test Beneficiary",
+            "Test NCT Retirement",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        // Verify retirement succeeded
+        assertTrue(IERC20(C.usdc()).balanceOf(testUser) < 100e6, "Native USDC should have been spent");
+    }
+
+    function testRetireSpecificNCTWithNativeUSDC() public {
+        upgradeScript.run();
+
+        _performUpgrade();
+
+        // Setup test with native USDC
+        address testUser = address(0x1243);
+        uint256 retireAmount = 1e18; // 1 NCT worth of specific TCO2
+
+        // Deal native USDC to test user
+        deal(C.usdc(), testUser, 100e6);
+
+        // Get quote for specific retirement
+        uint256 sourceNeeded = retirementQuoter.getSourceAmountSpecificRetirement(
+            C.usdc(),
+            C.nct(),
+            retireAmount
+        );
+
+        assertTrue(sourceNeeded > 0, "Source amount should be greater than 0");
+        assertTrue(sourceNeeded <= 100e6, "Source amount should be within available balance");
+
+        vm.startPrank(testUser);
+        IERC20(C.usdc()).approve(address(INFINITY_ADDRESS), sourceNeeded);
+
+        // Execute specific retirement - should convert native USDC to USDC.e then route to NCT
+        retireCarbonFacet.retireExactCarbonSpecific(
+            C.usdc(),
+            C.nct(),
+            0x05a28540DE2869281fE8a39882fbadC96Ec4766c, // Specific NCT project token
+            sourceNeeded,
+            retireAmount,
+            "Test Entity Specific NCT",
+            testUser,
+            "Test Beneficiary",
+            "Test Specific NCT Retirement",
+            LibTransfer.From.EXTERNAL
+        );
+        vm.stopPrank();
+
+        // Verify retirement succeeded
+        assertTrue(IERC20(C.usdc()).balanceOf(testUser) < 100e6, "Native USDC should have been spent");
+    }
 }
