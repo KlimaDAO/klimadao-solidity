@@ -7,7 +7,10 @@ import "../../../src/infinity/facets/DiamondLoupeFacet.sol";
 import {C} from "../../../src/infinity/C.sol";
 import {ConstantsGetter} from "../../../src/infinity/mocks/ConstantsGetter.sol";
 import {RetireCarbonFacet} from "../../../src/infinity/facets/Retire/RetireCarbonFacet.sol";
+import {RetireSourceFacet} from "../../../src/infinity/facets/Retire/RetireSourceFacet.sol";
 import {RetirementQuoter} from "../../../src/infinity/facets/RetirementQuoter.sol";
+import {RedeemToucanPoolFacet} from "../../../src/infinity/facets/Bridges/Toucan/RedeemToucanPoolFacet.sol";
+import {RedeemC3PoolFacet} from "../../../src/infinity/facets/Bridges/C3/RedeemC3PoolFacet.sol";
 import {LibTransfer} from "../../../src/infinity/libraries/Token/LibTransfer.sol";
 import {TestHelper} from "../TestHelper.sol";
 import {IERC20} from "oz/token/ERC20/IERC20.sol";
@@ -42,13 +45,13 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
 
     function _performUpgrade() internal {
         bytes memory swapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        bytes memory retireFacetCalldata = upgradeScript.updateRetireCarbonFacetCalldata();
+        bytes memory facetsCalldata = upgradeScript.updateFacetsCalldata();
 
         vm.startPrank(multisig);
         (bool swapSuccess,) = INFINITY_ADDRESS.call(swapPathsCalldata);
         require(swapSuccess, "Swap paths update failed");
-        (bool facetSuccess,) = INFINITY_ADDRESS.call(retireFacetCalldata);
-        require(facetSuccess, "RetireCarbonFacet update failed");
+        (bool facetSuccess,) = INFINITY_ADDRESS.call(facetsCalldata);
+        require(facetSuccess, "Facet update failed");
         vm.stopPrank();
     }
 
@@ -63,10 +66,10 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         upgradeScript.run();
 
         bytes memory updateSwapPathsCalldata = upgradeScript.updateSwapPathsCalldata();
-        bytes memory updateRetireCarbonFacetCalldata = upgradeScript.updateRetireCarbonFacetCalldata();
+        bytes memory updateFacetsCalldata = upgradeScript.updateFacetsCalldata();
 
         assertTrue(updateSwapPathsCalldata.length > 0, "Update swap paths calldata is empty");
-        assertTrue(updateRetireCarbonFacetCalldata.length > 0, "RetireCarbonFacet update calldata is empty");
+        assertTrue(updateFacetsCalldata.length > 0, "Facet update calldata is empty");
     }
 
     function testVerifyUpdatedBCTSwapPaths() public {
@@ -91,6 +94,26 @@ contract UpgradeBCTSwapPathsTest is TestHelper {
         address retireFacetAddress =
             loupe.facetAddress(RetireCarbonFacet.retireExactCarbonDefault.selector);
         assertEq(retireFacetAddress, address(upgradeScript.retireCarbonF()), "RetireCarbonFacet not replaced");
+
+        // AFTER UPGRADE: Verify RetirementQuoter replacement
+        address quoterFacetAddress =
+            loupe.facetAddress(RetirementQuoter.getSourceAmountDefaultRetirement.selector);
+        assertEq(quoterFacetAddress, address(upgradeScript.retirementQuoterF()), "RetirementQuoter not replaced");
+
+        // AFTER UPGRADE: Verify RetireSourceFacet replacement
+        address retireSourceFacetAddress =
+            loupe.facetAddress(RetireSourceFacet.retireExactSourceDefault.selector);
+        assertEq(retireSourceFacetAddress, address(upgradeScript.retireSourceF()), "RetireSourceFacet not replaced");
+
+        // AFTER UPGRADE: Verify RedeemToucanPoolFacet replacement
+        address redeemToucanFacetAddress =
+            loupe.facetAddress(RedeemToucanPoolFacet.toucanRedeemExactCarbonPoolDefault.selector);
+        assertEq(redeemToucanFacetAddress, address(upgradeScript.redeemToucanPoolF()), "RedeemToucanPoolFacet not replaced");
+
+        // AFTER UPGRADE: Verify RedeemC3PoolFacet replacement
+        address redeemC3FacetAddress =
+            loupe.facetAddress(RedeemC3PoolFacet.c3RedeemPoolDefault.selector);
+        assertEq(redeemC3FacetAddress, address(upgradeScript.redeemC3PoolF()), "RedeemC3PoolFacet not replaced");
 
         // AFTER: Verify BCT from USDC.e path is [USDC.e, BCT] (2 tokens)
         (uint8[] memory swapDexes, address[] memory ammRouters, address[] memory swapPath) =
