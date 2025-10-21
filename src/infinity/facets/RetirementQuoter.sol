@@ -41,13 +41,8 @@ contract RetirementQuoter {
 
         (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
 
-        uint256 sourceAmount;
-
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon) {
-            sourceAmount = LibSwap.getSourceAmountFromRetirementBond(handledSourceToken, carbonToken, totalCarbon);
-        } else {
-            sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
-        }
+        // Retirement bonds deprecated - removed bond liquidity check
+        uint256 sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
 
         uint256 additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, sourceAmount);
 
@@ -65,13 +60,8 @@ contract RetirementQuoter {
 
         (address originalSourceToken, address handledSourceToken) = handleSourceToken(sourceToken);
 
-        uint256 sourceAmount;
-
-        if (IERC20(carbonToken).balanceOf(C.klimaRetirementBond()) >= totalCarbon) {
-            sourceAmount = LibSwap.getSourceAmountFromRetirementBond(handledSourceToken, carbonToken, totalCarbon);
-        } else {
-            sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
-        }
+        // Retirement bonds deprecated - removed bond liquidity check
+        uint256 sourceAmount = LibSwap.getSourceAmount(handledSourceToken, carbonToken, totalCarbon);
 
         uint256 additionalSwapAmount = calculateAdditionalSwapFee(originalSourceToken, sourceAmount);
 
