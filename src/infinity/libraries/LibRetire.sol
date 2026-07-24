@@ -477,4 +477,16 @@ library LibRetire {
         AppStorage storage s = LibAppStorage.diamondStorage();
         projectTokenAddress = s.a[account].retirements[retirementIndex].projectTokenAddress;
     }
+
+    // Simple fix; given polygon deprecation
+    function isBlacklisted(address account) internal view returns (bool) {
+        if (account == C.retirementV1Aggregator()) {
+            return true;
+        }
+        return false;
+    }
+
+    function enforceNotBlacklisted(address account) internal view {
+        require(!isBlacklisted(account), "Caller is blacklisted");
+    }
 }

@@ -64,6 +64,8 @@ library C {
     address constant COOREST_POCC_TOKEN = 0x51cF819352FC536aD8A84214922615C160BB497D;
     address constant COOREST_CCO2_TOKEN = 0x82B37070e43C1BA0EA9e2283285b674eF7f1D4E2;
 
+    address constant RETIREMENT_V1_AGGREGATOR = 0xEde3bd57a04960E6469B70B4863cE1c9d9363Cb8;
+
     function toucanCert() internal pure returns (address) {
         return TOUCAN_RETIRE_CERT;
     }
@@ -194,5 +196,9 @@ library C {
 
     function coorestCCO2Token() internal pure returns (address) {
         return COOREST_CCO2_TOKEN;
+    }
+
+    function retirementV1Aggregator() internal pure returns (address) {
+        return RETIREMENT_V1_AGGREGATOR;
     }
 }

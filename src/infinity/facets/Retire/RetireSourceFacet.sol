@@ -42,6 +42,8 @@ contract RetireSourceFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint256 retirementIndex) {
+        LibRetire.enforceNotBlacklisted(msg.sender);
+        
         require(maxAmountIn > 0, "Cannot retire zero tonnes");
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
@@ -106,6 +108,8 @@ contract RetireSourceFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint256 retirementIndex) {
+        LibRetire.enforceNotBlacklisted(msg.sender);
+        
         require(maxAmountIn > 0, "Cannot retire zero tonnes");
 
         LibTransfer.receiveToken(IERC20(sourceToken), maxAmountIn, msg.sender, fromMode);
