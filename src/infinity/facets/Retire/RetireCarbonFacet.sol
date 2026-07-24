@@ -47,6 +47,8 @@ contract RetireCarbonFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint256 retirementIndex) {
+        LibRetire.enforceNotBlacklisted(msg.sender);
+
         require(retireAmount > 0, "Cannot retire zero tonnes");
 
         uint256 totalCarbon = LibRetire.getTotalCarbon(retireAmount);
@@ -127,6 +129,8 @@ contract RetireCarbonFacet is ReentrancyGuard {
         string memory retirementMessage,
         LibTransfer.From fromMode
     ) external payable nonReentrant returns (uint256 retirementIndex) {
+        LibRetire.enforceNotBlacklisted(msg.sender);
+        
         require(retireAmount > 0, "Cannot retire zero tonnes");
 
         uint256 totalCarbon = LibRetire.getTotalCarbonSpecific(poolToken, retireAmount);
